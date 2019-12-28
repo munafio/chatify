@@ -1,0 +1,912 @@
+body{
+	margin: 0;
+}
+/*internet connection*/
+.internet-connection{
+    display: none;
+    background: rgba(0, 0, 0, 0.76);
+    position: absolute;
+    top: 43px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    padding: 4px;
+    color: #fff;
+}
+.internet-connection span{
+    display: none;
+}
+
+/*green background RGBA*/
+.successBG-rgba{background: rgba(54, 180, 36, 0.76) !important;}
+
+/* app scroll*/
+.app-scroll::-webkit-scrollbar{
+    width:5px;
+    height:5px;
+    border-radius: 4px;
+    background: transparent;
+    transition: all 0.3s ease;
+}
+.app-scroll-thin::-webkit-scrollbar{
+    width:1px;
+    height:1px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+.app-scroll::-webkit-scrollbar-thumb,
+.app-scroll-thin::-webkit-scrollbar-thumb{
+    border-radius: 4px;
+}
+.messenger{
+    display: inline-flex;
+    width: 100%;
+    height: 100%;
+    font-family: sans-serif;
+}
+.messenger-listView{
+  position: relative;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+	z-index: 1;
+	background: transparent;
+  width: 45%;
+  min-width: 200px;
+  overflow: auto;
+}
+.messenger-listView .m-header{
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 0px !important;
+}
+.messenger-listView .m-header>nav{
+    margin: 10px;
+}
+.messenger-listView .m-body{
+    margin-top: 126px;
+}
+.messenger-messagingView{
+	position: relative;
+	overflow: hidden;
+	width: 100%;
+}
+.messenger-messagingView .m-body{
+    padding-top: 15px;
+    height: calc(100% - 90px);
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+.m-header{
+	padding: 10px 15px;
+	font-weight: 600;
+	background: transparent;
+}
+.m-header-right {
+  display: inline-flex;
+  float: right;
+}
+.m-header-messaging{
+  background: #fff;
+	box-shadow: 0px 5px 6px rgba(0, 0, 0, 0.06);
+}
+.m-header svg{
+	margin: 0px 8px;
+  font-size: 16px;
+  transition: transform .12s;
+}
+.m-header svg:active{
+	transform: scale(.9);
+}
+.messenger-search{
+	margin: 0px 10px;
+	width: calc(100% - 20px);
+	border: none;
+	padding: 3px 7px;
+	border-radius: 3px;
+	outline: none;
+}
+.messenger-listView-tabs{
+	display: inline-flex;
+	width: 100%;
+	margin-top: 10px;
+	background-color: transparent;
+	box-shadow: 0px 5px 6px rgba(0, 0, 0, 0.06);
+}
+.messenger-listView-tabs a{
+	width: 100%;
+	text-align: center;
+	padding: 10px;
+	text-decoration: none;
+	background-color: transparent;
+	transition: background .3s;
+}
+.messenger-listView-tabs a:hover,
+.messenger-listView-tabs a:focus{
+	text-decoration: none;
+}
+.messenger-tab{
+	overflow: auto;
+	height: calc(100% - 126.2px);
+	display: none;
+}
+.add-to-favorite{
+    display: none;
+}
+.add-to-favorite svg{
+	color: rgba(180, 180, 180, 0.52) !important;
+}
+.favorite-added svg{
+	color: #FFC107 !important;
+}
+.favorite svg{
+    color: #FFC107 !important;
+}
+.show{
+	display: block;
+}
+.hide{
+	display: none;
+}
+.messenger-list-item{
+	margin: 0;
+	width: 100%;
+  cursor: pointer;
+  transition: background .10s;
+}
+.m-list-active span,
+.m-list-active  p{
+	color: #fff !important;
+}
+
+.messenger-list-item td{
+	padding: 10px;
+}
+.messenger-list-item tr>td:first-child{
+	padding-right: 0;
+	width: 55px;
+}
+.messenger-list-item td p{
+	margin-bottom: 4px;
+	font-size: 14px;
+	font-weight: 600;
+}
+.messenger-list-item td p span{
+	float: right;
+}
+.messenger-list-item td span{
+	color: #cacaca;
+	font-weight: 400;
+	font-size: 13px;
+}
+.messenger-list-item td b{
+	float: right;
+	color: #fff;
+	padding: 0px 4px;
+	border-radius: 20px;
+	font-size: 13px;
+}
+.avatar{
+    text-align: center;
+    border-radius: 100%;
+    overflow: hidden;
+    background-color: #eee;
+    background-image: url('');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center center;
+}
+.av-l{
+	width: 100px;
+    height: 100px;
+}
+.av-m{
+	width: 45px;
+    height: 45px;
+}
+.av-s{
+	width: 32px;
+    height: 32px;
+}
+.messenger-favorites{
+	padding: 10px;
+    overflow: auto;
+    white-space: nowrap;
+}
+.messenger-favorites>div{
+	display: inline-block;
+	text-align: center;
+    transition: transform .3s;
+    cursor: pointer;
+}
+.messenger-favorites>div p{
+    font-size: 12px;
+    margin: 8px 0px;
+    margin-bottom: 0px;
+}
+.messenger-favorites div.avatar{
+  border: 2px solid #fff;
+    margin: 0px 4px;
+}
+.messenger-favorites>div:active{
+	transform: scale(.9);
+}
+.messenger-title{
+	margin: 0;
+    padding: 10px;
+    padding-bottom: 0px;
+    text-transform: uppercase;
+    color: #aeaeb7;
+    font-size: 12px;
+    font-weight: 600;
+}
+.messenger-infoView{
+	display: none;
+    padding-top: 7px;
+    overflow: auto;
+    width: 40%;
+    min-width: 200px;
+}
+.messenger-infoView nav a{
+    text-decoration: none;
+    padding: 5px 8px;
+    font-size: 18px;
+}
+.messenger-infoView>div{
+	margin: auto;
+    margin-top: 8%;
+    text-align: center;
+}
+.messenger-infoView>p{
+    text-align: center;
+    margin: auto;
+    margin-top: 15px;
+    font-size: 18px;
+    font-weight: 600;
+}
+.messenger-infoView-btns a{
+	display: block;
+    text-decoration: none !important;
+    padding: 5px 10px;
+    margin: 0% 10%;
+    border-radius: 3px;
+    font-size: 14px;
+    transition: background .3s;
+}
+.messenger-infoView-btns a.default:hover,{
+	background: #f0f6ff;
+}
+.messenger-infoView-btns a.danger{
+	color: #ff5555;
+}
+.messenger-infoView-btns a.danger:hover{
+	background: rgba(255, 85, 85, 0.11);
+}
+.shared-photo{
+    border-radius: 3px;
+    background: #f7f7f7;
+    height: 120px;
+    overflow: hidden;
+    display: inline-block;
+    margin: 0px 1px;
+    width: calc(50% - 12px);
+    background-position: center center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
+.shared-photo img{
+	width: auto;
+	height: 100%
+}
+.messenger-infoView-shared{
+    display: none;
+}
+.messenger-infoView-shared .messenger-title{
+	padding-bottom: 10px;
+}
+.messenger-infoView-btns .delete-conversation{
+    display: none;
+}
+.message-card{
+	display: inline-flex;
+    margin: 2px 15px;
+    width: calc(100% - 30px);
+}
+.message-card div{
+	margin-top: 0px;
+}
+.message-card p{
+    margin: 0;
+    padding: 6px 15px;
+    padding-bottom: 5px;
+    max-width: 80%;
+    border-radius: 20px;
+    word-break: break-word;
+}
+.message-card p sub{
+	display: inline-block;
+    font-size: 11px;
+}
+.message-card p sub:before {
+	content: '';
+    background: transparent;
+    width: 10px;
+    height: 10px;
+    display: inline-block;
+}
+.mc-sender{
+	direction: rtl;
+}
+.mc-sender p{
+	direction: ltr;
+  color: #fff !important;
+}
+.mc-sender p sub{
+	color: rgba(255, 255, 255, 0.67);
+}
+
+.mc-error p{
+    background: rgba(255, 0, 0, 0.27) !important;
+    color: #ff0000 !important;
+}
+.mc-error p sub{
+    color: #ff0000 !important;
+}
+.listView-x,
+.show-listView{
+	display: none;
+}
+.messenger-sendCard{
+    display: none;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+}
+.messenger-sendCard form{
+	width: 100%;
+	display: inline-flex;
+	margin: 0;
+}
+.messenger-sendCard input[type=file]{
+	display: none;
+}
+.messenger-sendCard button,
+.messenger-sendCard button:active,
+.messenger-sendCard button:focus{
+	border: none;
+	outline: none;
+    background: none;
+    padding: 0;
+    margin: 0;
+}
+.messenger-sendCard label{
+	margin: 0;
+}
+.messenger-sendCard svg{
+    margin: 9px 10px;
+    color: #bdcbd6;
+    cursor: pointer;
+    font-size: 21px;
+    transition: transform .15s;
+}
+
+.messenger-sendCard svg:active{
+	transform: scale(.9);
+}
+.m-send{
+	font-size: 14px;
+	width: 100%;
+    border: none;
+    padding: 10px 0px;
+    outline: none;
+    resize: none;
+    background: transparent;
+    font-family: sans-serif;
+    height: 36px;
+    max-height: 200px;
+}
+.attachment-preview{
+	position: relative;
+	padding: 10px;
+}
+.attachment-preview>p{
+	margin: 0;
+    font-weight: 600;
+    padding: 0px;
+    padding-top: 10px;
+}
+.attachment-preview>p>svg{
+	font-size: 16px;
+    margin: 0;
+    margin-bottom: -1px;
+    color: #737373;
+}
+.attachment-preview svg:active{
+	transform: none;
+}
+.image-file{
+    cursor: pointer;
+	width: 140px;
+    height: 70px;
+    border-radius: 4px;
+    background-color: #f7f7f7;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+.attachment-preview>svg:first-child{
+	position: absolute;
+    background: rgba(0, 0, 0, 0.33);
+    width: 20px;
+    height: 20px;
+    padding: 3px;
+    border-radius: 100%;
+    font-size: 16px;
+    margin: 0;
+    top: 10px;
+    color: #fff;
+}
+#message-form>button{
+	height: 40px;
+}
+.file-download{
+	font-size: 12px;
+    display: block;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: rgba(0, 0, 0, 0.03);
+    padding: 2px 8px;
+    margin-top: 10px;
+    border-radius: 20px;
+    transition: transform .3s, background .3s
+}
+.file-download:hover,
+.file-download:focus{
+	color: #fff;
+    text-decoration: none;
+	background: rgba(0, 0, 0, 0.08);
+}
+.file-download:active{
+	transform: scale(.95);
+}
+.typing-indicator{
+    display: none;
+}
+.messages{
+    padding: 5px 0px;
+}
+.message-hint{
+    margin: 0;
+    text-align: center;
+}
+.message-hint span{
+    background: rgba(154, 161, 170, 0.13);
+    padding: 3px 10px;
+    border-radius: 20px;
+    color: rgb(135, 147, 164);
+}
+.upload-avatar-details{
+    font-size: 14px;
+    color: #949ba5;
+    display: none;
+}
+.upload-avatar-preview{
+    position: relative;
+    border: 1px solid #e0e0e0;
+    margin: 20px auto;
+}
+.upload-avatar-loading{
+    position: absolute;
+    top: calc(50% - 21px);
+    margin: 0;
+    left: calc(50% - 20px);
+}
+.divider{
+    margin: 15px;
+}
+.update-messengerColor{
+
+}
+.update-messengerColor a{
+    width: 30px;
+    height: 30px;
+    border-radius: 20px;
+    display: inline-block;
+    cursor: pointer;
+}
+.m-color-active{
+  border: 3px solid rgba(255, 255, 255, 0.5);
+}
+.update-messengerColor a{
+  transition: transform .15s, border .15s;
+}
+.update-messengerColor a:active{
+  transform: scale(.9);
+}
+.messengerColor-1{
+  background-color: #2180f3;
+}
+.messengerColor-2{
+  background-color: #2196F3;
+}
+.messengerColor-3{
+  background-color: #00BCD4;
+}
+.messengerColor-4{
+  background-color: #3F51B5;
+}
+.messengerColor-5{
+  background-color: #673AB7;
+}
+.messengerColor-6{
+  background-color: #4CAF50;
+}
+.messengerColor-7{
+  background-color: #FFC107;
+}
+.messengerColor-8{
+  background-color: #FF9800;
+}
+.messengerColor-9{
+  background-color: #ff2522;
+}
+.messengerColor-10{
+  background-color: #9C27B0;
+}
+.dark-mode-switch{
+  margin: 0px 5px;
+  cursor: pointer;
+}
+.activeStatus{
+  width: 12px;
+  height: 12px;
+  background: #4CAF50;
+  border-radius: 20px;
+  position: absolute;
+  bottom: 12%;
+  right: 6%;
+  transition: border .10s;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+***********************************************
+* App Buttons
+***********************************************
+*/
+.app-btn{
+    cursor: pointer;
+    border: none;
+    padding: 3px 15px;
+    border-radius: 20px;
+    margin: 1px;
+    font-size: 14px;
+    display: inline-block;
+    outline: none;
+    text-decoration: none;
+    transition: all .3s;
+    color: rgb(33, 128, 243);
+}
+.app-btn:hover,
+.app-btn:focus{
+    color: rgb(33, 128, 243);
+    outline: none;
+    text-decoration: none;
+}
+.app-btn:active{
+    transform: scale(.9);
+}
+.a-btn-light{
+    background: #f1f1f1;
+    color: #333;
+}
+.a-btn-light:hover,
+.a-btn-light:focus{
+    color: #333;
+    background: #e4e4e4;
+}
+.a-btn-primary{
+    background: #0976d6;
+    color: #fff;
+}
+.a-btn-primary:hover,
+.a-btn-primary:focus{
+    background: #0085ef;
+    color: #fff;
+}
+.a-btn-warning{
+    background: #FFC107;
+    color: #fff;
+}
+.a-btn-warning:hover,
+.a-btn-warning:focus{
+    background: #ffa726;
+    color: #fff;
+}
+.a-btn-success{
+    background: #3fc380;
+    color: #fff;
+}
+.a-btn-success:hover,
+.a-btn-success:focus{
+    background: #2ecc71;
+    color: #fff;
+}
+.a-btn-danger{
+    background: #ea1909;
+    color: #fff;
+}
+.a-btn-danger:hover,
+.a-btn-danger:focus{
+    color: #fff;
+    background: #b70d00;
+}
+.btn-disabled{
+    opacity: .5;
+}
+/*
+***********************************************
+* App Modal
+***********************************************
+*/
+.app-modal{
+    display: none;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.53);
+    z-index: 2;
+}
+.app-modal-container{
+    position: absolute;
+    top: 20%;
+    width: 100%;
+    padding: 10px;
+}
+.app-modal-card{
+    width: auto;
+    max-width: 400px;
+    margin: auto;
+    padding: 20px 15px;
+    border-radius: 5px;
+    text-align: center;
+    box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.27);
+    transform: scale(0);
+}
+.app-modal-header{
+    font-weight: 500;
+}
+.app-modal-footer{
+    margin-top: 10px;
+}
+.app-show-modal{
+    transform: scale(1);
+    animation: show_modal .15s;
+}
+/* modal animation */
+@keyframes show_modal{
+    from{
+        transform: scale(0);
+    }to{
+        transform: scale(1);
+    }
+}
+
+
+
+/*
+***********************************************
+* Placeholder loading
+***********************************************
+*/
+.loadingPlaceholder-wrapper {
+  position: relative;
+}
+
+.loadingPlaceholder-body div,
+.loadingPlaceholder-header tr td div {
+  background-repeat: no-repeat;
+  background-size: 800px 104px;
+  height: 104px;
+  position: relative;
+}
+
+.loadingPlaceholder-body div {
+  position: absolute;
+  right: 0px;
+  left: 0px;
+  top: 0px;
+}
+
+div.loadingPlaceholder-avatar {
+  height: 45px !important;
+  width: 45px;
+  margin: 10px;
+  border-radius: 60px;
+}
+div.loadingPlaceholder-name {
+  height: 15px !important;
+  margin-bottom: 10px;
+  width: 150px;
+  border-radius: 2px;
+}
+
+div.loadingPlaceholder-date {
+  height: 10px !important;
+  width: 106px;
+  border-radius: 2px;
+}
+/*
+***********************************************
+* Image modal box
+***********************************************
+*/
+.imageModal {
+  display: none; 
+  position: fixed; 
+  z-index: 1; 
+  padding-top: 100px;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%; 
+  overflow: auto; 
+  background-color: rgb(0,0,0);
+  background-color: rgba(0,0,0,0.9); 
+}
+.imageModal-content {
+  margin: auto;
+  display: block;
+  width: 80%;
+  max-width: 700px;
+}
+.imageModal-content {  
+  -webkit-animation-name: zoom;
+  -webkit-animation-duration: 0.6s;
+  animation-name: zoom;
+  animation-duration: 0.6s;
+}
+
+@-webkit-keyframes zoom {
+  from {-webkit-transform:scale(0)} 
+  to {-webkit-transform:scale(1)}
+}
+@keyframes zoom {
+  from {transform:scale(0)} 
+  to {transform:scale(1)}
+}
+
+.imageModal-close {
+  position: absolute;
+  top: 15px;
+  right: 35px;
+  color: #f1f1f1;
+  font-size: 40px;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.imageModal-close:hover,
+.imageModal-close:focus {
+  color: #bbb;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+
+/*
+***********************************************
+* Typing (jumping) dots animation and style
+***********************************************
+*/
+.dot {
+  width: 8px;
+  height: 8px;
+  background: #bcc1c6;
+  display: inline-block;
+  border-radius: 50%;
+  right: 0px;
+  bottom: 0px;
+  position: relative;
+  animation: jump 1s infinite;
+}
+
+.typing-dots .dot-1 {
+  -webkit-animation-delay: 100ms;
+  animation-delay: 100ms;
+}
+
+.typing-dots .dot-2 {
+  -webkit-animation-delay: 200ms;
+  animation-delay: 200ms;
+}
+
+.typing-dots .dot-3 {
+  -webkit-animation-delay: 300ms;
+  animation-delay: 300ms;
+}
+
+@keyframes jump {
+   0%   {bottom: 0px;}
+   20%  {bottom: 5px;}
+   40%  {bottom: 0px;}
+}
+/*
+*****************************************
+* Responsive Design
+*****************************************
+*/
+@media (max-width: 1060px){
+	.messenger-infoView {
+	    position: fixed;
+	    right: 0;
+	    top: 0;
+	    bottom: 0;
+	    max-width: 334px;
+	}
+}
+@media (max-width: 980px){
+	.messenger-listView{
+		position: fixed;
+	    left: 0;
+	    top: 0;
+	    bottom: 0;
+	    max-width: 334px;
+	}
+	.listView-x{
+		display: block;
+	}
+	.show-listView{
+		display: inline-block;
+	}
+}
+@media (max-width: 680px){
+	.messenger-messagingView{
+		position: fixed;
+ 	    top: 0;
+	    left: 0;
+	    height: 100%;
+	}
+	.messenger-listView,
+	.messenger-infoView{
+		display: none;
+	    width:100%;
+	    max-width: unset;
+	}
+	.listView-x{
+		display: none;
+	}
+}
+@media (min-width: 680px){
+	.messenger-listView{
+		display: unset;
+	}
+}
+@media only screen and (max-width: 700px){
+  .imageModal-content {
+    width: 100%;
+  }
+}
