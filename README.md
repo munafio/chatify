@@ -67,14 +67,24 @@ Create a shourtcut or a symlink to the `storage` folder into the `public` folder
 $ php artisan storage:link
 ```
 
-#### 6. This step for Laravel Version (<=5.4) that doesn't support package auto-discovery
-Add the following provider into `config/app.php` under package's providers :
+#### 6. App config
+Add the following provider into `config/app.php` providers, for Laravel `<=v5.4` that doesn't support package auto-discovery :
 ```php
 ...
 /*
 * Package Service Providers...
 */
 \Chatify\ChatifyServiceProvider::class,
+...
+```
+
+and the following alias into  into `config/app.php` aliases:
+```php
+...
+/*
+* Package Service Providers...
+*/
+'Chatify' => Chatify\Facades\ChatifyMessenger::class,
 ...
 ```
 
