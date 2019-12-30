@@ -69,7 +69,7 @@ $ php artisan storage:link
 
 #### 6. This step for Laravel Version (<=5.4) that doesn't support package auto-discovery
 Add the following provider into `config/app.php` under package's providers :
-```sh
+```php
 ...
 /*
 * Package Service Providers...
