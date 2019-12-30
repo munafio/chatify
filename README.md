@@ -32,7 +32,11 @@ It is a Laravel package to add a complete real-time chat system to your applicat
 
 # Installation
 Video Tutorial on YouTube [SOON]
-##### Steps :
+
+OR
+
+Follow the steps below :
+
 #### 1. Install the package in your Laravel app
 ```sh
 $ composer require munafio/chatify
