@@ -5,7 +5,7 @@ namespace Chatify;
 use Chatify\Http\Models\Message;
 use Chatify\Http\Models\Favorite;
 use Pusher\Pusher;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use Exception;
 
 class ChatifyMessenger
@@ -13,7 +13,7 @@ class ChatifyMessenger
     /**
      * Allowed extensions to upload attachment
      * [Images / Files]
-     * 
+     *
      * @var
      */
     public static $allowed_images = array('png','jpg','jpeg','gif');
@@ -99,7 +99,7 @@ class ChatifyMessenger
     public function pusherAuth($channelName, $socket_id, $data = []){
         return $this->pusher()->socket_auth($channelName, $socket_id, $data);
     }
-    
+
     /**
      * Fetch message by id and return the message card
      * view as a response.
@@ -110,7 +110,7 @@ class ChatifyMessenger
     public function fetchMessage($id){
         $attachment = $attachment_type = $attachment_title = null;
         $msg = Message::where('id',$id)->first();
-        
+
         // If message has attachment
         if($msg->attachment){
             // Get attachment and attachment title
@@ -122,7 +122,7 @@ class ChatifyMessenger
             $ext = pathinfo($attachment, PATHINFO_EXTENSION);
             $attachment_type = in_array($ext,$this->getAllowedImages()) ? 'image' : 'file';
         }
-        
+
         return [
             'id' => $msg->id,
             'from_id' => $msg->from_id,
@@ -246,7 +246,7 @@ class ChatifyMessenger
         return Favorite::where('user_id', Auth::user()->id)
                         ->where('favorite_id', $user_id)->count() > 0
                         ? true : false;
-        
+
     }
 
     /**
@@ -294,7 +294,7 @@ class ChatifyMessenger
             }
         }
         return $images;
-        
+
     }
 
     /**
@@ -319,9 +319,7 @@ class ChatifyMessenger
             return 1;
         }catch(Exception $e) {
             return 0;
-        } 
+        }
     }
-    
-}
 
-?>
+}

@@ -7,10 +7,10 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Response;
 use Chatify\Http\Models\Message;
 use Chatify\Http\Models\Favorite;
-use Chatify;
+use Chatify\Facades\ChatifyMessenger as Chatify;
 use App\User;
-use Auth;
-use Str;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 
 class MessagesController extends Controller
@@ -100,7 +100,7 @@ class MessagesController extends Controller
     {
         $path = storage_path() . '/app/public/' . config('chatify.attachments.folder') . '/' . $fileName;
         if (file_exists($path)) {
-            return \Response::download($path, $fileName);
+            return Response::download($path, $fileName);
         } else {
             return abort(404, "Sorry, File does not exist in our server or may have been deleted!");
         }
@@ -358,7 +358,7 @@ class MessagesController extends Controller
     }
 
     /**
-     * Get shared photos 
+     * Get shared photos
      *
      * @param Request $request
      * @return void

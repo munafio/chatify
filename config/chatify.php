@@ -22,7 +22,7 @@ return [
     | This value is the path of the package or in other meaning, it is the prefix
     | of all the registered routes in this package.
     |
-    | By default : your.app/chatify
+    | e.g. : app.test/chatify
     */
 
     'path' => env('CHATIFY_PATH', 'chatify'),
@@ -83,7 +83,7 @@ return [
     |
     | This array contains the important default values that used in this package.
     |
-    | The first value in this array is the default folder name in the storage  
+    | The first value in this array is the default folder name in the storage
     | which is all the attachments will be stored in.
     | This is also going to be used in attachments urls in the views.
     |
