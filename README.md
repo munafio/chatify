@@ -9,6 +9,8 @@ It is a Laravel package to add a complete real-time chat system to your applicat
 - Pusher Api Account.
 
 # Features
+ <img src="https://1.bp.blogspot.com/-KSPiLL3tq_o/XgpLmCgWAuI/AAAAAAAAA6w/n6m4k2MC1joNMgKS6Vpki2-3z92HXUvQwCLcBGAsYHQ/s1600/Screenshot%2Bfrom%2B2019-12-30%2B21-59-55.png" style="width:50%;" />
+
  - Users / groups(soon) chat system.
  - Real-time contacts list updates.
  - Favorites contacts list (Like stories style) and add to favorite button.
