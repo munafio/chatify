@@ -79,7 +79,7 @@ $ php artisan storage:link
 ```
 
 #### 6. App config
-Add the following provider into `config/app.php` providers, for Laravel `<=v5.4` that doesn't support package auto-discovery :
+For Laravel `<=v5.4` that doesn't support package auto-discovery, add the following provider into `config/app.php` providers array list :
 ```php
 ...
 /*
@@ -93,7 +93,7 @@ and the following alias into  into `config/app.php` aliases:
 ```php
 ...
 /*
-* Package Service Providers...
+* Class Aliases
 */
 'Chatify' => Chatify\Facades\ChatifyMessenger::class,
 ...
