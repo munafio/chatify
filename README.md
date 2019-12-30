@@ -24,7 +24,7 @@ It is a Laravel package to add a complete real-time chat system to your applicat
    with simple and wonderful UI design.
 
 # Demo
-Soon
+- Demo App [Click Here](https://github.com/munafio/chatify-demo)
 
 # Installation
 Video Tutorial [SOON]
