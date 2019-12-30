@@ -11,7 +11,7 @@ It is a Laravel package to add a complete real-time chat system to your applicat
  - Real-time user's active status.
  - Real-time typing indicator.
  - Real-time seen messages indicator.
- - upload attachments (Photo/File).
+ - Upload attachments (Photo/File).
  - User settings and chat customization : user's profile photo, dark mode and chat color.
    with simple and wonderful UI design.
 
@@ -19,7 +19,7 @@ It is a Laravel package to add a complete real-time chat system to your applicat
 Soon
 
 # Installation
-How to install Chatify Laravel package - Video Tutorial [SOON]
+Video Tutorial [SOON]
 ##### Steps :
 #### 1. Install the package in your Laravel app
 ```sh
@@ -27,7 +27,7 @@ $ composer require munafio/chatify
 ```
 
 #### 2. Publishing Assets
-Packages's assets to be published :
+Packages' assets to be published :<br/>
 The Important assets:
 - config
 - assets
@@ -37,7 +37,7 @@ The Important assets:
 - controllers
 - views
 
-to pusblish the assets, do the following command line with changing the tag value .. that means after `--tag=` write `chatify-` + asset name as mensioned above.
+to pusblish the assets, do the following command line with changing the tag value .. that means after `--tag=` write `chatify-` + asset name as mentioned above.
 Example :
 ```sh
 $ php artisan vendor:publish --tag=chatify-config
