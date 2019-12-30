@@ -34,7 +34,7 @@ $ composer require munafio/chatify
 #### 2. Pusher Api Settings
 This package using Pusher Api, so you need to :
 - Create account and modify `.env` file of your Laravel app with your api credentials.
-- This package used a Pusher client events, and client events must be enabled for the application. You can do this in the `Settings` tab for your app within the Channels dashboard.
+- This package used a Pusher client events, and client events must be enabled for the application. You can do this in the `Settings` tab for your app within the Channels dashboard. <br/>
 [Read more about Pusher 'Triggering client events'](https://pusher.com/docs/channels/using_channels/events#triggering-client-events)
 <img src="https://1.bp.blogspot.com/-1N10R4h8tO0/XgoBH7Xw55I/AAAAAAAAA6Y/KBRG-W-PqSQfhq1rKAsv-B61VfiQvwgTgCLcBGAsYHQ/s1600/Screenshot%2Bfrom%2B2019-12-30%2B16-47-05.png" style="width:100%;"/>
 
