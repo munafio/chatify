@@ -62,7 +62,9 @@ Create a shourtcut or a symlink to the `storage` folder into the `public` folder
 $ php artisan storage:link
 ```
 ##### That's it .. Enjoy :)
+
 <br/>
+
 # Configurations
 You can find and modify the default configurations of the package at `config/chatify.php` file that you published in the step 2 of the installation steps .. and all configurations is documented well to be understood by other developers.
 * All package’s files is documented to understand the whole code.
