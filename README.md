@@ -1,6 +1,11 @@
 # Chatify Laravel Package
 It is a Laravel package to add a complete real-time chat system to your application with one command line.
 
+# Requirements
+- PHP >=5.3.2.
+- Laravel >=5.4
+- Pusher Api Account.
+
 # Features
  - Users / groups(soon) chat system.
  - Real-time contacts list updates.
@@ -143,5 +148,9 @@ This is the default folder name for `attachments` in the storage which is all th
 ```
 It is the route name of the `download attachments` method.
 
+# Author 
+[Munaf A. Mahdi](https://www.munafio.com/p/contact-me.html)
 
+# License
+[MIT](https://choosealicense.com/licenses/mit/)
 
