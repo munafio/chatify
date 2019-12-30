@@ -18,6 +18,7 @@ It is a Laravel package to add a complete real-time chat system to your applicat
  - Real-time user's active status.
  - Real-time typing indicator.
  - Real-time seen messages indicator.
+ - Real-time internet connection status.
  - Upload attachments (Photo/File).
  - Shared photos, delete conversation.. (User's info right side).
  - User settings and chat customization : user's profile photo, dark mode and chat color.
