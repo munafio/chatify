@@ -1,4 +1,4 @@
-<img src="https://1.bp.blogspot.com/-jBZL-qG2iw8/XgobXuarbOI/AAAAAAAAA6k/0fov7mfLUmsUkm0x8Kz3NAfp5_wrO-H4wCLcBGAsYHQ/s1600/Untitled-1.png" style="width:100%;" />
+<img src="https://1.bp.blogspot.com/-vtmxKH8zJy8/XgveTWsEJkI/AAAAAAAAA7Q/yKslrOp0A2wj5VwrcNFF2ooR_f3bor3uwCLcBGAsYHQ/s1600/Untitled-12.png" style="width:100%;" />
 
 # Chatify Laravel Package
 It is a Laravel package to add a complete real-time chat system to your application with one command line.
