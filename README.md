@@ -1,5 +1,9 @@
 <img src="https://1.bp.blogspot.com/-vtmxKH8zJy8/XgveTWsEJkI/AAAAAAAAA7Q/yKslrOp0A2wj5VwrcNFF2ooR_f3bor3uwCLcBGAsYHQ/s1600/Untitled-12.png" style="width:100%;" />
 
+[![Latest Stable Version](https://poser.pugx.org/munafio/chatify/v/stable)](https://packagist.org/packages/munafio/chatify)
+[![Total Downloads](https://poser.pugx.org/munafio/chatify/downloads)](https://packagist.org/packages/munafio/chatify)
+[![License](https://poser.pugx.org/munafio/chatify/license)](https://packagist.org/packages/munafio/chatify)
+
 # Chatify Laravel Package
 It is a Laravel package to add a complete real-time chat system to your application with one command line.
 
