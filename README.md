@@ -100,6 +100,7 @@ and the following alias into  into `config/app.php` aliases:
 ...
 ```
 
+ * After installing the package, you can access the messeneger by the default path(route path) which is `/chatify`, and you can change path name in the config file `config/chatify.php` as mentioned in the `configurations` below.
 ##### That's it .. Enjoy :)
 
 <br/>
