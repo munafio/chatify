@@ -93,4 +93,14 @@ return [
         // Below is the route name to download attachments.
         'route' => 'attachments.download',
     ],
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Set namespace to Controller when it's publish
+    |--------------------------------------------------------------------------
+    | Uncomment namespace to set config
+    | By default: Chatify\Http\Controllers
+    */
+    'namespace' => env('CHATIFY_NAMESPACE_CONTROLLER', 'App\Http\Controllers\vendor\Chatify'),
 ];
