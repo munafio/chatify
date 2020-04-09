@@ -102,5 +102,5 @@ return [
     | Uncomment namespace to set config
     | By default: Chatify\Http\Controllers
     */
-    'namespace' => env('CHATIFY_NAMESPACE_CONTROLLER', 'App\Http\Controllers\vendor\Chatify'),
+    'namespace' => env('CHATIFY_NAMESPACE_CONTROLLER', 'Chatify\Http\Controllers'),
 ];

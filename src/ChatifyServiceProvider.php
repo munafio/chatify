@@ -93,7 +93,7 @@ class ChatifyServiceProvider extends ServiceProvider
     {
         return [
             'prefix' => config('chatify.path'),
-            'namespace' =>  config('chatify.namespace'),
+            'namespace' =>  config('chatify.namespace', 'Chatify\Http\Controllers'),
             'middleware' => ['web', config('chatify.middleware')],
         ];
     }
