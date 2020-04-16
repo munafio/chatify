@@ -93,4 +93,19 @@ return [
         // Below is the route name to download attachments.
         'route' => 'attachments.download',
     ],
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Route's controllers namespace
+    |--------------------------------------------------------------------------
+    |
+    | You may need to change the namespace of the route's controllers of
+    | this package after publishing the 'controllers' asset, from the
+    | default one to your App's controllers namespace.
+    |
+    | By default: Chatify\Http\Controllers
+    |
+    */
+    'namespace' => env('CHATIFY_ROUTES_NAMESPACE', 'Chatify\Http\Controllers'),
 ];
