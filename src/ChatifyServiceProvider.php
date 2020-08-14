@@ -14,6 +14,7 @@ class ChatifyServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->mergeConfigFrom(__DIR__.'/../config/chatify.php', 'chatify');
         app()->bind('ChatifyMessenger', function () {
             return new \Chatify\ChatifyMessenger;
         });
