@@ -42,7 +42,12 @@ OR
 
 Follow the steps below :
 
+
+
 #### 1. Install the package in your Laravel app
+
+Quick Note: If you are installing this package in a new project, make sure to install the default user authentication system provided with [Laravel](https://laravel.com/docs).
+
 ```sh
 $ composer require munafio/chatify
 ```
