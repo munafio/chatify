@@ -8,8 +8,8 @@
 It is a Laravel package to add a complete real-time chat system to your application with one command line.
 
 # Requirements
-- PHP >=5.3.2.
-- Laravel >=5.4
+- PHP 5.3.2. or higher version
+- Laravel 5.4 or higher version
 - Pusher Api Account.
 
 # Features
