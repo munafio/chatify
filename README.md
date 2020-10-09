@@ -118,7 +118,7 @@ and the following alias into  into `config/app.php` aliases:
 You can find and modify the default configurations of the package at `config/chatify.php` file that you published in the step 2 of the installation steps .. and all configurations is documented well to be understood by other developers.
 * All package’s files is documented to understand the whole code.
 
-#### Messenger Name
+### Messenger Name
 This value is the name of the app which is used in the views or elsewhere in the app.
 ```sh
 ...
@@ -126,9 +126,9 @@ This value is the name of the app which is used in the views or elsewhere in the
 ...
 ```
 
-#### Messenger Path in Your App
+### Messenger Path in Your App
 This value is the path of the package or in other meaning, it is the prefix of all the registered routes in this package.
-##### e.g (yourapp.domain/chatify)
+ `e.g (yourapp.domain/chatify)`
 ```sh
 ...
 'path' => env('CHATIFY_PATH', 'chatify'),
@@ -136,7 +136,7 @@ This value is the path of the package or in other meaning, it is the prefix of a
 ```
 
 
-#### Package's web routes middleware
+### Package's web routes middleware
 This value is the middleware of all routes registered in this package which is by default : `auth`.
 ```sh
 ...
@@ -145,10 +145,10 @@ This value is the middleware of all routes registered in this package which is b
 ```
 
 
-#### Pusher API credentials
+### Pusher API credentials
 you don't need to modify the credentials of Pusher from here, because you already added your credentials in the `.env` file of your Laravel app.
 
-#### User Avatar
+### User Avatar
 This is the user's avatar setting that includes :
 ```sh
 ...
@@ -170,7 +170,7 @@ which is the default folder name to upload and get user's avatar from.
 ```
 which is the default avatar file name for users stored in database .. and when you publishing `assets`, a copy of the avatar photo will be copied into your storage path.
 
-#### Attachments By Default
+### Attachments By Default
 This array contains the important default values that used in this package :
 ```sh
 ...
@@ -190,6 +190,19 @@ This is the default folder name for `attachments` in the storage which is all th
     ],
 ...
 ```
+
+### Controller's namespace
+This proprty if you may need to change the namespace of the route's controllers of this package after publishing the 'controllers' asset, from the default one to your App's controllers namespace.
+
+By default: `Chatify\Http\Controllers` <br/>
+If published to be modified, it should be like: `App\Http\Controllers\vendor\Chatify`
+
+```sh
+...
+'namespace' => env('CHATIFY_ROUTES_NAMESPACE', 'Chatify\Http\Controllers'),
+```
+
+
 It is the route name of the `download attachments` method.
 
 ## Author 
