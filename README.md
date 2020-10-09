@@ -67,7 +67,7 @@ The Important assets:
 - migrations
 
  and the optional assets :
-- controllers (you need to configure (https://github.com/munafio/chatify/#controllers-namespace)[this], if published)
+- controllers (you need to configure [this](https://github.com/munafio/chatify/#controllers-namespace), if published)
 - views
 
 to pusblish the assets, do the following command line with changing the tag value .. that means after `--tag=` write `chatify-` + asset name as mentioned above.<br/>
