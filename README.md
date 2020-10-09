@@ -190,6 +190,7 @@ This is the default folder name for `attachments` in the storage which is all th
     ],
 ...
 ```
+It is the route name of the `download attachments` method.
 
 ### Controller's namespace
 This proprty if you may need to change the namespace of the route's controllers of this package after publishing the 'controllers' asset, from the default one to your App's controllers namespace.
@@ -202,8 +203,6 @@ If published to be modified, it should be like: `App\Http\Controllers\vendor\Cha
 'namespace' => env('CHATIFY_ROUTES_NAMESPACE', 'Chatify\Http\Controllers'),
 ```
 
-
-It is the route name of the `download attachments` method.
 
 ## Author 
 [Munaf A. Mahdi](https://www.munafio.com/p/contact-me.html)
