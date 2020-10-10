@@ -5,7 +5,7 @@
 [![License](https://poser.pugx.org/munafio/chatify/license)](https://packagist.org/packages/munafio/chatify)
 
 # Chatify Laravel Package
-It is a Laravel package to add a complete real-time chat system to your application with one command line.
+A Laravel package that allows you to add a complete user messaging system into your new/existing Laravel application with only a few easy steps.
 
 # Requirements
 - PHP >=5.3.2.
