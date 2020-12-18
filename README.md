@@ -46,7 +46,7 @@ Follow the steps below :
 
 #### 1. Install the package in your Laravel app
 
-Quick Note: If you are installing this package in a new project, make sure to install the default user authentication system provided with [Laravel](https://laravel.com/docs).
+**Quick Note:** If you are installing this package in a new project, make sure to install the default user authentication system provided with [Laravel](https://laravel.com/docs).
 
 ```sh
 $ composer require munafio/chatify
@@ -203,6 +203,10 @@ If published to be modified, it should be like: `App\Http\Controllers\vendor\Cha
 'namespace' => env('CHATIFY_ROUTES_NAMESPACE', 'Chatify\Http\Controllers'),
 ```
 
+# Notes
+**Laravel 8+** will be supported with chatify v2.<br />
+**Chatify v2** release date may be delayed because of my job and time by general. <br />
+But I promise that `(Chatify v2 will be amazing)`, so be patience ❤️
 
 ## Author 
 [Munaf A. Mahdi](https://www.munafio.com/p/contact-me.html)
