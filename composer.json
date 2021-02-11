@@ -12,7 +12,7 @@
     ],
     "minimum-stability": "dev",
     "require": {
-        "pusher/pusher-php-server": "^3.4@dev"
+        "pusher/pusher-php-server": "^4.0"
     },
     "autoload": {
         "psr-4": {
