@@ -8,9 +8,9 @@
 A Laravel package that allows you to add a complete user messaging system into your new/existing Laravel application with only a few easy steps.
 
 ## Important Notes (Update 2021/03/07)
-* I'm currently working to release **v1.2.0** which will solve a lot of issues and will come with a minor changes in the UI/UX ... like so. 
+* I'm currently working to release **v1.2.0** which will solve a lot of issues, Laravel 8+ support, and will come with a minor changes in the UI/UX ... like so. 
 * And also I would like to mention that the documentation will be moved to [Gitbook](https://gitbook.com).
-* **Chatify v2** will be delayed because it should be completely re-designed/re-coded (Back-end, UI/UX, features...), so it takes a time to be done! and because of my job and time by general.<br />
+* **Chatify v2** will be delayed because it should be completely re-designed/re-coded (Back-end, UI/UX, features...), so it takes a time to be done! and also because of my job and time by general.<br />
 At the end .. I promise that `(Chatify v2 will be amazing)`, so be patient ❤️
 
 # Requirements
