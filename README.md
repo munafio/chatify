@@ -13,8 +13,8 @@ A Laravel package that allows you to add a complete user messaging system into y
 * **Chatify v2** will be delayed because it should be completely re-designed/re-coded (Back-end, UI/UX, features...), so it takes a time to be done! and also because of my job and time by general.<br />
 At the end .. I promise that `(Chatify v2 will be amazing)`, so be patient ❤️
 
-# Laravel 8+ support
-- Since this package may not currently support Laravel 8+, But still can get it to work with the current version after a few quite simple changes, as @lelu0 mentioned at https://github.com/munafio/chatify/issues/66#issuecomment-756083954
+## Laravel 8+ support
+Since this package may not currently support Laravel 8+, But still can get it to work with the current version after a few quite simple changes, as @lelu0 mentioned at https://github.com/munafio/chatify/issues/66#issuecomment-756083954
 
 # Requirements
 - PHP >=5.3.2.
