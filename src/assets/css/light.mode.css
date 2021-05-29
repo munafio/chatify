@@ -1,38 +1,38 @@
 /*app scroll*/
 .app-scroll::-webkit-scrollbar-thumb,
-.app-scroll-thin::-webkit-scrollbar-thumb{
-    background:#d8dce0;
+.app-scroll-thin::-webkit-scrollbar-thumb {
+    background: #d8dce0;
 }
-.app-scroll-thin::-webkit-scrollbar{
+.app-scroll-thin::-webkit-scrollbar {
     background: #eee;
 }
 .app-scroll::-webkit-scrollbar:hover,
-.app-scroll-thin::-webkit-scrollbar:hover{
+.app-scroll-thin::-webkit-scrollbar:hover {
     background: #eee;
 }
 
-.messenger{
+.messenger {
     background: #fff;
 }
-.messenger-search{
+.messenger-search[type="text"] {
     background: #f7f7f7;
-	color: #333;
+    color: #333;
 }
-.messenger-listView{
+.messenger-listView {
     background: #fff;
     border: 1px solid #eee;
 }
-.messenger-listView-tabs{
+.messenger-listView-tabs {
     border-bottom: 1px solid #eee;
 }
 .messenger-listView-tabs a:hover,
-.messenger-listView-tabs a:focus{
+.messenger-listView-tabs a:focus {
     background-color: #f7f7f7;
 }
-.messenger-favorites div.avatar{
+.messenger-favorites div.avatar {
     border: 2px solid #fff;
 }
-.messenger-list-item:hover{
+.messenger-list-item:hover {
     background: #f7f7f7;
 }
 .messenger-messagingView {
@@ -47,51 +47,52 @@
     background: #fff;
     border: 1px solid #eee;
 }
-.messenger-infoView>p{
-  color: #000;
+.messenger-infoView > p {
+    color: #000;
 }
-.divider{
+.divider {
     border-top: 1px solid #e0e0e0;
 }
-.messenger-sendCard{
+.messenger-sendCard {
     background: #fff;
     border-top: 1px solid #eee;
 }
-.attachment-preview>p{
+.attachment-preview > p {
     color: #333;
 }
-.m-send{
+.m-send {
     color: #333;
 }
-.message-card p{
+.message-card p {
     background: #ffffff;
     color: #656b75;
     box-shadow: 0px 6px 11px rgba(18, 67, 105, 0.03);
 }
-.m-li-divider{
+.m-li-divider {
     border-bottom: 1px solid #ebebeb;
 }
 .m-header a,
 .m-header a:hover,
-.m-header a:focus{
+.m-header a:focus {
     text-decoration: none;
     color: #606679;
 }
-.messenger-list-item td p{
+.messenger-list-item td p {
     color: #606679;
 }
-.activeStatus{
+.activeStatus {
     border: 2px solid #fff;
 }
-.messenger-list-item:hover .activeStatus{
+.messenger-list-item:hover .activeStatus {
     border-color: #f7f7f7;
 }
-.messenger-favorites>div p{
+.messenger-favorites > div p {
     color: #4a4a4a;
 }
 
-
-
+.avatar {
+    background-color: #eee;
+}
 
 /*
 ***********************************************
@@ -100,8 +101,14 @@
 */
 .loadingPlaceholder-body div,
 .loadingPlaceholder-header tr td div {
-	background: #f6f7f8;
-  background-image: -webkit-linear-gradient(left, #f6f7f8 0%, #eaecf3 20%, #f6f7f8 40%, #f6f7f8 100%);
+    background: #f6f7f8;
+    background-image: -webkit-linear-gradient(
+        left,
+        #f6f7f8 0%,
+        #eaecf3 20%,
+        #f6f7f8 40%,
+        #f6f7f8 100%
+    );
 }
 
 /*
@@ -110,30 +117,28 @@
 ***********************************************
 */
 
-.app-modal-card{
+.app-modal-card {
     background: rgba(255, 255, 255, 0.89);
 }
-.app-modal-header{
- 	color: #000;
+.app-modal-header {
+    color: #000;
 }
-.app-modal-body{
-  color: #000;
+.app-modal-body {
+    color: #000;
 }
-
-
 
 /*
 *****************************************
 * Responsive Design
 *****************************************
 */
-@media (max-width: 1060px){
+@media (max-width: 1060px) {
     .messenger-infoView {
         box-shadow: 0px 0px 20px rgba(18, 67, 105, 0.06);
     }
 }
-@media (max-width: 980px){
-    .messenger-listView{
+@media (max-width: 980px) {
+    .messenger-listView {
         box-shadow: 0px 0px 20px rgba(18, 67, 105, 0.06);
     }
 }

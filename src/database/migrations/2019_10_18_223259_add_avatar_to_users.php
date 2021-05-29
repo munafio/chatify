@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddMessengerColorToUsers extends Migration
+class AddAvatarToUsers extends Migration
 {
     /**
      * Run the migrations.
@@ -15,9 +15,9 @@ class AddMessengerColorToUsers extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             // if not exist, add the new column
-            if (!Schema::hasColumn('users', 'messenger_color')) {
-                $table->string('messenger_color')->default('#2180f3')->after('email');
-            } 
+            if (!Schema::hasColumn('users', 'avatar')) {
+                $table->string('avatar')->default(config('chatify.user_avatar.default'));
+            }
         });
     }
 

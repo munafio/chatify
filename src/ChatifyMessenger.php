@@ -2,23 +2,27 @@
 
 namespace Chatify;
 
-use Chatify\Http\Models\Message;
-use Chatify\Http\Models\Favorite;
+use App\Models\ChMessage as Message;
+use App\Models\ChFavorite as Favorite;
 use Pusher\Pusher;
 use Illuminate\Support\Facades\Auth;
 use Exception;
+use Illuminate\Support\Facades\File;
 
 class ChatifyMessenger
 {
-    /**
-     * Allowed extensions to upload attachment
-     * [Images / Files]
-     *
-     * @var
-     */
-    public static $allowed_images = array('png','jpg','jpeg','gif');
-    public static $allowed_files  = array('zip','rar','txt');
 
+    public $pusher;
+
+    public function __construct()
+    {
+        $this->pusher = new Pusher(
+            config('chatify.pusher.key'),
+            config('chatify.pusher.secret'),
+            config('chatify.pusher.app_id'),
+            config('chatify.pusher.options'),
+        );
+    }
     /**
      * This method returns the allowed image extensions
      * to attach with the message.
@@ -26,7 +30,7 @@ class ChatifyMessenger
      * @return array
      */
     public function getAllowedImages(){
-        return self::$allowed_images;
+        return config('chatify.attachments.allowed_images');
     }
 
     /**
@@ -36,7 +40,7 @@ class ChatifyMessenger
      * @return array
      */
     public function getAllowedFiles(){
-        return self::$allowed_files;
+        return config('chatify.attachments.allowed_files');
     }
 
     /**
@@ -60,22 +64,6 @@ class ChatifyMessenger
     }
 
     /**
-     * Pusher connection
-     */
-    public function pusher()
-    {
-        return new Pusher(
-            config('chatify.pusher.key'),
-            config('chatify.pusher.secret'),
-            config('chatify.pusher.app_id'),
-            [
-                'cluster' => config('chatify.pusher.options.cluster'),
-                'useTLS' => config('chatify.pusher.options.useTLS')
-            ]
-        );
-    }
-
-    /**
      * Trigger an event using Pusher
      *
      * @param string $channel
@@ -85,7 +73,7 @@ class ChatifyMessenger
      */
     public function push($channel, $event, $data)
     {
-        return $this->pusher()->trigger($channel, $event, $data);
+        return $this->pusher->trigger($channel, $event, $data);
     }
 
     /**
@@ -96,8 +84,8 @@ class ChatifyMessenger
      * @param array $data
      * @return void
      */
-    public function pusherAuth($channelName, $socket_id, $data = []){
-        return $this->pusher()->socket_auth($channelName, $socket_id, $data);
+    public function pusherAuth($channelName, $socket_id, $data = null){
+        return $this->pusher->socket_auth($channelName, $socket_id, $data);
     }
 
     /**
@@ -108,17 +96,17 @@ class ChatifyMessenger
      * @return array
      */
     public function fetchMessage($id){
-        $attachment = $attachment_type = $attachment_title = null;
+        $attachment = null;
+        $attachment_type = null;
+        $attachment_title = null;
+
         $msg = Message::where('id',$id)->first();
 
-        // If message has attachment
-        if($msg->attachment){
-            // Get attachment and attachment title
-            $att = explode(',',$msg->attachment);
-            $attachment       = $att[0];
-            $attachment_title = $att[1];
+        if(isset($msg->attachment)){
+            $attachmentOBJ = json_decode($msg->attachment);
+            $attachment = $attachmentOBJ->new_name;
+            $attachment_title = $attachmentOBJ->old_name;
 
-            // determine the type of the attachment
             $ext = pathinfo($attachment, PATHINFO_EXTENSION);
             $attachment_type = in_array($ext,$this->getAllowedImages()) ? 'image' : 'file';
         }
@@ -198,7 +186,7 @@ class ChatifyMessenger
      * @return Collection
      */
     public function getLastMessageQuery($user_id){
-        return self::fetchMessagesQuery($user_id)->orderBy('created_at','DESC')->latest()->first();
+        return $this->fetchMessagesQuery($user_id)->orderBy('created_at','DESC')->latest()->first();
     }
 
     /**
@@ -221,10 +209,10 @@ class ChatifyMessenger
      */
     public function getContactItem($messenger_id, $user){
         // get last message
-        $lastMessage = self::getLastMessageQuery($user->id);
+        $lastMessage = $this->getLastMessageQuery($user->id);
 
         // Get Unseen messages counter
-        $unseenCounter = self::countUnseenMessages($user->id);
+        $unseenCounter = $this->countUnseenMessages($user->id);
 
         return view('Chatify::layouts.listItem', [
             'get' => 'users',
@@ -306,15 +294,15 @@ class ChatifyMessenger
     public function deleteConversation($user_id){
         try {
             foreach ($this->fetchMessagesQuery($user_id)->get() as $msg) {
-                // delete from database
-                $msg->delete();
                 // delete file attached if exist
-                if ($msg->attachment) {
-                    $path = storage_path('app/public/'.config('chatify.attachments.folder').'/'.explode(',', $msg->attachment)[0]);
-                    if(file_exists($path)){
-                        @unlink($path);
+                if (isset($msg->attachment)) {
+                    $path = storage_path('app/public/'.config('chatify.attachments.folder').'/'.json_decode( $msg->attachment)->new_name);
+                    if(File::exists($path)){
+                        File::delete($path);
                     }
                 }
+                // delete from database
+                $msg->delete();
             }
             return 1;
         }catch(Exception $e) {

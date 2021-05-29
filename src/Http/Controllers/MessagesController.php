@@ -5,11 +5,12 @@ namespace Chatify\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Response;
-use Chatify\Http\Models\Message;
-use Chatify\Http\Models\Favorite;
+use App\Models\ChMessage as Message;
+use App\Models\ChFavorite as Favorite;
 use Chatify\Facades\ChatifyMessenger as Chatify;
-use App\User;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Request as FacadesRequest;
 use Illuminate\Support\Str;
 
 
@@ -48,12 +49,12 @@ class MessagesController extends Controller
      * @param int $id
      * @return void
      */
-    public function index($id = null)
+    public function index( $id = null)
     {
-        // get current route
-        $route = (in_array(\Request::route()->getName(), ['user', config('chatify.path')]))
+        $routeName= FacadesRequest::route()->getName();
+        $route = (in_array($routeName, ['user', config('chatify.routes.prefix')]))
             ? 'user'
-            : \Request::route()->getName();
+            : $routeName;
 
         // prepare id
         return view('Chatify::pages.app', [
@@ -150,7 +151,10 @@ class MessagesController extends Controller
                 'from_id' => Auth::user()->id,
                 'to_id' => $request['id'],
                 'body' => trim(htmlentities($request['message'])),
-                'attachment' => ($attachment) ? $attachment . ',' . $attachment_title : null,
+                'attachment' => ($attachment) ? json_encode((object)[
+                    'new_name' => $attachment,
+                    'old_name' => $attachment_title,
+                ]) : null,
             ]);
 
             // fetch message to send it with the response
@@ -235,12 +239,12 @@ class MessagesController extends Controller
     {
         // get all users that received/sent message from/to [Auth user]
         $users = Message::join('users',  function ($join) {
-            $join->on('messages.from_id', '=', 'users.id')
-                ->orOn('messages.to_id', '=', 'users.id');
+            $join->on('ch_messages.from_id', '=', 'users.id')
+                ->orOn('ch_messages.to_id', '=', 'users.id');
         })
-            ->where('messages.from_id', Auth::user()->id)
-            ->orWhere('messages.to_id', Auth::user()->id)
-            ->orderBy('messages.created_at', 'desc')
+            ->where('ch_messages.from_id', Auth::user()->id)
+            ->orWhere('ch_messages.to_id', Auth::user()->id)
+            ->orderBy('ch_messages.created_at', 'desc')
             ->get()
             ->unique('id');
 

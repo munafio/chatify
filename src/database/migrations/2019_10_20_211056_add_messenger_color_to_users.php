@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddDarkModeToUsers extends Migration
+class AddMessengerColorToUsers extends Migration
 {
     /**
      * Run the migrations.
@@ -15,9 +15,9 @@ class AddDarkModeToUsers extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             // if not exist, add the new column
-            if (!Schema::hasColumn('users', 'dark_mode')) {
-                $table->boolean('dark_mode')->default(0)->after('email');
-            }  
+            if (!Schema::hasColumn('users', 'messenger_color')) {
+                $table->string('messenger_color')->default('#2180f3');
+            }
         });
     }
 

@@ -1,32 +1,41 @@
 {
-    "name": "munafio/chatify",
-    "description": "A package for Laravel PHP Framework to add a complete real-time chat system.",
-    "type": "library",
-    "keywords": ["laravel", "messenger", "conversations", "chat", "php", "pusher", "realtime", "real-time"],
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Munaf A. Mahdi",
-            "email": "munafaqeelmahdi@gmail.com"
-        }
-    ],
-    "minimum-stability": "dev",
-    "require": {
-        "pusher/pusher-php-server": "^3.4@dev"
-    },
-    "autoload": {
-        "psr-4": {
-            "Chatify\\" : "src/"
-        }
-    },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "Chatify\\ChatifyServiceProvider"
-            ],
-            "aliases": {
-                "Chatify": "Chatify\\Facades\\ChatifyMessenger"
-            }
-        }
+  "name": "munafio/chatify",
+  "description": "A package for Laravel PHP Framework to add a complete real-time chat system.",
+  "type": "library",
+  "keywords": [
+    "laravel",
+    "messenger",
+    "conversations",
+    "chat",
+    "php",
+    "pusher",
+    "realtime",
+    "real-time"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Munaf A. Mahdi",
+      "email": "munafaqeelmahdi@gmail.com"
     }
+  ],
+  "minimum-stability": "dev",
+  "require": {
+    "pusher/pusher-php-server": "^7.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Chatify\\": "src/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Chatify\\ChatifyServiceProvider"
+      ],
+      "aliases": {
+        "Chatify": "Chatify\\Facades\\ChatifyMessenger"
+      }
+    }
+  }
 }

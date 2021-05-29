@@ -2,6 +2,7 @@
 
 namespace Chatify;
 
+use Chatify\Console\InstallChatify;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
@@ -27,12 +28,17 @@ class ChatifyServiceProvider extends ServiceProvider
     public function boot()
     {
         // Load Views, Migrations and Routes
-        $this->loadViewsFrom(__DIR__ . '/../views', 'Chatify');
-        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+        $this->loadViewsFrom(__DIR__ . '/views', 'Chatify');
+        $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
         $this->loadRoutes();
 
-        // Publishes
-        $this->setPublishes();
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                InstallChatify::class,
+            ]);
+            $this->setPublishes();
+        }
+
     }
 
     /**
@@ -42,36 +48,43 @@ class ChatifyServiceProvider extends ServiceProvider
      */
     protected function setPublishes()
     {
-        // Config
-        $this->publishes([
-            __DIR__ . '/../config/chatify.php' => config_path('chatify.php')
-        ], 'chatify-config');
+            // Config
+            $this->publishes([
+                __DIR__ . '/config/chatify.php' => config_path('chatify.php')
+            ], 'chatify-config');
 
-        // Migrations
-        $this->publishes([
-            __DIR__ . '/../database/migrations/' => database_path('migrations')
-        ], 'chatify-migrations');
+            // Migrations
+            $this->publishes([
+                __DIR__ . '/database/migrations/' => database_path('migrations')
+            ], 'chatify-migrations');
 
-        // Controllers
-        $this->publishes([
-            __DIR__ . '/../src/Http/Controllers' => app_path('Http/Controllers/vendor/Chatify')
-        ], 'chatify-controllers');
+            // Models
+            $isV8 = explode('.',app()->version())[0] >= 8;
+            $this->publishes([
+                __DIR__ . '/Models' => app_path($isV8 ? 'Models' : '')
+            ], 'chatify-models');
 
-        // Views
-        $this->publishes([
-            __DIR__ . '/../views' => resource_path('views/vendor/Chatify')
-        ], 'chatify-views');
+            // Controllers
+            $this->publishes([
+                __DIR__ . '/Http/Controllers' => app_path('Http/Controllers/vendor/Chatify')
+            ], 'chatify-controllers');
 
-        // Assets
-        $this->publishes([
-            // CSS
-            __DIR__ . '/../assets/css' => public_path('css/chatify'),
-            // JavaScript
-            __DIR__ . '/../assets/js' => public_path('js/chatify'),
-            // Images
-            __DIR__ . '/../assets/imgs' => storage_path('app/public/' . config('chatify.user_avatar.folder')),
-        ], 'chatify-assets');
+            // Views
+            $this->publishes([
+                __DIR__ . '/views' => resource_path('views/vendor/Chatify')
+            ], 'chatify-views');
+
+            // Assets
+            $this->publishes([
+                // CSS
+                __DIR__ . '/assets/css' => public_path('css/chatify'),
+                // JavaScript
+                __DIR__ . '/assets/js' => public_path('js/chatify'),
+                // Images
+                __DIR__ . '/assets/imgs' => storage_path('app/public/' . config('chatify.user_avatar.folder')),
+            ], 'chatify-resources');
     }
+
     /**
      * Group the routes and set up configurations to load them.
      *
@@ -80,7 +93,7 @@ class ChatifyServiceProvider extends ServiceProvider
     protected function loadRoutes()
     {
         Route::group($this->routesConfigurations(), function () {
-            $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
+            $this->loadRoutesFrom(__DIR__ . '/routes/web.php');
         });
     }
 
@@ -92,9 +105,9 @@ class ChatifyServiceProvider extends ServiceProvider
     private function routesConfigurations()
     {
         return [
-            'prefix' => config('chatify.path'),
-            'namespace' =>  config('chatify.namespace'),
-            'middleware' => ['web', config('chatify.middleware')],
+            'prefix' => config('chatify.routes.prefix'),
+            'namespace' =>  config('chatify.routes.namespace'),
+            'middleware' => config('chatify.routes.middleware'),
         ];
     }
 }

@@ -1,10 +1,10 @@
 <?php
 
-namespace Chatify\Http\Models;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Favorite extends Model
+class ChFavorite extends Model
 {
     //
 }
