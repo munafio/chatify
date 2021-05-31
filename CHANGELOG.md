@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.2.2 - (2021-05-30)
+
+### Fixed
+
+- Migrate to database command removed.
+- Publishable asset `assets` avatar config issue.
+- Pusher encryption key option removed.
+- Settings button on click not working issue.
+
+## v1.2.1 - (2021-05-30)
+
+### Fixed
+
+- Publishable asset `assets`.
+
 ## v1.2.0 - (2021-05-30)
 
 ### FIxed
