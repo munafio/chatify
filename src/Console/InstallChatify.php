@@ -45,11 +45,6 @@ class InstallChatify extends Command
         }
 
         $this->line('----------');
-        $this->line('Migrating to database...');
-        Artisan::call('migrate');
-        $this->info('[✓] Migrated.');
-
-        $this->line('----------');
         $this->line('Creating storage symlink...');
         Artisan::call('storage:link');
         $this->info('[✓] Storage linked.');
