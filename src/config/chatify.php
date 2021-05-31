@@ -32,7 +32,6 @@ return [
         'options' => (array) [
             'cluster' => env('PUSHER_APP_CLUSTER'),
             'useTLS' => env('PUSHER_APP_USETLS'),
-            'encryption_master_key_base64' => env('PUSHER_APP_ENCRYPTION_KEY'),
         ],
     ],
 

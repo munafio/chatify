@@ -48,7 +48,11 @@ class ChatifyServiceProvider extends ServiceProvider
      */
     protected function setPublishes()
     {
-            // Config
+        // Load user's avatar folder from package's config
+        // $userAvatarFolder = ((object) ((object) include('./config/chatify.php'))->user_avatar)->folder;
+        $userAvatarFolder = json_decode(json_encode(include(__DIR__.'/config/chatify.php')))->user_avatar->folder;
+
+        // Config
             $this->publishes([
                 __DIR__ . '/config/chatify.php' => config_path('chatify.php')
             ], 'chatify-config');
@@ -81,7 +85,7 @@ class ChatifyServiceProvider extends ServiceProvider
                 // JavaScript
                 __DIR__ . '/assets/js' => public_path('js/chatify'),
                 // Images
-                __DIR__ . '/assets/imgs' => storage_path('app/public/' . config('chatify.user_avatar.folder')),
+                __DIR__ . '/assets/imgs' => storage_path('app/public/' . $userAvatarFolder),
             ], 'chatify-assets');
     }
 

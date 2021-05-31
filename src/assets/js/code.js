@@ -1247,7 +1247,7 @@ $(document).ready(function() {
     });
 
   // Settings button action to show settings modal
-  $(".settings-btn").on("click", function(e) {
+  $("body").on("click", ".settings-btn", function(e) {
     e.preventDefault();
     app_modal({
       show: true,
