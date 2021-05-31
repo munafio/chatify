@@ -49,7 +49,6 @@ class ChatifyServiceProvider extends ServiceProvider
     protected function setPublishes()
     {
         // Load user's avatar folder from package's config
-        // $userAvatarFolder = ((object) ((object) include('./config/chatify.php'))->user_avatar)->folder;
         $userAvatarFolder = json_decode(json_encode(include(__DIR__.'/config/chatify.php')))->user_avatar->folder;
 
         // Config
