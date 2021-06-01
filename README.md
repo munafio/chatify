@@ -6,7 +6,7 @@
 
 # Chatify Laravel Package
 
-A Laravel package that allows you to add a complete user messaging system into your new/existing Laravel application with only a few easy steps.
+A Laravel package helps you add a complete real-time messaging system to your new / existing application with only one command.
 
 # Prerequisites
 
