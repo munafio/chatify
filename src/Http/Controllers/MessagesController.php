@@ -262,7 +262,7 @@ class MessagesController extends Controller
 
         // send the response
         return Response::json([
-            'contacts' => $users->count() > 0 ? $contacts : '<br><p class="message-hint"><span>Your contatct list is empty</span></p>',
+            'contacts' => $users->count() > 0 ? $contacts : '<br><p class="message-hint"><span>Your contact list is empty</span></p>',
         ], 200);
     }
 
