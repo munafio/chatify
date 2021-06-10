@@ -29,7 +29,7 @@ class AddMessengerColorToUsers extends Migration
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            //
+            $table->dropColumn('messenger_color');
         });
     }
 }
