@@ -186,7 +186,7 @@ class ChatifyMessenger
      * @return Collection
      */
     public function getLastMessageQuery($user_id){
-        return $this->fetchMessagesQuery($user_id)->orderBy('created_at','DESC')->latest()->first();
+        return $this->fetchMessagesQuery($user_id)->latest()->first();
     }
 
     /**
