@@ -6,13 +6,17 @@
 
 # Chatify Laravel Package
 
-A Laravel package that allows you to add a complete user messaging system into your new/existing Laravel application with only a few easy steps.
+A Laravel package helps you add a complete real-time messaging system to your new / existing application with only one command.
 
-# Requirements
+# Prerequisites
 
 - PHP >=5.3.2.
 - Laravel >=5.4
 - Pusher Api Account.
+
+# Updates (2021-06-1)
+
+- New release v1.2.2, see [What's new](https://github.com/munafio/chatify/blob/master/CHANGELOG.md)
 
 # Features
 
@@ -36,13 +40,25 @@ A Laravel package that allows you to add a complete user messaging system into y
 
 # Demo
 
-- Live Demo [SOON].
+- [Live Demo](https://chatify-demo.munafio.com/)
+
+Register a new user or login using the credentials below :
+
+```
+email    : demo@e.com
+password : demo1234
+```
+
 - Demo app - [Click Here](https://github.com/munafio/chatify-demo).
 - Video on YouTube - [Click Here](https://youtu.be/gjo74FUJJPI)
 
 # Documentation
 
 You can see the full documentation [here](https://chatify.munafio.com)
+
+# Change log
+
+[CHANGELOG.md](https://github.com/munafio/chatify/blob/master/CHANGELOG.md)
 
 ## Author
 
