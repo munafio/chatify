@@ -16,6 +16,12 @@ A Laravel package helps you add a complete real-time messaging system to your ne
 
 # Updates (2021-06-1)
 
+<<<<<<< HEAD
+
+=======
+
+> > > > > > > e3427fef3c3ab0aa8bc491e4ce043f1b3e650cca
+
 - New release v1.2.2, see [What's new](https://github.com/munafio/chatify/blob/master/CHANGELOG.md)
 
 # Features
@@ -44,9 +50,9 @@ A Laravel package helps you add a complete real-time messaging system to your ne
 
 Register a new user or login using the credentials below :
 
-```
-email    : demo@e.com
+email : demo@e.com
 password : demo1234
+
 ```
 
 - Demo app - [Click Here](https://github.com/munafio/chatify-demo).
@@ -67,3 +73,4 @@ You can see the full documentation [here](https://chatify.munafio.com)
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
+```
