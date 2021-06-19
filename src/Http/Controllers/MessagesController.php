@@ -116,7 +116,12 @@ class MessagesController extends Controller
     public function send(Request $request)
     {
         // default variables
-        $error_msg = $attachment = $attachment_title = null;
+        $error = (object)[
+            'status' => 0,
+            'message' => null
+        ];
+        $attachment = null;
+        $attachment_title = null;
 
         // if there is attachment [file]
         if ($request->hasFile('file')) {
@@ -135,14 +140,16 @@ class MessagesController extends Controller
                     $attachment = Str::uuid() . "." . $file->getClientOriginalExtension();
                     $file->storeAs("public/" . config('chatify.attachments.folder'), $attachment);
                 } else {
-                    $error_msg = "File extension not allowed!";
+                    $error->status = 1;
+                    $error->message = "File extension not allowed!";
                 }
             } else {
-                $error_msg = "File size is too long!";
+                $error->status = 1;
+                $error->message = "File extension not allowed!";
             }
         }
 
-        if (!$error_msg) {
+        if (!$error->status) {
             // send to database
             $messageID = mt_rand(9, 999999999) + time();
             Chatify::newMessage([
@@ -171,8 +178,7 @@ class MessagesController extends Controller
         // send the response
         return Response::json([
             'status' => '200',
-            'error' => $error_msg ? 1 : 0,
-            'error_msg' => $error_msg,
+            'error' => $error,
             'message' => Chatify::messageCard(@$messageData),
             'tempID' => $request['temporaryMsgId'],
         ]);

@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.2.3 - (2021-06-19)
+
+### Fixed
+
+- XSS issue on inputs.
+- UI/UX fixes & improvements.
+- Send message fixes (UI & backend).
+- Update Profile Settings (upload file & error handling ….).
+- Shared photos not working issue.
+- Typo error fixes (Your `contatc` list is empty).
+- Rolling back migrations added.
+- Get Last message `orderBy` query duplication.
+
 ## v1.2.2 - (2021-06-01)
 
 ### Fixed
