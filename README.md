@@ -45,9 +45,8 @@ A Laravel package helps you add a complete real-time messaging system to your ne
 Register a new user or login using the credentials below :
 
 ```
-email : demo@e.com
+email    : demo@e.com
 password : demo1234
-
 ```
 
 - Demo app - [Click Here](https://github.com/munafio/chatify-demo).
@@ -68,7 +67,3 @@ You can see the full documentation [here](https://chatify.munafio.com)
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
-
-```
-
-```
