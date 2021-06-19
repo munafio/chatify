@@ -14,15 +14,9 @@ A Laravel package helps you add a complete real-time messaging system to your ne
 - Laravel >=5.4
 - Pusher Api Account.
 
-# Updates (2021-06-1)
+# Updates (2021-06-19)
 
-<<<<<<< HEAD
-
-=======
-
-> > > > > > > e3427fef3c3ab0aa8bc491e4ce043f1b3e650cca
-
-- New release v1.2.2, see [What's new](https://github.com/munafio/chatify/blob/master/CHANGELOG.md)
+- New release v1.2.3, see [What's new](https://github.com/munafio/chatify/blob/master/CHANGELOG.md)
 
 # Features
 
@@ -50,6 +44,7 @@ A Laravel package helps you add a complete real-time messaging system to your ne
 
 Register a new user or login using the credentials below :
 
+```
 email : demo@e.com
 password : demo1234
 
@@ -73,4 +68,7 @@ You can see the full documentation [here](https://chatify.munafio.com)
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
+
+```
+
 ```
