@@ -29,14 +29,16 @@
            <div class="@if($route == 'user') show @endif messenger-tab app-scroll" data-view="users">
 
                {{-- Favorites --}}
-               <p class="messenger-title">Favorites</p>
+               <div class="favorites-section">
+                <p class="messenger-title">Favorites</p>
                 <div class="messenger-favorites app-scroll-thin"></div>
+               </div>
 
                {{-- Saved Messages --}}
                {!! view('Chatify::layouts.listItem', ['get' => 'saved','id' => $id])->render() !!}
 
                {{-- Contact --}}
-               <div class="listOfContacts" style="width: 100%;height: calc(100% - 200px);"></div>
+               <div class="listOfContacts" style="width: 100%;height: calc(100% - 200px);position: relative;"></div>
 
            </div>
 
@@ -51,7 +53,7 @@
                 {{-- items --}}
                 <p class="messenger-title">Search</p>
                 <div class="search-records">
-                    <p class="message-hint"><span>Type to search..</span></p>
+                    <p class="message-hint center-el"><span>Type to search..</span></p>
                 </div>
              </div>
         </div>
@@ -86,7 +88,7 @@
         {{-- Messaging area --}}
         <div class="m-body app-scroll">
             <div class="messages">
-                <p class="message-hint" style="margin-top: calc(30% - 126.2px);"><span>Please select a chat to start messaging</span></p>
+                <p class="message-hint center-el"><span>Please select a chat to start messaging</span></p>
             </div>
             {{-- Typing indicator --}}
             <div class="typing-indicator">

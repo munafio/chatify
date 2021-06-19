@@ -274,10 +274,10 @@ class ChatifyMessenger
             foreach ($msgs->get() as $msg) {
                 // If message has attachment
                 if($msg->attachment){
-                    $attachment = explode(',',$msg->attachment)[0]; // Attachment
+                    $attachment = json_decode($msg->attachment);
                     // determine the type of the attachment
-                    in_array(pathinfo($attachment, PATHINFO_EXTENSION), $this->getAllowedImages())
-                    ? array_push($images, $attachment) : '';
+                    in_array(pathinfo($attachment->new_name, PATHINFO_EXTENSION), $this->getAllowedImages())
+                    ? array_push($images, $attachment->new_name) : '';
                 }
             }
         }

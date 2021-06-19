@@ -150,7 +150,7 @@ class MessagesController extends Controller
                 'type' => $request['type'],
                 'from_id' => Auth::user()->id,
                 'to_id' => $request['id'],
-                'body' => trim(htmlentities($request['message'])),
+                'body' => htmlentities(trim($request['message']), ENT_QUOTES, 'UTF-8'),
                 'attachment' => ($attachment) ? json_encode((object)[
                     'new_name' => $attachment,
                     'old_name' => $attachment_title,
@@ -242,15 +242,19 @@ class MessagesController extends Controller
             $join->on('ch_messages.from_id', '=', 'users.id')
                 ->orOn('ch_messages.to_id', '=', 'users.id');
         })
-            ->where('ch_messages.from_id', Auth::user()->id)
-            ->orWhere('ch_messages.to_id', Auth::user()->id)
-            ->orderBy('ch_messages.created_at', 'desc')
-            ->get()
-            ->unique('id');
+        ->where(function ($q) {
+            $q->where('ch_messages.from_id', Auth::user()->id)
+              ->orWhere('ch_messages.to_id', Auth::user()->id);
+        })
+        ->orderBy('ch_messages.created_at', 'desc')
+        ->get()
+        ->unique('id');
 
+        $contacts = '<p class="message-hint center-el"><span>Your contact list is empty</span></p>';
+        $users = $users->where('id','!=',Auth::user()->id);
         if ($users->count() > 0) {
             // fetch contacts
-            $contacts = null;
+            $contacts = '';
             foreach ($users as $user) {
                 if ($user->id != Auth::user()->id) {
                     // Get user data
@@ -262,7 +266,7 @@ class MessagesController extends Controller
 
         // send the response
         return Response::json([
-            'contacts' => $users->count() > 0 ? $contacts : '<br><p class="message-hint"><span>Your contact list is empty</span></p>',
+            'contacts' => $contacts,
         ], 200);
     }
 
@@ -328,9 +332,10 @@ class MessagesController extends Controller
         }
         // send the response
         return Response::json([
+            'count' => $favorites->count(),
             'favorites' => $favorites->count() > 0
                 ? $favoritesList
-                : '<p class="message-hint"><span>Your favorite list is empty</span></p>',
+                : 0,
         ], 200);
     }
 
@@ -356,7 +361,7 @@ class MessagesController extends Controller
         return Response::json([
             'records' => $records->count() > 0
                 ? $getRecords
-                : '<p class="message-hint"><span>Nothing to show.</span></p>',
+                : '<p class="message-hint center-el"><span>Nothing to show.</span></p>',
             'addData' => 'html'
         ], 200);
     }

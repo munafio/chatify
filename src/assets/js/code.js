@@ -395,20 +395,22 @@ function sendMessage() {
       contentType: false,
       beforeSend: () => {
         // remove message hint
-        $(".message-hint").remove();
+        $(".messages")
+          .find(".message-hint")
+          .remove();
         // append message
         hasFile
           ? messagesContainer
               .find(".messages")
               .append(
                 sendigCard(
-                  messageInput.val() + "\n" + loadingSVG("28px"),
+                  messageInput.text() + "\n" + loadingSVG("28px"),
                   tempID
                 )
               )
           : messagesContainer
               .find(".messages")
-              .append(sendigCard(messageInput.val(), tempID));
+              .append(sendigCard(messageInput.text(), tempID));
         // scroll to bottom
         scrollBottom(messagesContainer);
         messageInput.css({ height: "42px" });
@@ -533,7 +535,9 @@ var channel = pusher.subscribe("private-chatify");
 // Listen to messages, and append if data received
 channel.bind("messaging", function(data) {
   if (data.from_id == messenger.split("_")[1] && data.to_id == auth_id) {
-    $(".message-hint").remove();
+    $(".messages")
+      .find(".message-hint")
+      .remove();
     messagesContainer.find(".messages").append(data.message);
     scrollBottom(messagesContainer);
     makeSeen(true);
@@ -796,8 +800,12 @@ function getFavoritesList() {
     data: { _token: access_token },
     dataType: "JSON",
     success: (data) => {
-      $(".messenger-favorites").html("");
-      $(".messenger-favorites").html(data.favorites);
+      if (data.count > 0) {
+        $(".favorites-section").show();
+        $(".messenger-favorites").html(data.favorites);
+      } else {
+        $(".favorites-section").hide();
+      }
       // update data-action required with [responsive design]
       cssMediaQueries();
     },
@@ -879,7 +887,7 @@ function deleteConversation(id) {
         show: true,
         name: "alert",
         buttons: false,
-        body: loadingSVG("32px"),
+        body: loadingSVG("32px", null, "margin:auto"),
       });
     },
     success: (data) => {
@@ -907,7 +915,7 @@ function deleteConversation(id) {
 }
 
 function updateSettings() {
-  const formData = new FormData($("#updateAvatar")[0]);
+  const formData = new FormData($("#update-settings")[0]);
   if (messengerColor) {
     formData.append("messengerColor", messengerColor);
   }
@@ -1035,16 +1043,6 @@ $(document).ready(function() {
     $(".messenger-infoView").toggle();
   });
 
-  // x button for info section to show the main button.
-  $(".messenger-infoView nav a").on("click", function() {
-    $(".show-infoSide").show();
-  });
-
-  // hide showing button for info section.
-  $(".show-infoSide").on("click", function() {
-    $(this).hide();
-  });
-
   // make favorites card dragable on click to slide.
   hScroller(".messenger-favorites");
 
@@ -1144,30 +1142,34 @@ $(document).ready(function() {
   });
 
   function attachmentValidate(file) {
-    // Allowing file type
     const fileElement = $(".upload-attachment");
-    if (typeof file != "undefined") {
-      var allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif|\.zip|\.rar|\.txt)$/i;
-      if (!allowedExtensions.exec(fileElement.val())) {
-        alert("File type is not allowed!");
-        fileElement.val("");
-        return false;
-      }
-      // Validate file size.
-      var size = parseFloat(file.size / (1024 * 1024)).toFixed(2);
-      if (size > 5) {
-        alert("Please select file size less than 5 MB");
-        return false;
-      }
-    } else {
-      alert("This browser does not support HTML5.");
+    const allowedExtensions = [
+        "jpg",
+        "jpeg",
+        "png",
+        "gif",
+        "zip",
+        "rar",
+        "txt",
+      ],
+      sizeLimit = 5000000; // 5 megabyte
+    const { name: fileName, size: fileSize } = file;
+    const fileExtension = fileName.split(".").pop();
+    if (!allowedExtensions.includes(fileExtension)) {
+      alert("file type not allowed");
+      fileElement.val("");
+      return false;
+    }
+    // Validate file size.
+    if (fileSize > sizeLimit) {
+      alert("Please select file size less than 5 MiB");
       return false;
     }
     return true;
   }
 
   // Attachment preview cancel button.
-  $("body").on("click", ".attachment-preview .cancel", (e) => {
+  $("body").on("click", ".attachment-preview .cancel", () => {
     cancelAttachment();
   });
 
@@ -1249,6 +1251,7 @@ $(document).ready(function() {
   // Settings button action to show settings modal
   $("body").on("click", ".settings-btn", function(e) {
     e.preventDefault();
+    console.log("test");
     app_modal({
       show: true,
       name: "settings",
@@ -1256,7 +1259,7 @@ $(document).ready(function() {
   });
 
   // on submit settings' form
-  $("#updateAvatar").on("submit", (e) => {
+  $("#update-settings").on("submit", (e) => {
     e.preventDefault();
     updateSettings();
   });
@@ -1279,6 +1282,7 @@ $(document).ready(function() {
       );
     }
     let file = e.target.files[0];
+    if (!attachmentValidate(file)) return false;
     let reader = new FileReader();
     reader.readAsDataURL(file);
     reader.addEventListener("loadstart", (e) => {
@@ -1303,11 +1307,11 @@ $(document).ready(function() {
     });
   });
   // change messenger color button
-  $("body").on("click", ".update-messengerColor a", function() {
+  $("body").on("click", ".update-messengerColor .color-btn", function() {
     messengerColor = $(this)
       .attr("class")
       .split(" ")[0];
-    $(".update-messengerColor a").removeClass("m-color-active");
+    $(".update-messengerColor .color-btn").removeClass("m-color-active");
     $(this).addClass("m-color-active");
   });
   // Switch to Dark/Light mode
