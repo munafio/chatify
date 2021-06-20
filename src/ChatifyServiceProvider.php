@@ -2,7 +2,8 @@
 
 namespace Chatify;
 
-use Chatify\Console\InstallChatify;
+use Chatify\Console\InstallCommand;
+use Chatify\Console\PublishCommand;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
@@ -34,7 +35,8 @@ class ChatifyServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->commands([
-                InstallChatify::class,
+                InstallCommand::class,
+                PublishCommand::class,
             ]);
             $this->setPublishes();
         }
@@ -52,40 +54,40 @@ class ChatifyServiceProvider extends ServiceProvider
         $userAvatarFolder = json_decode(json_encode(include(__DIR__.'/config/chatify.php')))->user_avatar->folder;
 
         // Config
-            $this->publishes([
-                __DIR__ . '/config/chatify.php' => config_path('chatify.php')
-            ], 'chatify-config');
+        $this->publishes([
+            __DIR__ . '/config/chatify.php' => config_path('chatify.php')
+        ], 'chatify-config');
 
-            // Migrations
-            $this->publishes([
-                __DIR__ . '/database/migrations/' => database_path('migrations')
-            ], 'chatify-migrations');
+        // Migrations
+        $this->publishes([
+            __DIR__ . '/database/migrations/' => database_path('migrations')
+        ], 'chatify-migrations');
 
-            // Models
-            $isV8 = explode('.',app()->version())[0] >= 8;
-            $this->publishes([
-                __DIR__ . '/Models' => app_path($isV8 ? 'Models' : '')
-            ], 'chatify-models');
+        // Models
+        $isV8 = explode('.',app()->version())[0] >= 8;
+        $this->publishes([
+            __DIR__ . '/Models' => app_path($isV8 ? 'Models' : '')
+        ], 'chatify-models');
 
-            // Controllers
-            $this->publishes([
-                __DIR__ . '/Http/Controllers' => app_path('Http/Controllers/vendor/Chatify')
-            ], 'chatify-controllers');
+        // Controllers
+        $this->publishes([
+            __DIR__ . '/Http/Controllers' => app_path('Http/Controllers/vendor/Chatify')
+        ], 'chatify-controllers');
 
-            // Views
-            $this->publishes([
-                __DIR__ . '/views' => resource_path('views/vendor/Chatify')
-            ], 'chatify-views');
+        // Views
+        $this->publishes([
+            __DIR__ . '/views' => resource_path('views/vendor/Chatify')
+        ], 'chatify-views');
 
-            // Assets
-            $this->publishes([
-                // CSS
-                __DIR__ . '/assets/css' => public_path('css/chatify'),
-                // JavaScript
-                __DIR__ . '/assets/js' => public_path('js/chatify'),
-                // Images
-                __DIR__ . '/assets/imgs' => storage_path('app/public/' . $userAvatarFolder),
-            ], 'chatify-assets');
+        // Assets
+        $this->publishes([
+            // CSS
+            __DIR__ . '/assets/css' => public_path('css/chatify'),
+            // JavaScript
+            __DIR__ . '/assets/js' => public_path('js/chatify'),
+            // Images
+            __DIR__ . '/assets/imgs' => storage_path('app/public/' . $userAvatarFolder),
+        ], 'chatify-assets');
     }
 
     /**

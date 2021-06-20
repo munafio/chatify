@@ -8,15 +8,10 @@
 
 A Laravel package helps you add a complete real-time messaging system to your new / existing application with only one command.
 
-# Prerequisites
+# Announcement 📣
 
-- PHP >=5.3.2.
-- Laravel >=5.4
-- Pusher Api Account.
-
-# Updates (2021-06-19)
-
-- New release v1.2.3, see [What's new](https://github.com/munafio/chatify/blob/master/CHANGELOG.md)
+I have created a server for **Chatify** on `Discord` to let you **up-to-date** and help you as much as I can .. so now you can chat with me, get a help, showcases, and most importantly to get announcements and updates about **Chatify**.
+I'll announce a **big news** soon 🤩🤩 .. So, [join now](https://discord.gg/rb6vvp3C) and keep updated.
 
 # Features
 
@@ -52,18 +47,18 @@ password : demo1234
 - Demo app - [Click Here](https://github.com/munafio/chatify-demo).
 - Video on YouTube - [Click Here](https://youtu.be/gjo74FUJJPI)
 
-# Documentation
+# Official Documentation
 
-You can see the full documentation [here](https://chatify.munafio.com)
+Documentation for Chatify can be found [here](https://chatify.munafio.com)
 
 # Change log
 
 [CHANGELOG.md](https://github.com/munafio/chatify/blob/master/CHANGELOG.md)
 
-## Author
+# Authors
 
-[Munaf A. Mahdi](https://www.munafio.com/p/contact-me.html)
+- [Munaf A. Mahdi](https://www.munafio.com/p/about-me.html)
 
-## License
+# License
 
-[MIT](https://choosealicense.com/licenses/mit/)
+Chatify is licensed under the [MIT license](https://choosealicense.com/licenses/mit/)
