@@ -6,14 +6,34 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 
-class InstallChatify extends Command
+class InstallCommand extends Command
 {
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
     protected $signature = 'chatify:install';
 
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
     protected $description = 'Install Chatify package';
 
+    /**
+     * Check Laravel version.
+     *
+     * @var bool
+     */
     private $isV8;
 
+    /**
+     * Execute the console command.
+     *
+     * @return void
+     */
     public function handle()
     {
         $this->isV8 = explode('.',app()->version())[0] >= 8;
@@ -53,6 +73,13 @@ class InstallChatify extends Command
         $this->info('[✓] Chatify installed successfully');
     }
 
+    /**
+     * Modify models imports/namespace path according to Laravel version.
+     *
+     * @param string $targetFilePath
+     * @param string $model
+     * @return void
+     */
     private function modifyModelsPath($targetFilePath, $model = null){
         $path = realpath(__DIR__.$targetFilePath);
         $contents = File::get($path);
@@ -65,22 +92,36 @@ class InstallChatify extends Command
         File::put($path, $contents);
     }
 
+    /**
+     * Check, publish, or overwrite the assets.
+     *
+     * @param string $target
+     * @param string $path
+     * @return void
+     */
     private function process($target, $path)
     {
         $this->line('Publishing '.$target.'...');
         if (!File::exists($path)) {
             $this->publish($target);
             $this->info('[✓] '.$target.' published.');
-        } else {
-            if ($this->shouldOverwrite($target)) {
-                $this->line('Overwriting '.$target.'...');
-                $this->publish($target,true);
-            } else {
-                $this->line('[-] Ignored, The existing '.$target.' was not overwritten');
-            }
+            return;
         }
+        if ($this->shouldOverwrite($target)) {
+            $this->line('Overwriting '.$target.'...');
+            $this->publish($target,true);
+            $this->info('[✓] '.$target.' published.');
+            return;
+        }
+        $this->line('[-] Ignored, The existing '.$target.' was not overwritten');
     }
 
+    /**
+     * Ask to overwrite.
+     *
+     * @param string $target
+     * @return void
+     */
     private function shouldOverwrite($target)
     {
         return $this->confirm(
@@ -89,17 +130,18 @@ class InstallChatify extends Command
         );
     }
 
+    /**
+     * Call the publish command.
+     *
+     * @param string $tag
+     * @param bool $forcePublish
+     * @return void
+     */
     private function publish($tag, $forcePublish = false)
     {
-        $params = [
-            '--provider' => "Chatify\ChatifyServiceProvider",
-            '--tag' => 'chatify-'.$tag
-        ];
-
-        if ($forcePublish === true) {
-            $params['--force'] = '';
-        }
-
-       $this->call('vendor:publish', $params);
+        $this->call('vendor:publish', [
+            '--tag' => 'chatify-'.$tag,
+            '--force' => $forcePublish,
+        ]);
     }
 }
