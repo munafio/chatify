@@ -11,7 +11,7 @@ A Laravel package helps you add a complete real-time messaging system to your ne
 # Announcement 📣
 
 I have created a server for **Chatify** on `Discord` to let you **up-to-date** and help you as much as I can .. so now you can chat with me, get a help, showcases, and most importantly to get announcements and updates about **Chatify**.
-I'll announce a **big news** soon 🤩🤩 .. So, [join now](https://discord.gg/rb6vvp3C) and keep updated.
+I'll announce a **big news** soon 🤩🤩 .. So, [join now](https://discord.gg/RaxyKVykYJ) and keep updated.
 
 # Features
 

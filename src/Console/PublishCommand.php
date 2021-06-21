@@ -27,10 +27,22 @@ class PublishCommand extends Command
      */
     public function handle()
     {
-        $this->call('vendor:publish', [
-            '--tag' => 'chatify-config',
-            '--force' => $this->option('force'),
-        ]);
+        if($this->option('force')){
+            $this->call('vendor:publish', [
+                '--tag' => 'chatify-config',
+                '--force' => true,
+            ]);
+
+            $this->call('vendor:publish', [
+                '--tag' => 'chatify-migrations',
+                '--force' => true,
+            ]);
+
+            $this->call('vendor:publish', [
+                '--tag' => 'chatify-models',
+                '--force' => true,
+            ]);
+        }
 
         $this->call('vendor:publish', [
             '--tag' => 'chatify-views',
