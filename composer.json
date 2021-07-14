@@ -10,7 +10,8 @@
     "php",
     "pusher",
     "realtime",
-    "real-time"
+    "real-time",
+    "chatify"
   ],
   "license": "MIT",
   "authors": [
@@ -19,7 +20,7 @@
       "email": "munafaqeelmahdi@gmail.com"
     }
   ],
-  "minimum-stability": "dev",
+  "homepage": "https://github.com/munafio/chatify",
   "require": {
     "pusher/pusher-php-server": "^7.0"
   },
@@ -37,5 +38,7 @@
         "Chatify": "Chatify\\Facades\\ChatifyMessenger"
       }
     }
-  }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
 }
