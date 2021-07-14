@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.3.0
+
+### Fixed
+
+- README updates.
+- Install Command fixes & improvements.
+- Contact list visible onLoad.
+- Settings’ modal responsive design.
+
+### Added
+
+- UPGRADE.md added.
+- Publish command added.
+- Package.json additions & modifications.
+
 ## v1.2.3 - (2021-06-19)
 
 ### Fixed
