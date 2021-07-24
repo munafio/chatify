@@ -194,24 +194,28 @@ class MessagesController extends Controller
     {
         // messages variable
         $allMessages = null;
+        $pageNumber = $request['previous_page_number'] ?? 0;
 
         // fetch messages
-        $query = Chatify::fetchMessagesQuery($request['id'])->orderBy('created_at', 'asc');
-        $messages = $query->get();
-
+        $query = Chatify::fetchMessagesQuery($request['id'])->orderBy('created_at', 'DESC');
+        $messages = $query->paginate(15, ['*'], 'page', $pageNumber);
+        
         // if there is a messages
-        if ($query->count() > 0) {
-            foreach ($messages as $message) {
+        if ($messages->count() > 0) {
+            foreach ($messages->reverse() as $message) {
                 $allMessages .= Chatify::messageCard(
                     Chatify::fetchMessage($message->id)
                 );
             }
+
             // send the response
             return Response::json([
                 'count' => $query->count(),
+                'previousPageNumber' => explode('?page=', $messages->nextPageUrl())[1] ?? -1,
                 'messages' => $allMessages,
             ]);
         }
+
         // send the response
         return Response::json([
             'count' => $query->count(),
