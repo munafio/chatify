@@ -105,7 +105,7 @@ class ChatifyMessenger
         if(isset($msg->attachment)){
             $attachmentOBJ = json_decode($msg->attachment);
             $attachment = $attachmentOBJ->new_name;
-            $attachment_title = $attachmentOBJ->old_name;
+            $attachment_title = htmlentities(trim($attachmentOBJ->old_name), ENT_QUOTES, 'UTF-8');
 
             $ext = pathinfo($attachment, PATHINFO_EXTENSION);
             $attachment_type = in_array($ext,$this->getAllowedImages()) ? 'image' : 'file';

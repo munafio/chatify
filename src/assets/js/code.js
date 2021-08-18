@@ -19,6 +19,12 @@ const messagesContainer = $(".messenger-messagingView .m-body"),
   access_token = $('meta[name="csrf-token"]').attr("content");
 // console.log(auth_id);
 
+const escapeHtml = (unsafe) => {
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+};
 /**
  *-------------------------------------------------------------
  * Global Templates
@@ -110,7 +116,7 @@ function attachmentTemplate(fileType, fileName, imgURL = null) {
      <div class="attachment-preview">
          <span class="fas fa-times cancel"></span>
          <p style="padding:0px 30px;"><span class="fas fa-file"></span> ` +
-      fileName +
+      escapeHtml(fileName) +
       `</p>
      </div>
      `
@@ -124,7 +130,7 @@ function attachmentTemplate(fileType, fileName, imgURL = null) {
       imgURL +
       `');"></div>
          <p><span class="fas fa-file-image"></span> ` +
-      fileName +
+      escapeHtml(fileName) +
       `</p>
      </div>
      `

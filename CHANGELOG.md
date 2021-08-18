@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.2.5 (2021-08-18)
+
+### Fixed
+
+- Fixed a security issue on uploaded file-name, which is vulnerable with XSS.
+
 ## v1.2.4 (2021-07-15)
 
 ### Fixed
