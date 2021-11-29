@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.3.0 (2021-11-30)
+
+### Fixed
+
+- UI/Ux fixes & improvements.
+- Backend fixes & improvements.
+
+### Added
+
+- Messages, Contacts, and Search pagination.
+- API routes.
+
 ## v1.2.5 (2021-08-18)
 
 ### Fixed

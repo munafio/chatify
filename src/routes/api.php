@@ -5,12 +5,12 @@ use Illuminate\Support\Facades\Route;
 /**
  * Authintication for pusher private channels
  */
-Route::post('/chat/auth', 'MessagesController@pusherAuth')->name('api.api.pusher.auth');
+Route::post('/chat/auth', 'MessagesController@pusherAuth')->name('api.pusher.auth');
 
 /**
  *  Fetch info for specific id [user/group]
  */
-Route::post('/idInfo', 'MessagesController@idFetchData');
+Route::post('/idInfo', 'MessagesController@idFetchData')->name('api.idInfo');
 
 /**
  * Send message route
