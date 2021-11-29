@@ -45,6 +45,9 @@ class InstallCommand extends Command
         $this->modifyModelsPath('/../Http/Controllers/MessagesController.php','User');
         $this->modifyModelsPath('/../Http/Controllers/MessagesController.php','ChFavorite');
         $this->modifyModelsPath('/../Http/Controllers/MessagesController.php','ChMessage');
+        $this->modifyModelsPath('/../Http/Controllers/Api/MessagesController.php','User');
+        $this->modifyModelsPath('/../Http/Controllers/Api/MessagesController.php','ChFavorite');
+        $this->modifyModelsPath('/../Http/Controllers/Api/MessagesController.php','ChMessage');
         $this->modifyModelsPath('/../ChatifyMessenger.php','ChFavorite');
         $this->modifyModelsPath('/../ChatifyMessenger.php','ChMessage');
         $this->modifyModelsPath('/../Models/ChFavorite.php');

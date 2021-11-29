@@ -207,7 +207,7 @@ class ChatifyMessenger
      * @param Collection $user
      * @return void
      */
-    public function getContactItem($messenger_id, $user){
+    public function getContactItem($user){
         // get last message
         $lastMessage = $this->getLastMessageQuery($user->id);
 
@@ -219,8 +219,6 @@ class ChatifyMessenger
             'user' => $user,
             'lastMessage' => $lastMessage,
             'unseenCounter' => $unseenCounter,
-            'type'=>'user',
-            'id' => $messenger_id,
         ])->render();
     }
 

@@ -48,7 +48,7 @@ Route::post('/makeSeen', 'MessagesController@seen')->name('messages.seen');
 /**
  * Get contacts
  */
-Route::post('/getContacts', 'MessagesController@getContacts')->name('contacts.get');
+Route::get('/getContacts', 'MessagesController@getContacts')->name('contacts.get');
 
 /**
  * Update contact item data
@@ -69,7 +69,7 @@ Route::post('/favorites', 'MessagesController@getFavorites')->name('favorites');
 /**
  * Search in messenger
  */
-Route::post('/search', 'MessagesController@search')->name('search');
+Route::get('/search', 'MessagesController@search')->name('search');
 
 /**
  * Get shared photos
