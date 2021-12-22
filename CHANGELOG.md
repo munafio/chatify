@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.3.1 (2021-12-23)
+
+### Fixed
+
+- Fixed migration's rollback, (ch\_) prefix added.
+
 ## v1.3.0 (2021-11-30)
 
 ### Fixed
