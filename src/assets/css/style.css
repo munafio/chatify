@@ -131,7 +131,7 @@ body {
 }
 .messenger-tab {
   overflow: auto;
-  height: calc(100% - 141px);
+  height: calc(100vh - 143px);
   display: none;
   position: relative;
 }
