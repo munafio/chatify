@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.3.2 (2022-01-07)
+
+### Fixed
+
+- Fixed CSS issue in FF with the contact list #157.
+- Correct misspelt of `updateContactItem` method (typo error) #159.
+
 ## v1.3.1 (2021-12-23)
 
 ### Fixed
