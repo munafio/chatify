@@ -464,7 +464,7 @@ function sendMessage() {
           console.error(data.error_msg);
         } else {
           // update contact item
-          updateContatctItem(getMessengerId());
+          updateContactItem(getMessengerId());
           messagesContainer.find('.mc-sender[data-id="sending"]').remove();
           // get message before the sending one [temporary]
           messagesContainer
@@ -638,7 +638,7 @@ channel.bind("client-seen", function (data) {
 channel.bind("client-contactItem", function (data) {
   if (data.update_for == auth_id) {
     data.updating == true
-      ? updateContatctItem(data.update_to)
+      ? updateContactItem(data.update_to)
       : console.error("[Contact Item updates] Updating failed!");
   }
 });
@@ -816,7 +816,7 @@ function getContacts() {
  * Update contact item
  *-------------------------------------------------------------
  */
-function updateContatctItem(user_id) {
+function updateContactItem(user_id) {
   if (user_id != auth_id) {
     let listItem = $("body")
       .find(".listOfContacts")
