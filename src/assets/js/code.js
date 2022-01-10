@@ -464,7 +464,7 @@ function sendMessage() {
           console.error(data.error_msg);
         } else {
           // update contact item
-          updateContactItem(getMessengerId());
+          updateContatctItem(getMessengerId());
           messagesContainer.find('.mc-sender[data-id="sending"]').remove();
           // get message before the sending one [temporary]
           messagesContainer
@@ -638,7 +638,7 @@ channel.bind("client-seen", function (data) {
 channel.bind("client-contactItem", function (data) {
   if (data.update_for == auth_id) {
     data.updating == true
-      ? updateContactItem(data.update_to)
+      ? updateContatctItem(data.update_to)
       : console.error("[Contact Item updates] Updating failed!");
   }
 });
@@ -816,7 +816,7 @@ function getContacts() {
  * Update contact item
  *-------------------------------------------------------------
  */
-function updateContactItem(user_id) {
+function updateContatctItem(user_id) {
   if (user_id != auth_id) {
     let listItem = $("body")
       .find(".listOfContacts")
@@ -1426,7 +1426,7 @@ $(document).ready(function () {
   });
   // change messenger color button
   $("body").on("click", ".update-messengerColor .color-btn", function () {
-    messengerColor = $(this).attr("class").split(" ")[0];
+    messengerColor = $(this).attr("data-color");
     $(".update-messengerColor .color-btn").removeClass("m-color-active");
     $(this).addClass("m-color-active");
   });

@@ -538,36 +538,6 @@ body {
 .update-messengerColor .color-btn:active {
   transform: scale(0.9);
 }
-.messengerColor-1 {
-  background-color: #2180f3;
-}
-.messengerColor-2 {
-  background-color: #2196f3;
-}
-.messengerColor-3 {
-  background-color: #00bcd4;
-}
-.messengerColor-4 {
-  background-color: #3f51b5;
-}
-.messengerColor-5 {
-  background-color: #673ab7;
-}
-.messengerColor-6 {
-  background-color: #4caf50;
-}
-.messengerColor-7 {
-  background-color: #ffc107;
-}
-.messengerColor-8 {
-  background-color: #ff9800;
-}
-.messengerColor-9 {
-  background-color: #ff2522;
-}
-.messengerColor-10 {
-  background-color: #9c27b0;
-}
 .dark-mode-switch {
   margin: 0px 5px;
   cursor: pointer;
