@@ -14,6 +14,15 @@ class ChatifyMessenger
 
     public $pusher;
 
+    /**
+     * Get max file's upload size in MB.
+     *
+     * @return int
+     */
+    public function getMaxUploadSize(){
+        return config('chatify.attachments.max_upload_size') * 1048576;
+    }
+
     public function __construct()
     {
         $this->pusher = new Pusher(

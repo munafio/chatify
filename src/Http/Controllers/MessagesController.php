@@ -135,8 +135,8 @@ class MessagesController extends Controller
             $allowed        = array_merge($allowed_images, $allowed_files);
 
             $file = $request->file('file');
-            // if size less than 150MB
-            if ($file->getSize() < 150000000) {
+            // check file size
+            if ($file->getSize() < Chatify::getMaxUploadSize()) {
                 if (in_array($file->getClientOriginalExtension(), $allowed)) {
                     // get attachment name
                     $attachment_title = $file->getClientOriginalName();
@@ -149,7 +149,7 @@ class MessagesController extends Controller
                 }
             } else {
                 $error->status = 1;
-                $error->message = "File extension not allowed!";
+                $error->message = "File size you are trying to upload is too large!";
             }
         }
 
@@ -455,8 +455,8 @@ class MessagesController extends Controller
             $allowed_images = Chatify::getAllowedImages();
 
             $file = $request->file('avatar');
-            // if size less than 150MB
-            if ($file->getSize() < 150000000) {
+            // check file size
+            if ($file->getSize() < Chatify::getMaxUploadSize()) {
                 if (in_array($file->getClientOriginalExtension(), $allowed_images)) {
                     // delete the older one
                     if (Auth::user()->avatar != config('chatify.user_avatar.default')) {
@@ -475,7 +475,7 @@ class MessagesController extends Controller
                     $error = 1;
                 }
             } else {
-                $msg = "File extension not allowed!";
+                $msg = "File size you are trying to upload is too large!";
                 $error = 1;
             }
         }
