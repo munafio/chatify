@@ -30,7 +30,6 @@ class ChatifyServiceProvider extends ServiceProvider
     {
         // Load Views, Migrations and Routes
         $this->loadViewsFrom(__DIR__ . '/views', 'Chatify');
-        $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
         $this->loadRoutes();
 
         if ($this->app->runningInConsole()) {
@@ -57,6 +56,16 @@ class ChatifyServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/config/chatify.php' => config_path('chatify.php')
         ], 'chatify-config');
+
+        // Migrations
+        $this->publishes([
+            __DIR__ . '/database/migrations/2022_01_10_99999_add_active_status_to_users.php' => database_path('migrations/' . date('Y_m_d') . '_999999_add_active_status_to_users.php'),
+            __DIR__ . '/database/migrations/2022_01_10_99999_add_avatar_to_users.php' => database_path('migrations/' . date('Y_m_d') . '_999999_add_avatar_to_users.php'),
+            __DIR__ . '/database/migrations/2022_01_10_99999_add_dark_mode_to_users.php' => database_path('migrations/' . date('Y_m_d') . '_999999_add_dark_mode_to_users.php'),
+            __DIR__ . '/database/migrations/2022_01_10_99999_add_messenger_color_to_users.php' => database_path('migrations/' . date('Y_m_d') . '_999999_add_messenger_color_to_users.php'),
+            __DIR__ . '/database/migrations/2022_01_10_99999_create_favorites_table.php' => database_path('migrations/' . date('Y_m_d') . '_999999_create_favorites_table.php'),
+            __DIR__ . '/database/migrations/2022_01_10_99999_create_messages_table.php' => database_path('migrations/' . date('Y_m_d') . '_999999_create_messages_table.php'),
+        ], 'chatify-migrations');
 
         // Models
         $isV8 = explode('.',app()->version())[0] >= 8;
