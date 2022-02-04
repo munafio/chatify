@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.3.4 (2022-02-04)
+
+### Fixed
+
+- Fixed Installing errors on the migrations step. #163
+
 ## v1.3.3 (2022-01-10)
 
 ### Fixed
