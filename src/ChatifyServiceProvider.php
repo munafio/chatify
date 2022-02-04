@@ -28,9 +28,8 @@ class ChatifyServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        // Load Views, Migrations and Routes
+        // Load Views and Routes
         $this->loadViewsFrom(__DIR__ . '/views', 'Chatify');
-        $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
         $this->loadRoutes();
 
         if ($this->app->runningInConsole()) {
