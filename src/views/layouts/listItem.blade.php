@@ -5,7 +5,7 @@
             {{-- Avatar side --}}
             <td>
             <div class="avatar av-m" style="background-color: #d9efff; text-align: center;">
-                <span class="far fa-bookmark" style="font-size: 22px; color: #68a5ff; margin-top: calc(50% - 10px);"></span>
+                <span class="far fa-bookmark" style="font-size: 22px; color: #68a5ff;"></span>
             </div>
             </td>
             {{-- center side --}}
