@@ -36,7 +36,7 @@ Route::post('/fetchMessages', 'MessagesController@fetch')->name('fetch.messages'
 Route::get('/download/{fileName}', 'MessagesController@download')->name(config('chatify.attachments.download_route_name'));
 
 /**
- * Authintication for pusher private channels
+ * Authentication for pusher private channels
  */
 Route::post('/chat/auth', 'MessagesController@pusherAuth')->name('pusher.auth');
 
