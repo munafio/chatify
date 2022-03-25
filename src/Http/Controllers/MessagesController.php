@@ -2,8 +2,10 @@
 
 namespace Chatify\Http\Controllers;
 
+use App\Models\ChMessage;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Response;
 use App\Models\ChMessage as Message;
@@ -105,8 +107,8 @@ class MessagesController extends Controller
      */
     public function download($fileName)
     {
-        if (Storage::exists(config('chatify.attachments.folder') . '/' . $fileName)) {
-            return Storage::download($fileName);
+        if (Storage::disk(config('chatify.disk_name'))->exists(config('chatify.attachments.folder') . '/' . $fileName)) {
+            return Storage::disk(config('chatify.disk_name'))->download($fileName);
         } else {
             return abort(404, "Sorry, File does not exist in our server or may have been deleted!");
         }
@@ -143,7 +145,7 @@ class MessagesController extends Controller
                     $attachment_title = $file->getClientOriginalName();
                     // upload attachment and store the new name
                     $attachment = Str::uuid() . "." . $file->getClientOriginalExtension();
-                    $file->storeAs(config('chatify.attachments.folder'), $attachment);
+                    $file->storeAs(config('chatify.attachments.folder'), $attachment, config('chatify.disk_name'));
                 } else {
                     $error->status = 1;
                     $error->message = "File extension not allowed!";
@@ -266,14 +268,14 @@ class MessagesController extends Controller
         ->groupBy('users.id')
         ->paginate($request->per_page ?? $this->perPage);
 
-        $usersList =$users->items();
+        $usersList = $users->items();
 
         if (count($usersList) > 0) {
             $contacts = '';
             foreach ($usersList as $user) {
                 $contacts .= Chatify::getContactItem($user);
             }
-        }else{
+        } else {
             $contacts = '<p class="message-hint center-el"><span>Your contact list is empty</span></p>';
         }
 
@@ -404,7 +406,7 @@ class MessagesController extends Controller
         for ($i = 0; $i < count($shared); $i++) {
             $sharedPhotos .= view('Chatify::layouts.listItem', [
                 'get' => 'sharedPhoto',
-                'image' => Storage::url(config('chatify.attachments.folder') .'/' . $shared[$i]),
+                'image' => Storage::disk(config('chatify.disk_name'))->url(config('chatify.attachments.folder') .'/' . $shared[$i]),
             ])->render();
         }
         // send the response
@@ -460,14 +462,14 @@ class MessagesController extends Controller
                     // delete the older one
                     if (Auth::user()->avatar != config('chatify.user_avatar.default')) {
                         $avatar = Auth::user()->avatar;
-                        if (Storage::exists($avatar)) {
-                            Storage::delete($avatar);
+                        if (Storage::disk(config('chatify.disk_name'))->exists($avatar)) {
+                            Storage::disk(config('chatify.disk_name'))->delete($avatar);
                         }
                     }
                     // upload
                     $avatar = Str::uuid() . "." . $file->getClientOriginalExtension();
                     $update = User::where('id', Auth::user()->id)->update(['avatar' => $avatar]);
-                    $file->storeAs(config('chatify.user_avatar.folder'), $avatar);
+                    $file->storeAs(config('chatify.user_avatar.folder'), $avatar, config('chatify.disk_name'));
                     $success = $update ? 1 : 0;
                 } else {
                     $msg = "File extension not allowed!";

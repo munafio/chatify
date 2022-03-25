@@ -4,6 +4,7 @@ namespace Chatify;
 
 use App\Models\ChMessage as Message;
 use App\Models\ChFavorite as Favorite;
+use Illuminate\Support\Facades\Storage;
 use Pusher\Pusher;
 use Illuminate\Support\Facades\Auth;
 use Exception;
@@ -215,7 +216,7 @@ class ChatifyMessenger
      *
      * @param int $messenger_id
      * @param Collection $user
-     * @return void
+     * @return string
      */
     public function getContactItem($user)
     {
@@ -227,10 +228,21 @@ class ChatifyMessenger
 
         return view('Chatify::layouts.listItem', [
             'get' => 'users',
-            'user' => $user,
+            'user' => $this->changeAvatar($user),
             'lastMessage' => $lastMessage,
             'unseenCounter' => $unseenCounter,
         ])->render();
+    }
+
+    public function changeAvatar($user)
+    {
+        $imageSize = 200;
+
+        if ($user->avatar == 'avatar.png') {
+            $user->avatar = 'https://www.gravatar.com/avatar/' . md5(strtolower(trim($user->email))) . '?s=' . $imageSize;
+        }
+
+        return $user;
     }
 
     /**
@@ -307,9 +319,9 @@ class ChatifyMessenger
             foreach ($this->fetchMessagesQuery($user_id)->get() as $msg) {
                 // delete file attached if exist
                 if (isset($msg->attachment)) {
-                    $path = storage_path('app/public/'.config('chatify.attachments.folder').'/'.json_decode($msg->attachment)->new_name);
-                    if (File::exists($path)) {
-                        File::delete($path);
+                    $path = config('chatify.attachments.folder').'/'.json_decode($msg->attachment)->new_name;
+                    if (Storage::disk(config('chatify.disk_name'))->exists($path)) {
+                        Storage::disk(config('chatify.disk_name'))->delete($path);
                     }
                 }
                 // delete from database

@@ -11,6 +11,13 @@ return [
 
     /*
     |-------------------------------------
+    | The disk on which to store added files and derived images by default.
+    |-------------------------------------
+    */
+    'disk_name' => env('CHATIFY_DISK', 'public'),
+
+    /*
+    |-------------------------------------
     | Routes configurations
     |-------------------------------------
     */

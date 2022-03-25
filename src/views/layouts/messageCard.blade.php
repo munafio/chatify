@@ -15,7 +15,7 @@
     @if(@$attachment[2] == 'image')
     <div>
         <div class="message-card">
-            <div class="image-file chat-image" style="width: 250px; height: 150px;background-image: url('{{ Storage::url(config('chatify.attachments.folder').'/'.$attachment[0]) }}')">
+            <div class="image-file chat-image" style="width: 250px; height: 150px;background-image: url('{{ Storage::disk(config('chatify.disk_name'))->url(config('chatify.attachments.folder').'/'.$attachment[0]) }}')">
             </div>
         </div>
     </div>
@@ -41,7 +41,7 @@
     @if(@$attachment[2] == 'image')
     <div>
         <div class="message-card mc-sender">
-            <div class="image-file chat-image" style="width: 250px; height: 150px;background-image: url('{{ Storage::url(config('chatify.attachments.folder').'/'.$attachment[0]) }}')">
+            <div class="image-file chat-image" style="width: 250px; height: 150px;background-image: url('{{ Storage::disk(config('chatify.disk_name'))->url(config('chatify.attachments.folder').'/'.$attachment[0]) }}')">
             </div>
         </div>
     </div>
