@@ -83,7 +83,7 @@ class MessagesController extends Controller
      */
     public function download($fileName)
     {
-        $path = Storage::disk(config('chatify.disk_name'))->path(config('chatify.attachments.folder') . '/' . $fileName);
+        $path = config('chatify.attachments.folder') . '/' . $fileName;
         if (Storage::disk(config('chatify.disk_name'))->exists($path)) {
             return response()->json([
                 'file_name' => $fileName,

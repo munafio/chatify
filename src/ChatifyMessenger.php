@@ -334,4 +334,33 @@ class ChatifyMessenger
             return 0;
         }
     }
+
+    /**
+     * Delete message
+     *
+     * @param int $id
+     * @return boolean
+     */
+    public function deleteMessage($id)
+    {
+        try {
+            $msg = Message::findOrFail($id);
+                if ($msg->from_id == auth()->id()) {
+                    // delete file attached if exist
+                    if (isset($msg->attachment)) {
+                        $path = config('chatify.attachments.folder') . '/' . json_decode($msg->attachment)->new_name;
+                        if (Storage::disk(config('chatify.disk_name'))->exists($path)) {
+                            Storage::disk(config('chatify.disk_name'))->delete($path);
+                        }
+                    }
+                    // delete from database
+                    $msg->delete();
+                } else {
+                    return 0;
+                }
+            return 1;
+        } catch (Exception $e) {
+            return 0;
+        }
+    }
 }

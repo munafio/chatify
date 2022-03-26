@@ -26,7 +26,7 @@ class MessagesController extends Controller
      * Authenticate the connection for pusher
      *
      * @param Request $request
-     * @return JsonResponse|void
+     * @return JsonResponse
      */
     public function pusherAuth(Request $request)
     {
@@ -108,7 +108,7 @@ class MessagesController extends Controller
     public function download($fileName)
     {
         if (Storage::disk(config('chatify.disk_name'))->exists(config('chatify.attachments.folder') . '/' . $fileName)) {
-            return Storage::disk(config('chatify.disk_name'))->download($fileName);
+            return Storage::disk(config('chatify.disk_name'))->download(config('chatify.attachments.folder') . '/' . $fileName);
         } else {
             return abort(404, "Sorry, File does not exist in our server or may have been deleted!");
         }
@@ -425,6 +425,23 @@ class MessagesController extends Controller
     {
         // delete
         $delete = Chatify::deleteConversation($request['id']);
+
+        // send the response
+        return Response::json([
+            'deleted' => $delete ? 1 : 0,
+        ], 200);
+    }
+
+    /**
+     * Delete message
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function deleteMessage(Request $request)
+    {
+        // delete
+        $delete = Chatify::deleteMessage($request['id']);
 
         // send the response
         return Response::json([

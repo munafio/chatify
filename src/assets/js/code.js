@@ -1464,10 +1464,54 @@ $(document).ready(function () {
   });
 
   // show and hide message time
-    $('body').on('click', '.chat-message-wrapper', function () {
+    $('body').on('click', '.message-card', function () {
         $(this).find('sub').slideToggle('300', function() {
-            $(this).removeClass('chatify-d-none');
+            $(this).toggleClass('chatify-d-none d-md-flex');
         });
     })
+
+    $('body').on('click', '.chatify-hover-delete-btn', function () {
+        deleteMessage($(this).data('id'))
+    })
+
+    function deleteMessage(id) {
+        $.ajax({
+            url: url + "/deleteMessage",
+            method: "POST",
+            data: { _token: access_token, id: id },
+            dataType: "JSON",
+            beforeSend: () => {
+                // hide delete modal
+                app_modal({
+                    show: false,
+                    name: "delete",
+                });
+                // Show waiting alert modal
+                app_modal({
+                    show: true,
+                    name: "alert",
+                    buttons: false,
+                    body: loadingSVG("32px", null, "margin:auto"),
+                });
+            },
+            success: (data) => {
+                console.log($(".messages").find(`[data-message-id='${id}']`))
+                $(".messages").find(`[data-message-id='${id}']`).remove()
+                console.log(data)
+                data.deleted ? "" : console.error("Error occurred!");
+
+                // Hide waiting alert modal
+                app_modal({
+                    show: false,
+                    name: "alert",
+                    buttons: true,
+                    body: "",
+                });
+            },
+            error: () => {
+                console.error("Server error, check your response");
+            },
+        });
+    }
 
 });

@@ -1,4 +1,7 @@
 <style>
+    :root {
+        --messengerColor: {{ $messengerColor }},
+    }
 /* NProgress background */
 #nprogress .bar{
 	background: {{ $messengerColor }} !important;

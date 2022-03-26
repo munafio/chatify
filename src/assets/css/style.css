@@ -960,3 +960,12 @@ div.loadingPlaceholder-date {
     border: none;
     box-shadow: none;
 }
+.chatify-hover-delete-btn {
+    display: none;
+    cursor: pointer;
+    color: #333333;
+}
+
+.message-card:hover .chatify-hover-delete-btn {
+    display: block;
+}

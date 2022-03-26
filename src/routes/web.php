@@ -82,7 +82,12 @@ Route::post('/shared', 'MessagesController@sharedPhotos')->name('shared');
 Route::post('/deleteConversation', 'MessagesController@deleteConversation')->name('conversation.delete');
 
 /**
- * Delete Conversation
+ * Delete Message
+ */
+Route::post('/deleteMessage', 'MessagesController@deleteMessage')->name('message.delete');
+
+/**
+ * Update setting
  */
 Route::post('/updateSettings', 'MessagesController@updateSettings')->name('avatar.update');
 
