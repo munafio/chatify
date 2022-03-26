@@ -106,7 +106,7 @@ body {
   margin: 0px 10px;
   width: calc(100% - 20px);
   border: none;
-  padding: 8px ​10px;
+  padding: 8px 10px;
   border-radius: 6px;
   outline: none;
 }
@@ -212,8 +212,8 @@ body {
   height: 45px;
 }
 .av-s {
-  width: 32px;
-  height: 32px;
+  width: 32px !important;
+  height: 32px !important;
 }
 .messenger-favorites {
   padding: 10px;
@@ -612,22 +612,22 @@ body {
   color: #fff;
 }
 .a-btn-success {
-  background: #3fc380;
+  background: #3fc380 !important;
   color: #fff;
 }
 .a-btn-success:hover,
 .a-btn-success:focus {
-  background: #2ecc71;
+  background: #2ecc71 !important;
   color: #fff;
 }
 .a-btn-danger {
-  background: #ea1909;
+  background: #ea1909 !important;
   color: #fff;
 }
 .a-btn-danger:hover,
 .a-btn-danger:focus {
   color: #fff;
-  background: #b70d00;
+  background: #b70d00 !important;
 }
 .btn-disabled {
   opacity: 0.5;
@@ -953,4 +953,10 @@ div.loadingPlaceholder-date {
 
 .mb-2 {
     margin-bottom: 0.5rem; /* 8px */
+}
+
+.messenger textarea:focus {
+    outline: none;
+    border: none;
+    box-shadow: none;
 }

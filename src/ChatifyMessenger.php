@@ -240,6 +240,8 @@ class ChatifyMessenger
 
         if ($user->avatar == 'avatar.png') {
             $user->avatar = 'https://www.gravatar.com/avatar/' . md5(strtolower(trim($user->email))) . '?s=' . $imageSize;
+        } else {
+            $user->avatar = Storage::disk(config('chatify.disk_name'))->url(config('chatify.user_avatar.folder') . '/' . $user->avatar);
         }
 
         return $user;

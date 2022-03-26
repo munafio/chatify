@@ -70,4 +70,11 @@
 .m-list-active .activeStatus{
     border-color: {{ $messengerColor }} !important;
 }
+
+.messenger [type='text']:focus {
+    outline: 1px solid {{ $messengerColor }};
+    border-color: {{ $messengerColor }} !important;
+    border-color: {{ $messengerColor }};
+    box-shadow: 0 0 2px {{ $messengerColor }};
+}
 </style>

@@ -377,7 +377,7 @@ class MessagesController extends Controller
             $getRecords .= view('Chatify::layouts.listItem', [
                 'get' => 'search_item',
                 'type' => 'user',
-                'user' => $record,
+                'user' => Chatify::getUserWithGravatar($record),
             ])->render();
         }
         if($records->total() < 1){

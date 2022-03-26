@@ -287,7 +287,7 @@ class MessagesController extends Controller
      * Search in messenger
      *
      * @param Request $request
-     * @return void
+     * @return \Illuminate\Http\JsonResponse
      */
     public function search(Request $request)
     {
@@ -295,6 +295,11 @@ class MessagesController extends Controller
         $records = User::where('id','!=',Auth::user()->id)
                     ->where('name', 'LIKE', "%{$input}%")
                     ->paginate($request->per_page ?? $this->perPage);
+
+        foreach ($records->items() as $index => $record) {
+            $records[$index] += Chatify::getUserWithGravatar($record);
+        }
+
         return Response::json([
             'records' => $records->items(),
             'total' => $records->total(),
