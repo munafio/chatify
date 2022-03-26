@@ -50,7 +50,7 @@ class MessagesController extends Controller
      * Fetch data by id for (user/group)
      *
      * @param Request $request
-     * @return collection
+     * @return \Illuminate\Http\JsonResponse
      */
     public function idFetchData(Request $request)
     {
@@ -62,7 +62,7 @@ class MessagesController extends Controller
         if ($request['type'] == 'user') {
             $fetch = User::where('id', $request['id'])->first();
             if($fetch){
-                $userAvatar = $fetch->avatar;
+                $userAvatar = Chatify::getUserWithGravatar($fetch)->avatar;
             }
         }
 

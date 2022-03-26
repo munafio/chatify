@@ -134,7 +134,7 @@ class ChatifyMessenger
      *
      * @param array $data
      * @param string $viewType
-     * @return void
+     * @return string
      */
     public function messageCard($data, $viewType = null)
     {
@@ -146,7 +146,7 @@ class ChatifyMessenger
      * Default fetch messages query between a Sender and Receiver.
      *
      * @param int $user_id
-     * @return Collection
+     * @return Message|\Illuminate\Database\Eloquent\Builder
      */
     public function fetchMessagesQuery($user_id)
     {
@@ -192,7 +192,7 @@ class ChatifyMessenger
      * Get last message for a specific user
      *
      * @param int $user_id
-     * @return Collection
+     * @return Message|Collection|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|object|null
      */
     public function getLastMessageQuery($user_id)
     {
@@ -228,13 +228,13 @@ class ChatifyMessenger
 
         return view('Chatify::layouts.listItem', [
             'get' => 'users',
-            'user' => $this->changeAvatar($user),
+            'user' => $this->getUserWithGravatar($user),
             'lastMessage' => $lastMessage,
             'unseenCounter' => $unseenCounter,
         ])->render();
     }
 
-    public function changeAvatar($user)
+    public function getUserWithGravatar($user)
     {
         $imageSize = 200;
 
