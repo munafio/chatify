@@ -39,7 +39,6 @@ class ChatifyServiceProvider extends ServiceProvider
             ]);
             $this->setPublishes();
         }
-
     }
 
     /**
@@ -68,7 +67,7 @@ class ChatifyServiceProvider extends ServiceProvider
         ], 'chatify-migrations');
 
         // Models
-        $isV8 = explode('.',app()->version())[0] >= 8;
+        $isV8 = explode('.', app()->version())[0] >= 8;
         $this->publishes([
             __DIR__ . '/Models' => app_path($isV8 ? 'Models' : '')
         ], 'chatify-models');

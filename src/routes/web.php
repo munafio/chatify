@@ -36,7 +36,7 @@ Route::post('/fetchMessages', 'MessagesController@fetch')->name('fetch.messages'
 Route::get('/download/{fileName}', 'MessagesController@download')->name(config('chatify.attachments.download_route_name'));
 
 /**
- * Authintication for pusher private channels
+ * Authentication for pusher private channels
  */
 Route::post('/chat/auth', 'MessagesController@pusherAuth')->name('pusher.auth');
 
@@ -82,7 +82,12 @@ Route::post('/shared', 'MessagesController@sharedPhotos')->name('shared');
 Route::post('/deleteConversation', 'MessagesController@deleteConversation')->name('conversation.delete');
 
 /**
- * Delete Conversation
+ * Delete Message
+ */
+Route::post('/deleteMessage', 'MessagesController@deleteMessage')->name('message.delete');
+
+/**
+ * Update setting
  */
 Route::post('/updateSettings', 'MessagesController@updateSettings')->name('avatar.update');
 

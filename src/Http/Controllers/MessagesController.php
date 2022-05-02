@@ -2,7 +2,10 @@
 
 namespace Chatify\Http\Controllers;
 
+use App\Models\ChMessage;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Response;
 use App\Models\ChMessage as Message;
@@ -12,6 +15,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request as FacadesRequest;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 class MessagesController extends Controller
 {
@@ -19,10 +23,10 @@ class MessagesController extends Controller
     protected $messengerFallbackColor = '#2180f3';
 
     /**
-     * Authinticate the connection for pusher
+     * Authenticate the connection for pusher
      *
      * @param Request $request
-     * @return void
+     * @return JsonResponse
      */
     public function pusherAuth(Request $request)
     {
@@ -49,7 +53,7 @@ class MessagesController extends Controller
      * Returning the view of the app with the required data.
      *
      * @param int $id
-     * @return void
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
     public function index( $id = null)
     {
@@ -71,7 +75,7 @@ class MessagesController extends Controller
      * Fetch data by id for (user/group)
      *
      * @param Request $request
-     * @return collection
+     * @return JsonResponse
      */
     public function idFetchData(Request $request)
     {
@@ -82,7 +86,7 @@ class MessagesController extends Controller
         if ($request['type'] == 'user') {
             $fetch = User::where('id', $request['id'])->first();
             if($fetch){
-                $userAvatar = asset('/storage/' . config('chatify.user_avatar.folder') . '/' . $fetch->avatar);
+                $userAvatar = Chatify::getUserWithGravatar($fetch)->avatar;
             }
         }
 
@@ -99,13 +103,12 @@ class MessagesController extends Controller
      * to be downloadable.
      *
      * @param string $fileName
-     * @return void
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse|void
      */
     public function download($fileName)
     {
-        $path = storage_path() . '/app/public/' . config('chatify.attachments.folder') . '/' . $fileName;
-        if (file_exists($path)) {
-            return Response::download($path, $fileName);
+        if (Storage::disk(config('chatify.disk_name'))->exists(config('chatify.attachments.folder') . '/' . $fileName)) {
+            return Storage::disk(config('chatify.disk_name'))->download(config('chatify.attachments.folder') . '/' . $fileName);
         } else {
             return abort(404, "Sorry, File does not exist in our server or may have been deleted!");
         }
@@ -115,7 +118,7 @@ class MessagesController extends Controller
      * Send a message to database
      *
      * @param Request $request
-     * @return JSON response
+     * @return JsonResponse
      */
     public function send(Request $request)
     {
@@ -142,7 +145,7 @@ class MessagesController extends Controller
                     $attachment_title = $file->getClientOriginalName();
                     // upload attachment and store the new name
                     $attachment = Str::uuid() . "." . $file->getClientOriginalExtension();
-                    $file->storeAs("public/" . config('chatify.attachments.folder'), $attachment);
+                    $file->storeAs(config('chatify.attachments.folder'), $attachment, config('chatify.disk_name'));
                 } else {
                     $error->status = 1;
                     $error->message = "File extension not allowed!";
@@ -192,7 +195,7 @@ class MessagesController extends Controller
      * fetch [user/group] messages from database
      *
      * @param Request $request
-     * @return JSON response
+     * @return JsonResponse
      */
     public function fetch(Request $request)
     {
@@ -217,9 +220,9 @@ class MessagesController extends Controller
             return Response::json($response);
         }
         $allMessages = null;
-        foreach ($messages->reverse() as $message) {
+        foreach ($messages->reverse() as $index => $message) {
             $allMessages .= Chatify::messageCard(
-                Chatify::fetchMessage($message->id)
+                Chatify::fetchMessage($message->id, $index)
             );
         }
         $response['messages'] = $allMessages;
@@ -230,7 +233,7 @@ class MessagesController extends Controller
      * Make messages as seen
      *
      * @param Request $request
-     * @return void
+     * @return JsonResponse|void
      */
     public function seen(Request $request)
     {
@@ -246,7 +249,7 @@ class MessagesController extends Controller
      * Get contacts list
      *
      * @param Request $request
-     * @return JSON response
+     * @return JsonResponse
      */
     public function getContacts(Request $request)
     {
@@ -265,14 +268,14 @@ class MessagesController extends Controller
         ->groupBy('users.id')
         ->paginate($request->per_page ?? $this->perPage);
 
-        $usersList =$users->items();
+        $usersList = $users->items();
 
         if (count($usersList) > 0) {
             $contacts = '';
             foreach ($usersList as $user) {
                 $contacts .= Chatify::getContactItem($user);
             }
-        }else{
+        } else {
             $contacts = '<p class="message-hint center-el"><span>Your contact list is empty</span></p>';
         }
 
@@ -287,7 +290,7 @@ class MessagesController extends Controller
      * Update user's list item data
      *
      * @param Request $request
-     * @return JSON response
+     * @return JsonResponse
      */
     public function updateContactItem(Request $request)
     {
@@ -310,7 +313,7 @@ class MessagesController extends Controller
      * Put a user in the favorites list
      *
      * @param Request $request
-     * @return void
+     * @return JsonResponse|void
      */
     public function favorite(Request $request)
     {
@@ -335,7 +338,7 @@ class MessagesController extends Controller
      * Get favorites list
      *
      * @param Request $request
-     * @return void
+     * @return JsonResponse|void
      */
     public function getFavorites(Request $request)
     {
@@ -361,7 +364,7 @@ class MessagesController extends Controller
      * Search in messenger
      *
      * @param Request $request
-     * @return void
+     * @return JsonResponse|void
      */
     public function search(Request $request)
     {
@@ -374,7 +377,7 @@ class MessagesController extends Controller
             $getRecords .= view('Chatify::layouts.listItem', [
                 'get' => 'search_item',
                 'type' => 'user',
-                'user' => $record,
+                'user' => Chatify::getUserWithGravatar($record),
             ])->render();
         }
         if($records->total() < 1){
@@ -392,7 +395,7 @@ class MessagesController extends Controller
      * Get shared photos
      *
      * @param Request $request
-     * @return void
+     * @return JsonResponse|void
      */
     public function sharedPhotos(Request $request)
     {
@@ -403,7 +406,7 @@ class MessagesController extends Controller
         for ($i = 0; $i < count($shared); $i++) {
             $sharedPhotos .= view('Chatify::layouts.listItem', [
                 'get' => 'sharedPhoto',
-                'image' => asset('storage/attachments/' . $shared[$i]),
+                'image' => Storage::disk(config('chatify.disk_name'))->url(config('chatify.attachments.folder') .'/' . $shared[$i]),
             ])->render();
         }
         // send the response
@@ -416,12 +419,29 @@ class MessagesController extends Controller
      * Delete conversation
      *
      * @param Request $request
-     * @return void
+     * @return JsonResponse
      */
     public function deleteConversation(Request $request)
     {
         // delete
         $delete = Chatify::deleteConversation($request['id']);
+
+        // send the response
+        return Response::json([
+            'deleted' => $delete ? 1 : 0,
+        ], 200);
+    }
+
+    /**
+     * Delete message
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function deleteMessage(Request $request)
+    {
+        // delete
+        $delete = Chatify::deleteMessage($request['id']);
 
         // send the response
         return Response::json([
@@ -458,15 +478,15 @@ class MessagesController extends Controller
                 if (in_array($file->getClientOriginalExtension(), $allowed_images)) {
                     // delete the older one
                     if (Auth::user()->avatar != config('chatify.user_avatar.default')) {
-                        $path = storage_path('app/public/' . config('chatify.user_avatar.folder') . '/' . Auth::user()->avatar);
-                        if (file_exists($path)) {
-                            @unlink($path);
+                        $avatar = Auth::user()->avatar;
+                        if (Storage::disk(config('chatify.disk_name'))->exists($avatar)) {
+                            Storage::disk(config('chatify.disk_name'))->delete($avatar);
                         }
                     }
                     // upload
                     $avatar = Str::uuid() . "." . $file->getClientOriginalExtension();
                     $update = User::where('id', Auth::user()->id)->update(['avatar' => $avatar]);
-                    $file->storeAs("public/" . config('chatify.user_avatar.folder'), $avatar);
+                    $file->storeAs(config('chatify.user_avatar.folder'), $avatar, config('chatify.disk_name'));
                     $success = $update ? 1 : 0;
                 } else {
                     $msg = "File extension not allowed!";
@@ -490,7 +510,7 @@ class MessagesController extends Controller
      * Set user's active status
      *
      * @param Request $request
-     * @return void
+     * @return JsonResponse
      */
     public function setActiveStatus(Request $request)
     {

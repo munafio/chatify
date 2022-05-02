@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 /**
- * Authintication for pusher private channels
+ * Authentication for pusher private channels
  */
 Route::post('/chat/auth', 'MessagesController@pusherAuth')->name('api.pusher.auth');
 

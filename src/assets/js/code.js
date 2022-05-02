@@ -464,7 +464,7 @@ function sendMessage() {
           console.error(data.error_msg);
         } else {
           // update contact item
-          updateContatctItem(getMessengerId());
+          updateContactItem(getMessengerId());
           messagesContainer.find('.mc-sender[data-id="sending"]').remove();
           // get message before the sending one [temporary]
           messagesContainer
@@ -554,6 +554,7 @@ function fetchMessages(id, type, newFetch = false) {
         if (messenger != 0) {
           disableOnLoad(false);
         }
+
       },
       error: (error) => {
         setMessagesLoading(false);
@@ -638,7 +639,7 @@ channel.bind("client-seen", function (data) {
 channel.bind("client-contactItem", function (data) {
   if (data.update_for == auth_id) {
     data.updating == true
-      ? updateContatctItem(data.update_to)
+      ? updateContactItem(data.update_to)
       : console.error("[Contact Item updates] Updating failed!");
   }
 });
@@ -816,7 +817,7 @@ function getContacts() {
  * Update contact item
  *-------------------------------------------------------------
  */
-function updateContatctItem(user_id) {
+function updateContactItem(user_id) {
   if (user_id != auth_id) {
     let listItem = $("body")
       .find(".listOfContacts")
@@ -1006,7 +1007,7 @@ function deleteConversation(id) {
       // refresh info
       IDinfo(id, getMessengerType());
 
-      data.deleted ? "" : console.error("Error occured!");
+      data.deleted ? "" : console.error("Error occurred!");
 
       // Hide waiting alert modal
       app_modal({
@@ -1461,4 +1462,56 @@ $(document).ready(function () {
   actionOnScroll(".messenger-tab.search-tab", function () {
     messengerSearch($(".messenger-search").val());
   });
+
+  // show and hide message time
+    $('body').on('click', '.message-card', function () {
+        $(this).find('sub').slideToggle('300', function() {
+            $(this).toggleClass('chatify-d-none d-md-flex');
+        });
+    })
+
+    $('body').on('click', '.chatify-hover-delete-btn', function () {
+        deleteMessage($(this).data('id'))
+    })
+
+    function deleteMessage(id) {
+        $.ajax({
+            url: url + "/deleteMessage",
+            method: "POST",
+            data: { _token: access_token, id: id },
+            dataType: "JSON",
+            beforeSend: () => {
+                // hide delete modal
+                app_modal({
+                    show: false,
+                    name: "delete",
+                });
+                // Show waiting alert modal
+                app_modal({
+                    show: true,
+                    name: "alert",
+                    buttons: false,
+                    body: loadingSVG("32px", null, "margin:auto"),
+                });
+            },
+            success: (data) => {
+                console.log($(".messages").find(`[data-message-id='${id}']`))
+                $(".messages").find(`[data-message-id='${id}']`).remove()
+                console.log(data)
+                data.deleted ? "" : console.error("Error occurred!");
+
+                // Hide waiting alert modal
+                app_modal({
+                    show: false,
+                    name: "alert",
+                    buttons: true,
+                    body: "",
+                });
+            },
+            error: () => {
+                console.error("Server error, check your response");
+            },
+        });
+    }
+
 });

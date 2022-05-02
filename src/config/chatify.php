@@ -11,6 +11,13 @@ return [
 
     /*
     |-------------------------------------
+    | The disk on which to store added files and derived images by default.
+    |-------------------------------------
+    */
+    'disk_name' => env('CHATIFY_DISK', 'public'),
+
+    /*
+    |-------------------------------------
     | Routes configurations
     |-------------------------------------
     */
@@ -60,7 +67,7 @@ return [
         'download_route_name' => 'attachments.download',
         'allowed_images' => (array) ['png','jpg','jpeg','gif'],
         'allowed_files' => (array) ['zip','rar','txt'],
-        'max_upload_size' => 150, // MB
+        'max_upload_size' => env('CHATIFY_MAX_FILE_SIZE', 150), // MB
     ],
 
     /*
