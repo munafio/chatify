@@ -329,6 +329,8 @@ body {
   padding: 6px 15px;
   padding-bottom: 5px;
   max-width: 80%;
+  width: fit-content;
+  width: -webkit-fit-content;
   border-radius: 20px;
   word-break: break-word;
 }
@@ -751,9 +753,9 @@ div.loadingPlaceholder-date {
 }
 .imageModal-content {
   -webkit-animation-name: zoom;
-  -webkit-animation-duration: 0.6s;
+  -webkit-animation-duration: 0.15s;
   animation-name: zoom;
-  animation-duration: 0.6s;
+  animation-duration: 0.15s;
 }
 
 @-webkit-keyframes zoom {
@@ -908,64 +910,64 @@ div.loadingPlaceholder-date {
 }
 
 @media (max-width: 576px) {
-    .user-name {
-        max-width: 150px;
-        white-space: nowrap;
-        overflow: hidden !important;
-        text-overflow: ellipsis;
-    }
-    .chatify-md-block {
-        display: block;
-    }
+  .user-name {
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden !important;
+    text-overflow: ellipsis;
+  }
+  .chatify-md-block {
+    display: block;
+  }
 }
 
 .chatify-d-flex {
-    display: flex !important;
+  display: flex !important;
 }
 
 .chatify-d-none {
-    display: none !important;
+  display: none !important;
 }
 
 .chatify-d-hidden {
-    visibility: hidden !important;
+  visibility: hidden !important;
 }
 
 .chatify-justify-content-between {
-    justify-content: space-between !important;
+  justify-content: space-between !important;
 }
 
 .chatify-align-items-center {
-    align-items: center !important;
+  align-items: center !important;
 }
 
 .chat-message-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: end;
-    unicode-bidi: bidi-override;
-    direction: ltr;
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  unicode-bidi: bidi-override;
+  direction: ltr;
 }
 
 .pb-3 {
-    padding-bottom: 0.75rem; /* 12px */
+  padding-bottom: 0.75rem; /* 12px */
 }
 
 .mb-2 {
-    margin-bottom: 0.5rem; /* 8px */
+  margin-bottom: 0.5rem; /* 8px */
 }
 
 .messenger textarea:focus {
-    outline: none;
-    border: none;
-    box-shadow: none;
+  outline: none;
+  border: none;
+  box-shadow: none;
 }
 .chatify-hover-delete-btn {
-    display: none;
-    cursor: pointer;
-    color: #333333;
+  display: none;
+  cursor: pointer;
+  color: #333333;
 }
 
 .message-card:hover .chatify-hover-delete-btn {
-    display: block;
+  display: block;
 }

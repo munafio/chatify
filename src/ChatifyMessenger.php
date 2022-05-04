@@ -228,22 +228,27 @@ class ChatifyMessenger
 
         return view('Chatify::layouts.listItem', [
             'get' => 'users',
-            'user' => $this->getUserWithGravatar($user),
+            'user' => $this->getUserWithAvatar($user),
             'lastMessage' => $lastMessage,
             'unseenCounter' => $unseenCounter,
         ])->render();
     }
 
-    public function getUserWithGravatar($user)
+    /**
+     * Get user with avatar (formatted).
+     *
+     * @param Collection $user
+     * @return Collection
+     */
+    public function getUserWithAvatar($user)
     {
-        $imageSize = 200;
-
-        if ($user->avatar == 'avatar.png') {
-            $user->avatar = 'https://www.gravatar.com/avatar/' . md5(strtolower(trim($user->email))) . '?s=' . $imageSize;
+        if ($user->avatar == 'avatar.png' && config('chatify.gravatar.enabled')) {
+            $imageSize = config('chatify.gravatar.image_size');
+            $imageset = config('chatify.gravatar.imageset');
+            $user->avatar = 'https://www.gravatar.com/avatar/' . md5(strtolower(trim($user->email))) . '?s=' . $imageSize . '&d=' . $imageset;
         } else {
-            $user->avatar = Storage::disk(config('chatify.disk_name'))->url(config('chatify.user_avatar.folder') . '/' . $user->avatar);
+            $user->avatar = self::getUserAvatarUrl($user->avatar);
         }
-
         return $user;
     }
 
@@ -322,8 +327,8 @@ class ChatifyMessenger
                 // delete file attached if exist
                 if (isset($msg->attachment)) {
                     $path = config('chatify.attachments.folder').'/'.json_decode($msg->attachment)->new_name;
-                    if (Storage::disk(config('chatify.disk_name'))->exists($path)) {
-                        Storage::disk(config('chatify.disk_name'))->delete($path);
+                    if (self::storage()->exists($path)) {
+                        self::storage()->delete($path);
                     }
                 }
                 // delete from database
@@ -336,7 +341,7 @@ class ChatifyMessenger
     }
 
     /**
-     * Delete message
+     * Delete message by ID
      *
      * @param int $id
      * @return boolean
@@ -349,8 +354,8 @@ class ChatifyMessenger
                     // delete file attached if exist
                     if (isset($msg->attachment)) {
                         $path = config('chatify.attachments.folder') . '/' . json_decode($msg->attachment)->new_name;
-                        if (Storage::disk(config('chatify.disk_name'))->exists($path)) {
-                            Storage::disk(config('chatify.disk_name'))->delete($path);
+                        if (self::storage()->exists($path)) {
+                            self::storage()->delete($path);
                         }
                     }
                     // delete from database
@@ -362,5 +367,36 @@ class ChatifyMessenger
         } catch (Exception $e) {
             return 0;
         }
+    }
+
+    /**
+     * Return a storage instance with disk name specified in the config.
+     *
+     */
+    public function storage()
+    {
+        return Storage::disk(config('chatify.storage_disk_name'));
+    }
+
+    /**
+     * Get user avatar url.
+     *
+     * @param string $user_avatar_name
+     * @return string
+     */
+    public function getUserAvatarUrl($user_avatar_name)
+    {
+        return self::storage()->url(config('chatify.user_avatar.folder') . '/' . $user_avatar_name);
+    }
+
+    /**
+     * Get attachment's url.
+     *
+     * @param string $attachment_name
+     * @return string
+     */
+    public function getAttachmentUrl($attachment_name)
+    {
+        return self::storage()->url(config('chatify.attachments.folder') . '/' . $attachment_name);
     }
 }

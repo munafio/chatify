@@ -86,7 +86,7 @@ class MessagesController extends Controller
         if ($request['type'] == 'user') {
             $fetch = User::where('id', $request['id'])->first();
             if($fetch){
-                $userAvatar = Chatify::getUserWithGravatar($fetch)->avatar;
+                $userAvatar = Chatify::getUserWithAvatar($fetch)->avatar;
             }
         }
 
@@ -107,8 +107,8 @@ class MessagesController extends Controller
      */
     public function download($fileName)
     {
-        if (Storage::disk(config('chatify.disk_name'))->exists(config('chatify.attachments.folder') . '/' . $fileName)) {
-            return Storage::disk(config('chatify.disk_name'))->download(config('chatify.attachments.folder') . '/' . $fileName);
+        if (Chatify::storage()->exists(config('chatify.attachments.folder') . '/' . $fileName)) {
+            return Chatify::storage()->download(config('chatify.attachments.folder') . '/' . $fileName);
         } else {
             return abort(404, "Sorry, File does not exist in our server or may have been deleted!");
         }
@@ -145,7 +145,7 @@ class MessagesController extends Controller
                     $attachment_title = $file->getClientOriginalName();
                     // upload attachment and store the new name
                     $attachment = Str::uuid() . "." . $file->getClientOriginalExtension();
-                    $file->storeAs(config('chatify.attachments.folder'), $attachment, config('chatify.disk_name'));
+                    $file->storeAs(config('chatify.attachments.folder'), $attachment, config('chatify.storage_disk_name'));
                 } else {
                     $error->status = 1;
                     $error->message = "File extension not allowed!";
@@ -369,7 +369,7 @@ class MessagesController extends Controller
     public function search(Request $request)
     {
         $getRecords = null;
-        $input = trim(filter_var($request['input'], FILTER_SANITIZE_STRING));
+        $input = trim(filter_var($request['input']));
         $records = User::where('id','!=',Auth::user()->id)
                     ->where('name', 'LIKE', "%{$input}%")
                     ->paginate($request->per_page ?? $this->perPage);
@@ -377,7 +377,7 @@ class MessagesController extends Controller
             $getRecords .= view('Chatify::layouts.listItem', [
                 'get' => 'search_item',
                 'type' => 'user',
-                'user' => Chatify::getUserWithGravatar($record),
+                'user' => Chatify::getUserWithAvatar($record),
             ])->render();
         }
         if($records->total() < 1){
@@ -406,7 +406,7 @@ class MessagesController extends Controller
         for ($i = 0; $i < count($shared); $i++) {
             $sharedPhotos .= view('Chatify::layouts.listItem', [
                 'get' => 'sharedPhoto',
-                'image' => Storage::disk(config('chatify.disk_name'))->url(config('chatify.attachments.folder') .'/' . $shared[$i]),
+                'image' => Chatify::getAttachmentUrl($shared[$i]),
             ])->render();
         }
         // send the response
@@ -463,7 +463,7 @@ class MessagesController extends Controller
 
         // If messenger color selected
         if ($request['messengerColor']) {
-            $messenger_color = trim(filter_var($request['messengerColor'], FILTER_SANITIZE_STRING));
+            $messenger_color = trim(filter_var($request['messengerColor']));
             User::where('id', Auth::user()->id)
                 ->update(['messenger_color' => $messenger_color]);
         }
@@ -479,14 +479,14 @@ class MessagesController extends Controller
                     // delete the older one
                     if (Auth::user()->avatar != config('chatify.user_avatar.default')) {
                         $avatar = Auth::user()->avatar;
-                        if (Storage::disk(config('chatify.disk_name'))->exists($avatar)) {
-                            Storage::disk(config('chatify.disk_name'))->delete($avatar);
+                        if (Chatify::storage()->exists($avatar)) {
+                            Chatify::storage()->delete($avatar);
                         }
                     }
                     // upload
                     $avatar = Str::uuid() . "." . $file->getClientOriginalExtension();
                     $update = User::where('id', Auth::user()->id)->update(['avatar' => $avatar]);
-                    $file->storeAs(config('chatify.user_avatar.folder'), $avatar, config('chatify.disk_name'));
+                    $file->storeAs(config('chatify.user_avatar.folder'), $avatar, config('chatify.storage_disk_name'));
                     $success = $update ? 1 : 0;
                 } else {
                     $msg = "File extension not allowed!";

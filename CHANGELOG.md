@@ -1,6 +1,23 @@
 # Change log
 
 All notable changes to this project will be documented in this file.
+v.1.4.0
+
+## v1.4.0 (2022-05-02)
+
+### Added
+
+- [Gravatar](https:://gravatar.com) support (optional, can be changed at config/chatify.php).
+- Delete Message by ID.
+- Laravel's Storage disk now supported and can be changed from the config.
+
+### Changed
+
+- File upload (user avatar & attachments) `allowed files` and `max size` now can be changed from one place which is (config/chatify.php).
+
+### Fixed
+
+- Bugs and UI/UX design fixes/improvements.
 
 ## v1.3.4 (2022-02-04)
 

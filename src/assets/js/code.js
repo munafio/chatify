@@ -64,14 +64,14 @@ function updateSelectedContact(user_id) {
  *-------------------------------------------------------------
  */
 // Loading svg
-function loadingSVG(w_h = "25px", className = "", style = "") {
+function loadingSVG(size = "25px", className = "", style = "") {
   return `
-<svg style="${style}" class="loadingSVG ${className}" xmlns="http://www.w3.org/2000/svg" width="${w_h}" height="${w_h}" viewBox="0 0 40 40" stroke="${defaultMessengerColor}">
+<svg style="${style}" class="loadingSVG ${className}" xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 40 40" stroke="#ffffff">
 <g fill="none" fill-rule="evenodd">
 <g transform="translate(2 2)" stroke-width="3">
 <circle stroke-opacity=".1" cx="18" cy="18" r="18"></circle>
 <path d="M36 18c0-9.94-8.06-18-18-18" transform="rotate(349.311 18 18)">
-    <animateTransform attributeName="transform" type="rotate" from="0 18 18" to="360 18 18" dur=".8s" repeatCount="indefinite"></animateTransform>
+ <animateTransform attributeName="transform" type="rotate" from="0 18 18" to="360 18 18" dur=".8s" repeatCount="indefinite"></animateTransform>
 </path>
 </g>
 </g>
@@ -93,17 +93,17 @@ function listItemLoading(items) {
     template += `
 <div class="loadingPlaceholder">
 <div class="loadingPlaceholder-wrapper">
-  <div class="loadingPlaceholder-body">
-  <table class="loadingPlaceholder-header">
-    <tr>
-      <td style="width: 45px;"><div class="loadingPlaceholder-avatar"></div></td>
-      <td>
-        <div class="loadingPlaceholder-name"></div>
-            <div class="loadingPlaceholder-date"></div>
-      </td>
-    </tr>
-  </table>
-  </div>
+<div class="loadingPlaceholder-body">
+<table class="loadingPlaceholder-header">
+ <tr>
+   <td style="width: 45px;"><div class="loadingPlaceholder-avatar"></div></td>
+   <td>
+     <div class="loadingPlaceholder-name"></div>
+         <div class="loadingPlaceholder-date"></div>
+   </td>
+ </tr>
+</table>
+</div>
 </div>
 </div>
 `;
@@ -118,15 +118,15 @@ function avatarLoading(items) {
     template += `
 <div class="loadingPlaceholder">
 <div class="loadingPlaceholder-wrapper">
-  <div class="loadingPlaceholder-body">
-      <table class="loadingPlaceholder-header">
-          <tr>
-              <td style="width: 45px;">
-                  <div class="loadingPlaceholder-avatar" style="margin: 2px;"></div>
-              </td>
-          </tr>
-      </table>
-  </div>
+<div class="loadingPlaceholder-body">
+   <table class="loadingPlaceholder-header">
+       <tr>
+           <td style="width: 45px;">
+               <div class="loadingPlaceholder-avatar" style="margin: 2px;"></div>
+           </td>
+       </tr>
+   </table>
+</div>
 </div>
 </div>
 `;
@@ -135,18 +135,18 @@ function avatarLoading(items) {
 }
 
 // While sending a message, show this temporary message card.
-function sendigCard(message, id) {
-  return (
-    `
-<div class="message-card mc-sender" data-id="` +
-    id +
-    `">
-<p>` +
-    message +
-    `<sub><span class="far fa-clock"></span></sub></p>
-</div>
-`
-  );
+function sendTempMessageCard(message, id) {
+  console.log("message", message);
+  return `
+ <div class="message-card mc-sender" data-id="${id}">
+     <p>
+         ${message}
+         <sub>
+             <span class="far fa-clock"></span>
+         </sub>
+     </p>
+ </div>
+ `;
 }
 // upload image preview card.
 function attachmentTemplate(fileType, fileName, imgURL = null) {
@@ -154,8 +154,8 @@ function attachmentTemplate(fileType, fileName, imgURL = null) {
     return (
       `
 <div class="attachment-preview">
-  <span class="fas fa-times cancel"></span>
-  <p style="padding:0px 30px;"><span class="fas fa-file"></span> ` +
+<span class="fas fa-times cancel"></span>
+<p style="padding:0px 30px;"><span class="fas fa-file"></span> ` +
       escapeHtml(fileName) +
       `</p>
 </div>
@@ -165,11 +165,11 @@ function attachmentTemplate(fileType, fileName, imgURL = null) {
     return (
       `
 <div class="attachment-preview">
-  <span class="fas fa-times cancel"></span>
-  <div class="image-file chat-image" style="background-image: url('` +
+<span class="fas fa-times cancel"></span>
+<div class="image-file chat-image" style="background-image: url('` +
       imgURL +
       `');"></div>
-  <p><span class="fas fa-file-image"></span> ` +
+<p><span class="fas fa-file-image"></span> ` +
       escapeHtml(fileName) +
       `</p>
 </div>
@@ -252,7 +252,7 @@ let app_modal = function ({
  * Slide to bottom on [action] - e.g. [message received, sent, loaded]
  *-------------------------------------------------------------
  */
-function scrollBottom(container) {
+function scrollToBottom(container) {
   $(container)
     .stop()
     .animate({
@@ -417,10 +417,10 @@ function IDinfo(id, type) {
  */
 function sendMessage() {
   temporaryMsgId += 1;
-  let tempID = "temp_" + temporaryMsgId;
-  let hasFile = $(".upload-attachment").val() ? true : false;
-
-  if ($.trim(messageInput.val()).length > 0 || hasFile) {
+  let tempID = `temp_${temporaryMsgId}`;
+  let hasFile = !!$(".upload-attachment").val();
+  const inputValue = $.trim(messageInput.val());
+  if (inputValue.length > 0 || hasFile) {
     const formData = new FormData($("#message-form")[0]);
     formData.append("id", getMessengerId());
     formData.append("type", getMessengerType());
@@ -436,21 +436,23 @@ function sendMessage() {
       beforeSend: () => {
         // remove message hint
         $(".messages").find(".message-hint").remove();
-        // append message
-        hasFile
-          ? messagesContainer
-              .find(".messages")
-              .append(
-                sendigCard(
-                  messageInput.text() + "\n" + loadingSVG("28px"),
-                  tempID
-                )
+        // append a temporary message card
+        if (hasFile) {
+          messagesContainer
+            .find(".messages")
+            .append(
+              sendTempMessageCard(
+                inputValue + "\n" + loadingSVG("28px"),
+                tempID
               )
-          : messagesContainer
-              .find(".messages")
-              .append(sendigCard(messageInput.text(), tempID));
+            );
+        } else {
+          messagesContainer
+            .find(".messages")
+            .append(sendTempMessageCard(inputValue, tempID));
+        }
         // scroll to bottom
-        scrollBottom(messagesContainer);
+        scrollToBottom(messagesContainer);
         messageInput.css({ height: "42px" });
         // form reset and focus
         $("#message-form").trigger("reset");
@@ -465,17 +467,16 @@ function sendMessage() {
         } else {
           // update contact item
           updateContactItem(getMessengerId());
-          messagesContainer.find('.mc-sender[data-id="sending"]').remove();
-          // get message before the sending one [temporary]
-          messagesContainer
-            .find(".message-card[data-id=" + data.tempID + "]")
-            .before(data.message);
-          // delete the temporary one
-          messagesContainer
-            .find(".message-card[data-id=" + data.tempID + "]")
-            .remove();
+          // temporary message card
+          const tempMsgCardElement = messagesContainer.find(
+            `.message-card[data-id=${data.tempID}]`
+          );
+          // add the message card coming from the server before the temp-card
+          tempMsgCardElement.before(data.message);
+          // then, remove the temporary message card
+          tempMsgCardElement.remove();
           // scroll to bottom
-          scrollBottom(messagesContainer);
+          scrollToBottom(messagesContainer);
           // send contact item updates
           sendContactItemUpdates(true);
         }
@@ -485,7 +486,7 @@ function sendMessage() {
         errorMessageCard(tempID);
         // error log
         console.error(
-          "Failed sending the message! Please, check your server response"
+          "Failed sending the message! Please, check your server response."
         );
       },
     });
@@ -535,7 +536,7 @@ function fetchMessages(id, type, newFetch = false) {
         setMessagesLoading(false);
         if (messagesPage == 1) {
           messagesElement.html(data.messages);
-          scrollBottom(messagesContainer);
+          scrollToBottom(messagesContainer);
         } else {
           const lastMsg = messagesElement.find(
             messagesElement.find(".message-card")[0]
@@ -554,7 +555,6 @@ function fetchMessages(id, type, newFetch = false) {
         if (messenger != 0) {
           disableOnLoad(false);
         }
-
       },
       error: (error) => {
         setMessagesLoading(false);
@@ -600,7 +600,7 @@ channel.bind("messaging", function (data) {
   if (data.from_id == getMessengerId() && data.to_id == auth_id) {
     $(".messages").find(".message-hint").remove();
     messagesContainer.find(".messages").append(data.message);
-    scrollBottom(messagesContainer);
+    scrollToBottom(messagesContainer);
     makeSeen(true);
     // remove unseen counter for the user from the contacts list
     $(".messenger-list-item[data-contact=" + getMessengerId() + "]")
@@ -617,7 +617,7 @@ channel.bind("client-typing", function (data) {
       : messagesContainer.find(".typing-indicator").hide();
   }
   // scroll to bottom
-  scrollBottom(messagesContainer);
+  scrollToBottom(messagesContainer);
 });
 
 // listen to seen event
@@ -642,6 +642,11 @@ channel.bind("client-contactItem", function (data) {
       ? updateContactItem(data.update_to)
       : console.error("[Contact Item updates] Updating failed!");
   }
+});
+
+// listen on message delete event
+channel.bind("client-messageDelete", function (data) {
+  $("body").find(`.message-card[data-id=${data.id}]`).remove();
 });
 
 // -------------------------------------
@@ -717,6 +722,17 @@ function sendContactItemUpdates(status) {
     update_for: getMessengerId(), // Messenger
     update_to: auth_id, // Me
     updating: status,
+  });
+}
+
+/**
+ *-------------------------------------------------------------
+ * Trigger message delete
+ *-------------------------------------------------------------
+ */
+function sendMessageDeleteEvent(messageId) {
+  return channel.trigger("client-messageDelete", {
+    id: messageId,
   });
 }
 
@@ -831,6 +847,10 @@ function updateContactItem(user_id) {
       },
       dataType: "JSON",
       success: (data) => {
+        const totalContacts =
+          $(".listOfContacts").find(".messenger-list-item")?.length || 0;
+        if (totalContacts < 1)
+          $(".listOfContacts").find(".message-hint").remove();
         listItem.remove();
         $(".listOfContacts").prepend(data.contactItem);
         // update data-action required with [responsive design]
@@ -1007,7 +1027,8 @@ function deleteConversation(id) {
       // refresh info
       IDinfo(id, getMessengerType());
 
-      data.deleted ? "" : console.error("Error occurred!");
+      if (!data.deleted)
+        console.error("Error occurred, messages can not be deleted!");
 
       // Hide waiting alert modal
       app_modal({
@@ -1023,6 +1044,57 @@ function deleteConversation(id) {
   });
 }
 
+/**
+ *-------------------------------------------------------------
+ * Delete Message By ID
+ *-------------------------------------------------------------
+ */
+function deleteMessage(id) {
+  $.ajax({
+    url: url + "/deleteMessage",
+    method: "POST",
+    data: { _token: access_token, id: id },
+    dataType: "JSON",
+    beforeSend: () => {
+      // hide delete modal
+      app_modal({
+        show: false,
+        name: "delete",
+      });
+      // Show waiting alert modal
+      app_modal({
+        show: true,
+        name: "alert",
+        buttons: false,
+        body: loadingSVG("32px", null, "margin:auto"),
+      });
+    },
+    success: (data) => {
+      $(".messages").find(`.message-card[data-id=${id}]`).remove();
+      if (!data.deleted)
+        console.error("Error occurred, message can not be deleted!");
+
+      sendMessageDeleteEvent(id);
+
+      // Hide waiting alert modal
+      app_modal({
+        show: false,
+        name: "alert",
+        buttons: true,
+        body: "",
+      });
+    },
+    error: () => {
+      console.error("Server error, check your response");
+    },
+  });
+}
+
+/**
+ *-------------------------------------------------------------
+ * Update Settings
+ *-------------------------------------------------------------
+ */
 function updateSettings() {
   const formData = new FormData($("#update-settings")[0]);
   if (messengerColor) {
@@ -1261,26 +1333,18 @@ $(document).ready(function () {
 
   function attachmentValidate(file) {
     const fileElement = $(".upload-attachment");
-    const allowedExtensions = [
-      "jpg",
-      "jpeg",
-      "png",
-      "gif",
-      "zip",
-      "rar",
-      "txt",
-    ];
-    const sizeLimit = 5000000; // 5 megabyte
     const { name: fileName, size: fileSize } = file;
     const fileExtension = fileName.split(".").pop();
-    if (!allowedExtensions.includes(fileExtension)) {
+    if (
+      !getAllowedExtensions.includes(fileExtension.toString().toLowerCase())
+    ) {
       alert("file type not allowed");
       fileElement.val("");
       return false;
     }
     // Validate file size.
-    if (fileSize > sizeLimit) {
-      alert("Please select file size less than 5 MiB");
+    if (fileSize > getMaxUploadSize) {
+      alert("File is too large!");
       return false;
     }
     return true;
@@ -1350,11 +1414,26 @@ $(document).ready(function () {
       name: "delete",
     });
   });
-  // delete modal [delete button]
+  // Delete Message Button
+  $("body").on("click", ".chatify-hover-delete-btn", function () {
+    app_modal({
+      name: "delete",
+      data: $(this).data("id"),
+    });
+  });
+  // Delete modal [on delete button click]
   $(".app-modal[data-name=delete]")
     .find(".app-modal-footer .delete")
     .on("click", function () {
-      deleteConversation(getMessengerId());
+      const id = $("body")
+        .find(".app-modal[data-name=delete]")
+        .find(".app-modal-card")
+        .attr("data-modal");
+      if (id == 0) {
+        deleteConversation(getMessengerId());
+      } else {
+        deleteMessage(id);
+      }
       app_modal({
         show: false,
         name: "delete",
@@ -1462,56 +1541,4 @@ $(document).ready(function () {
   actionOnScroll(".messenger-tab.search-tab", function () {
     messengerSearch($(".messenger-search").val());
   });
-
-  // show and hide message time
-    $('body').on('click', '.message-card', function () {
-        $(this).find('sub').slideToggle('300', function() {
-            $(this).toggleClass('chatify-d-none d-md-flex');
-        });
-    })
-
-    $('body').on('click', '.chatify-hover-delete-btn', function () {
-        deleteMessage($(this).data('id'))
-    })
-
-    function deleteMessage(id) {
-        $.ajax({
-            url: url + "/deleteMessage",
-            method: "POST",
-            data: { _token: access_token, id: id },
-            dataType: "JSON",
-            beforeSend: () => {
-                // hide delete modal
-                app_modal({
-                    show: false,
-                    name: "delete",
-                });
-                // Show waiting alert modal
-                app_modal({
-                    show: true,
-                    name: "alert",
-                    buttons: false,
-                    body: loadingSVG("32px", null, "margin:auto"),
-                });
-            },
-            success: (data) => {
-                console.log($(".messages").find(`[data-message-id='${id}']`))
-                $(".messages").find(`[data-message-id='${id}']`).remove()
-                console.log(data)
-                data.deleted ? "" : console.error("Error occurred!");
-
-                // Hide waiting alert modal
-                app_modal({
-                    show: false,
-                    name: "alert",
-                    buttons: true,
-                    body: "",
-                });
-            },
-            error: () => {
-                console.error("Server error, check your response");
-            },
-        });
-    }
-
 });

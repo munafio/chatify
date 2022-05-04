@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     /*
     |-------------------------------------
     | Messenger display name
@@ -11,10 +10,11 @@ return [
 
     /*
     |-------------------------------------
-    | The disk on which to store added files and derived images by default.
+    | The disk on which to store added
+    | files and derived images by default.
     |-------------------------------------
     */
-    'disk_name' => env('CHATIFY_DISK', 'public'),
+    'storage_disk_name' => env('CHATIFY_STORAGE_DISK', 'public'),
 
     /*
     |-------------------------------------
@@ -55,6 +55,20 @@ return [
     'user_avatar' => [
         'folder' => 'users-avatar',
         'default' => 'avatar.png',
+    ],
+
+    /*
+    |-------------------------------------
+    | Gravatar
+    |
+    | imageset property options:
+    | [ 404 | mp | identicon (default) | monsterid | wavatar ]
+    |-------------------------------------
+    */
+    'gravatar' => [
+        'enabled' => false,
+        'image_size' => 200,
+        'imageset' => 'identicon'
     ],
 
     /*

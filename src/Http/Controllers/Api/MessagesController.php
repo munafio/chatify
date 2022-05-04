@@ -62,7 +62,7 @@ class MessagesController extends Controller
         if ($request['type'] == 'user') {
             $fetch = User::where('id', $request['id'])->first();
             if($fetch){
-                $userAvatar = Chatify::getUserWithGravatar($fetch)->avatar;
+                $userAvatar = Chatify::getUserWithAvatar($fetch)->avatar;
             }
         }
 
@@ -84,10 +84,10 @@ class MessagesController extends Controller
     public function download($fileName)
     {
         $path = config('chatify.attachments.folder') . '/' . $fileName;
-        if (Storage::disk(config('chatify.disk_name'))->exists($path)) {
+        if (Chatify::storage()->exists($path)) {
             return response()->json([
                 'file_name' => $fileName,
-                'download_path' => Storage::disk(config('chatify.disk_name'))->url($path)
+                'download_path' => Chatify::storage()->url($path)
             ], 200);
         } else {
             return response()->json([
@@ -127,7 +127,7 @@ class MessagesController extends Controller
                     $attachment_title = $file->getClientOriginalName();
                     // upload attachment and store the new name
                     $attachment = Str::uuid() . "." . $file->getClientOriginalExtension();
-                    $file->storeAs(config('chatify.attachments.folder'), $attachment, config('chatify.disk_name'));
+                    $file->storeAs(config('chatify.attachments.folder'), $attachment, config('chatify.storage_disk_name'));
                 } else {
                     $error->status = 1;
                     $error->message = "File extension not allowed!";
@@ -291,13 +291,13 @@ class MessagesController extends Controller
      */
     public function search(Request $request)
     {
-        $input = trim(filter_var($request['input'], FILTER_SANITIZE_STRING));
+        $input = trim(filter_var($request['input']));
         $records = User::where('id','!=',Auth::user()->id)
                     ->where('name', 'LIKE', "%{$input}%")
                     ->paginate($request->per_page ?? $this->perPage);
 
         foreach ($records->items() as $index => $record) {
-            $records[$index] += Chatify::getUserWithGravatar($record);
+            $records[$index] += Chatify::getUserWithAvatar($record);
         }
 
         return Response::json([
@@ -372,15 +372,15 @@ class MessagesController extends Controller
                 if (in_array($file->getClientOriginalExtension(), $allowed_images)) {
                     // delete the older one
                     if (Auth::user()->avatar != config('chatify.user_avatar.default')) {
-                        $path = Storage::disk(config('chatify.disk_name'))->path(config('chatify.user_avatar.folder') . '/' . Auth::user()->avatar);
-                        if (Storage::disk(config('chatify.disk_name'))->exists($path)) {
-                            Storage::disk(config('chatify.disk_name'))->delete($path);
+                        $path = Chatify::getUserAvatarUrl(Auth::user()->avatar);
+                        if (Chatify::storage()->exists($path)) {
+                            Chatify::storage()->delete($path);
                         }
                     }
                     // upload
                     $avatar = Str::uuid() . "." . $file->getClientOriginalExtension();
                     $update = User::where('id', Auth::user()->id)->update(['avatar' => $avatar]);
-                    $file->storeAs(config('chatify.user_avatar.folder'), $avatar, config('chatify.disk_name'));
+                    $file->storeAs(config('chatify.user_avatar.folder'), $avatar, config('chatify.storage_disk_name'));
                     $success = $update ? 1 : 0;
                 } else {
                     $msg = "File extension not allowed!";
