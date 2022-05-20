@@ -357,7 +357,7 @@ class MessagesController extends Controller
 
         // If messenger color selected
         if ($request['messengerColor']) {
-            $messenger_color = trim(filter_var($request['messengerColor'], FILTER_SANITIZE_STRING));
+            $messenger_color = trim(filter_var($request['messengerColor']));
             User::where('id', Auth::user()->id)
                 ->update(['messenger_color' => $messenger_color]);
         }
