@@ -140,7 +140,7 @@ class MessagesController extends Controller
             $file = $request->file('file');
             // check file size
             if ($file->getSize() < Chatify::getMaxUploadSize()) {
-                if (in_array($file->getClientOriginalExtension(), $allowed)) {
+                if (in_array(strtolower($file->getClientOriginalExtension()), $allowed)) {
                     // get attachment name
                     $attachment_title = $file->getClientOriginalName();
                     // upload attachment and store the new name
@@ -475,7 +475,7 @@ class MessagesController extends Controller
             $file = $request->file('avatar');
             // check file size
             if ($file->getSize() < Chatify::getMaxUploadSize()) {
-                if (in_array($file->getClientOriginalExtension(), $allowed_images)) {
+                if (in_array(strtolower($file->getClientOriginalExtension()), $allowed_images)) {
                     // delete the older one
                     if (Auth::user()->avatar != config('chatify.user_avatar.default')) {
                         $avatar = Auth::user()->avatar;
