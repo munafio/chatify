@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 v.1.4.0
 
+## v1.5.0 (2022-xx-xx)
+
+### Added
+
+- Page/Document visibility Support which improves (seen) feature #183
+
+### Fixed
+
+- fix: case insensitive file upload extension check #182
+
 ## v1.4.0 (2022-05-02)
 
 ### Added
