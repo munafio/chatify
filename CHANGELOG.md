@@ -1,7 +1,6 @@
 # Change log
 
 All notable changes to this project will be documented in this file.
-v.1.4.0
 
 ## v1.5.0 (2022-xx-xx)
 
