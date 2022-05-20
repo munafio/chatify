@@ -674,19 +674,6 @@ activeStatusChannel.bind("pusher:member_removed", function (member) {
 
 /**
  *-------------------------------------------------------------
- * Handle visibility page
- *-------------------------------------------------------------
- */
- function handleVisibilityChange() {
-  if (!document.hidden) {
-    makeSeen(true);
-  }
-}
-
-document.addEventListener("visibilitychange", handleVisibilityChange, false);
-
-/**
- *-------------------------------------------------------------
  * Trigger typing event
  *-------------------------------------------------------------
  */
@@ -700,12 +687,24 @@ function isTyping(status) {
 
 /**
  *-------------------------------------------------------------
+ * Handle visibility page
+ *-------------------------------------------------------------
+ */
+function handleVisibilityChange() {
+  if (!document?.hidden) {
+    makeSeen(true);
+  }
+}
+
+document.addEventListener("visibilitychange", handleVisibilityChange, false);
+
+/**
+ *-------------------------------------------------------------
  * Trigger seen event
  *-------------------------------------------------------------
  */
 function makeSeen(status) {
-
-  if(document.hidden) {
+  if (document?.hidden) {
     return;
   }
 
