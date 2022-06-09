@@ -36,7 +36,9 @@ So, [join now](https://discord.gg/RaxyKVykYJ) and keep updated.
 
 # Demo
 
-- [Live Demo](https://chatify-demo.munafio.com/)
+- [Live Demo](http://chatify-demo.munafio.com/)
+
+`Note: since this is a demo link, your uploaded files may be deleted after a while .. you can then try install the demo app below in your machine.`
 
 Register a new user or login using the credentials below :
 
@@ -46,7 +48,7 @@ password : demo1234
 ```
 
 - Demo app - [Click Here](https://github.com/munafio/chatify-demo).
-- Video on YouTube - [Click Here](https://youtu.be/gjo74FUJJPI)
+- Demo video on YouTube - [Click Here](https://youtu.be/gjo74FUJJPI)
 
 # Official Documentation
 
