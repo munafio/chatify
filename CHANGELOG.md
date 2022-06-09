@@ -2,7 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
-## v1.5.0 (2022-xx-xx)
+## v1.5.1 (2022-06-09)
+
+### Fixed
+
+- Sync the `sending a message form`'s allowed files/images with the `config` file (Update sendForm.blade.php [#190](https://github.com/munafio/chatify/pull/190))
+
+## v1.5.0 (2022-06-08)
 
 ### Added
 
