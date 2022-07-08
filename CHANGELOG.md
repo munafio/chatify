@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.5.2 (2022-07-08)
+
+### Fixed
+
+- MessageCard & fetchMessage methods@`ChatifyMessenger.php` fallback.
+
 ## v1.5.1 (2022-06-09)
 
 ### Fixed
