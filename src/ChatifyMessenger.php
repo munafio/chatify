@@ -105,6 +105,9 @@ class ChatifyMessenger
         $attachment_title = null;
 
         $msg = Message::where('id', $id)->first();
+        if(!$msg){
+            return [];
+        }
 
         if (isset($msg->attachment)) {
             $attachmentOBJ = json_decode($msg->attachment);
@@ -138,6 +141,9 @@ class ChatifyMessenger
      */
     public function messageCard($data, $viewType = null)
     {
+        if (!$data) {
+            return '';
+        }
         $data['viewType'] = ($viewType) ? $viewType : $data['viewType'];
         return view('Chatify::layouts.messageCard', $data)->render();
     }
