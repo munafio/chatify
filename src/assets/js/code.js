@@ -71,7 +71,7 @@ function loadingSVG(size = "25px", className = "", style = "") {
 <g transform="translate(2 2)" stroke-width="3">
 <circle stroke-opacity=".1" cx="18" cy="18" r="18"></circle>
 <path d="M36 18c0-9.94-8.06-18-18-18" transform="rotate(349.311 18 18)">
- <animateTransform attributeName="transform" type="rotate" from="0 18 18" to="360 18 18" dur=".8s" repeatCount="indefinite"></animateTransform>
+<animateTransform attributeName="transform" type="rotate" from="0 18 18" to="360 18 18" dur=".8s" repeatCount="indefinite"></animateTransform>
 </path>
 </g>
 </g>
@@ -95,13 +95,13 @@ function listItemLoading(items) {
 <div class="loadingPlaceholder-wrapper">
 <div class="loadingPlaceholder-body">
 <table class="loadingPlaceholder-header">
- <tr>
-   <td style="width: 45px;"><div class="loadingPlaceholder-avatar"></div></td>
-   <td>
-     <div class="loadingPlaceholder-name"></div>
-         <div class="loadingPlaceholder-date"></div>
-   </td>
- </tr>
+<tr>
+<td style="width: 45px;"><div class="loadingPlaceholder-avatar"></div></td>
+<td>
+  <div class="loadingPlaceholder-name"></div>
+      <div class="loadingPlaceholder-date"></div>
+</td>
+</tr>
 </table>
 </div>
 </div>
@@ -119,13 +119,13 @@ function avatarLoading(items) {
 <div class="loadingPlaceholder">
 <div class="loadingPlaceholder-wrapper">
 <div class="loadingPlaceholder-body">
-   <table class="loadingPlaceholder-header">
-       <tr>
-           <td style="width: 45px;">
-               <div class="loadingPlaceholder-avatar" style="margin: 2px;"></div>
-           </td>
-       </tr>
-   </table>
+<table class="loadingPlaceholder-header">
+    <tr>
+        <td style="width: 45px;">
+            <div class="loadingPlaceholder-avatar" style="margin: 2px;"></div>
+        </td>
+    </tr>
+</table>
 </div>
 </div>
 </div>
@@ -136,17 +136,16 @@ function avatarLoading(items) {
 
 // While sending a message, show this temporary message card.
 function sendTempMessageCard(message, id) {
-  console.log("message", message);
   return `
- <div class="message-card mc-sender" data-id="${id}">
-     <p>
-         ${message}
-         <sub>
-             <span class="far fa-clock"></span>
-         </sub>
-     </p>
- </div>
- `;
+<div class="message-card mc-sender" data-id="${id}">
+  <p>
+      ${message}
+      <sub>
+          <span class="far fa-clock"></span>
+      </sub>
+  </p>
+</div>
+`;
 }
 // upload image preview card.
 function attachmentTemplate(fileType, fileName, imgURL = null) {
@@ -593,7 +592,18 @@ function cancelUpdatingAvatar() {
  */
 
 // subscribe to the channel
-var channel = pusher.subscribe("private-chatify");
+const channelName = "private-chatify";
+var channel = pusher.subscribe(`${channelName}.${auth_id}`);
+var clientSendChannel;
+var clientListenChannel;
+
+function initClientChannel() {
+  if (getMessengerId()) {
+    clientSendChannel = pusher.subscribe(`${channelName}.${getMessengerId()}`);
+    clientListenChannel = pusher.subscribe(`${channelName}.${auth_id}`);
+  }
+}
+initClientChannel();
 
 // Listen to messages, and append if data received
 channel.bind("messaging", function (data) {
@@ -610,7 +620,7 @@ channel.bind("messaging", function (data) {
 });
 
 // listen to typing indicator
-channel.bind("client-typing", function (data) {
+clientListenChannel.bind("client-typing", function (data) {
   if (data.from_id == getMessengerId() && data.to_id == auth_id) {
     data.typing == true
       ? messagesContainer.find(".typing-indicator").show()
@@ -621,22 +631,19 @@ channel.bind("client-typing", function (data) {
 });
 
 // listen to seen event
-channel.bind("client-seen", function (data) {
+clientListenChannel.bind("client-seen", function (data) {
   if (data.from_id == getMessengerId() && data.to_id == auth_id) {
     if (data.seen == true) {
       $(".message-time")
         .find(".fa-check")
         .before('<span class="fas fa-check-double seen"></span> ');
       $(".message-time").find(".fa-check").remove();
-      console.info("[seen] triggered!");
-    } else {
-      console.error("[seen] event not triggered!");
     }
   }
 });
 
 // listen to contact item updates event
-channel.bind("client-contactItem", function (data) {
+clientListenChannel.bind("client-contactItem", function (data) {
   if (data.update_for == auth_id) {
     data.updating == true
       ? updateContactItem(data.update_to)
@@ -645,7 +652,7 @@ channel.bind("client-contactItem", function (data) {
 });
 
 // listen on message delete event
-channel.bind("client-messageDelete", function (data) {
+clientListenChannel.bind("client-messageDelete", function (data) {
   $("body").find(`.message-card[data-id=${data.id}]`).remove();
 });
 
@@ -672,31 +679,26 @@ activeStatusChannel.bind("pusher:member_removed", function (member) {
     .remove();
 });
 
+function handleVisibilityChange() {
+  if (!document.hidden) {
+    makeSeen(true);
+  }
+}
+
+document.addEventListener("visibilitychange", handleVisibilityChange, false);
+
 /**
  *-------------------------------------------------------------
  * Trigger typing event
  *-------------------------------------------------------------
  */
 function isTyping(status) {
-  return channel.trigger("client-typing", {
+  return clientSendChannel.trigger("client-typing", {
     from_id: auth_id, // Me
     to_id: getMessengerId(), // Messenger
     typing: status,
   });
 }
-
-/**
- *-------------------------------------------------------------
- * Handle visibility page
- *-------------------------------------------------------------
- */
-function handleVisibilityChange() {
-  if (!document?.hidden) {
-    makeSeen(true);
-  }
-}
-
-document.addEventListener("visibilitychange", handleVisibilityChange, false);
 
 /**
  *-------------------------------------------------------------
@@ -707,7 +709,6 @@ function makeSeen(status) {
   if (document?.hidden) {
     return;
   }
-
   // remove unseen counter for the user from the contacts list
   $(".messenger-list-item[data-contact=" + getMessengerId() + "]")
     .find("tr>td>b")
@@ -718,11 +719,8 @@ function makeSeen(status) {
     method: "POST",
     data: { _token: access_token, id: getMessengerId() },
     dataType: "JSON",
-    // success: data => {
-    //     console.log("[seen] Messages seen - " + getMessengerId());
-    // }
   });
-  return channel.trigger("client-seen", {
+  return clientSendChannel.trigger("client-seen", {
     from_id: auth_id, // Me
     to_id: getMessengerId(), // Messenger
     seen: status,
@@ -735,7 +733,7 @@ function makeSeen(status) {
  *-------------------------------------------------------------
  */
 function sendContactItemUpdates(status) {
-  return channel.trigger("client-contactItem", {
+  return clientSendChannel.trigger("client-contactItem", {
     update_for: getMessengerId(), // Messenger
     update_to: auth_id, // Me
     updating: status,
@@ -748,7 +746,7 @@ function sendContactItemUpdates(status) {
  *-------------------------------------------------------------
  */
 function sendMessageDeleteEvent(messageId) {
-  return channel.trigger("client-messageDelete", {
+  return clientChannel.trigger("client-messageDelete", {
     id: messageId,
   });
 }
@@ -1375,23 +1373,12 @@ $(document).ready(function () {
   // typing indicator on [input] keyDown
   $("#message-form .m-send").on("keydown", () => {
     if (typingNow < 1) {
-      // Trigger typing
-      let triggered = isTyping(true);
-      triggered
-        ? console.info("[+] Triggered")
-        : console.error("[+] Not triggered");
-      // Typing now
+      isTyping(true);
       typingNow = 1;
     }
-    // Clear typing timeout
     clearTimeout(typingTimeout);
-    // Typing timeout
     typingTimeout = setTimeout(function () {
-      triggered = isTyping(false);
-      triggered
-        ? console.info("[-] Triggered")
-        : console.error("[-] Not triggered");
-      // Clear typing now
+      isTyping(false);
       typingNow = 0;
     }, 1000);
   });
@@ -1559,3 +1546,23 @@ $(document).ready(function () {
     messengerSearch($(".messenger-search").val());
   });
 });
+
+/**
+ *-------------------------------------------------------------
+ * Observer on DOM changes
+ *-------------------------------------------------------------
+ */
+let previousMessengerId = getMessengerId();
+const observer = new MutationObserver(function (mutations) {
+  if (getMessengerId() !== previousMessengerId) {
+    previousMessengerId = getMessengerId();
+    initClientChannel();
+  }
+});
+const config = { subtree: true, childList: true };
+
+// start listening to changes
+observer.observe(document, config);
+
+// stop listening to changes
+// observer.disconnect();
