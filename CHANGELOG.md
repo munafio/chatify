@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.5.4 (2022-12-05)
+
+### Fixed
+
+- Channels auth secutiy issue #29
+
 ## v1.5.3 (2022-12-04)
 
 ### Fixed
