@@ -27,23 +27,12 @@ class MessagesController extends Controller
      */
     public function pusherAuth(Request $request)
     {
-        // Auth data
-        $authData = json_encode([
-            'user_id' => Auth::user()->id,
-            'user_info' => [
-                'name' => Auth::user()->name
-            ]
-        ]);
-        // check if user authorized
-        if (Auth::check()) {
-            return Chatify::pusherAuth(
-                $request['channel_name'],
-                $request['socket_id'],
-                $authData
-            );
-        }
-        // if not authorized
-        return response()->json(['message'=>'Unauthorized'], 401);
+        return Chatify::pusherAuth(
+            $request->user(),
+            Auth::user(),
+            $request['channel_name'],
+            $request['socket_id']
+        );
     }
 
     /**
@@ -157,7 +146,7 @@ class MessagesController extends Controller
             $messageData = Chatify::fetchMessage($messageID);
 
             // send to user using pusher
-            Chatify::push('private-chatify', 'messaging', [
+            Chatify::push("private-chatify.".$request['id'], 'messaging', [
                 'from_id' => Auth::user()->id,
                 'to_id' => $request['id'],
                 'message' => Chatify::messageCard($messageData, 'default')

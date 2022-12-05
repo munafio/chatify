@@ -81,14 +81,36 @@ class ChatifyMessenger
     /**
      * Authentication for pusher
      *
+     * @param User $requestUser
+     * @param User $authUser
      * @param string $channelName
      * @param string $socket_id
      * @param array $data
      * @return void
      */
-    public function pusherAuth($channelName, $socket_id, $data = null)
+    public function pusherAuth($requestUser, $authUser, $channelName, $socket_id)
     {
-        return $this->pusher->socket_auth($channelName, $socket_id, $data);
+        // Auth data
+        $authData = json_encode([
+            'user_id' => $authUser->id,
+            'user_info' => [
+                'name' => $authUser->name
+            ]
+        ]);
+        // check if user authenticated
+        if (Auth::check()) {
+            if($requestUser->id == $authUser->id){
+                return $this->pusher->socket_auth(
+                    $channelName,
+                    $socket_id,
+                    $authData
+                );
+            }
+            // if not authorized
+            return response()->json(['message'=>'Unauthorized'], 401);
+        }
+        // if not authenticated
+        return response()->json(['message'=>'Not authenticated'], 403);
     }
 
     /**
