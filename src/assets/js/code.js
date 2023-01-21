@@ -746,7 +746,7 @@ function sendContactItemUpdates(status) {
  *-------------------------------------------------------------
  */
 function sendMessageDeleteEvent(messageId) {
-  return clientChannel.trigger("client-messageDelete", {
+  return clientSendChannel.trigger("client-messageDelete", {
     id: messageId,
   });
 }
