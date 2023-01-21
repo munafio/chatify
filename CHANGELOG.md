@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.5.4 (2023-01-21)
+
+### Fixed
+
+- message delete event channel #238.
+
 ## v1.5.4 (2022-12-05)
 
 ### Fixed
