@@ -6,7 +6,7 @@ body {
   display: none;
   background: rgba(0, 0, 0, 0.76);
   position: absolute;
-  top: 43px;
+  top: 0;
   left: 0;
   right: 0;
   text-align: center;
@@ -71,15 +71,18 @@ body {
   margin-top: 141px;
 }
 .messenger-messagingView {
-  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
   overflow: hidden;
   width: 100%;
 }
 .messenger-messagingView .m-body {
+  position: relative;
   padding-top: 15px;
-  height: calc(100% - 90px);
   overflow-x: hidden;
   overflow-y: auto;
+  height: 100%;
 }
 .m-header {
   padding: 10px 15px;
@@ -369,10 +372,10 @@ body {
 }
 .messenger-sendCard {
   display: none;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
+  margin: 10px;
+  border-radius: 8px;
+  padding-left: 8px;
+  padding-right: 8px;
 }
 .messenger-sendCard form {
   width: 100%;
