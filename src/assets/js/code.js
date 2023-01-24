@@ -1566,3 +1566,22 @@ observer.observe(document, config);
 
 // stop listening to changes
 // observer.disconnect();
+
+/**
+ *-------------------------------------------------------------
+ * Resize messaging area when resize the viewport.
+ * on mobile devices when the keyboard is shown, the viewport
+ * height is changed, so we need to resize the messaging area
+ * to fit the new height.
+ *-------------------------------------------------------------
+ */
+var resizeTimeout;
+window.visualViewport.addEventListener("resize", (e) => {
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(function () {
+    const h = e.target.height;
+    if (h) {
+      $(".messenger-messagingView").css({ height: h + "px" });
+    }
+  }, 100);
+});

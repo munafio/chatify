@@ -81,14 +81,15 @@
                 </nav>
             </nav>
         </div>
-        {{-- Internet connection --}}
-        <div class="internet-connection">
-            <span class="ic-connected">Connected</span>
-            <span class="ic-connecting">Connecting...</span>
-            <span class="ic-noInternet">No internet access</span>
-        </div>
+
         {{-- Messaging area --}}
         <div class="m-body messages-container app-scroll">
+             {{-- Internet connection --}}
+            <div class="internet-connection">
+                <span class="ic-connected">Connected</span>
+                <span class="ic-connecting">Connecting...</span>
+                <span class="ic-noInternet">No internet access</span>
+            </div>
             <div class="messages">
                 <p class="message-hint center-el"><span>Please select a chat to start messaging</span></p>
             </div>
@@ -104,9 +105,10 @@
                     </p>
                 </div>
             </div>
-            {{-- Send Message Form --}}
-            @include('Chatify::layouts.sendForm')
+
         </div>
+        {{-- Send Message Form --}}
+        @include('Chatify::layouts.sendForm')
     </div>
     {{-- ---------------------- Info side ---------------------- --}}
     <div class="messenger-infoView app-scroll">
