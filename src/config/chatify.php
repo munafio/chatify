@@ -101,4 +101,15 @@ return [
         '#ff2522',
         '#9C27B0',
     ],
+
+
+        /*
+    |-------------------------------------
+    | User Hidden Fields, in responses
+    |-------------------------------------
+    */
+    'user_hidden_fields' => (array) [
+        'email',
+        'password',
+    ],
 ];

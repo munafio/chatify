@@ -82,7 +82,7 @@ class MessagesController extends Controller
         // send the response
         return Response::json([
             'favorite' => $favorite,
-            'fetch' => $fetch ?? [],
+            'fetch' => $fetch->makeHidden(config('chatify.user_hidden_fields')) ?? [],
             'user_avatar' => $userAvatar ?? null,
         ]);
     }
@@ -287,7 +287,7 @@ class MessagesController extends Controller
                 'message' => 'User not found!',
             ], 401);
         }
-        $contactItem = Chatify::getContactItem($user);
+        $contactItem = Chatify::getContactItem($user->makeHidden(config('chatify.user_hidden_fields')));
 
         // send the response
         return Response::json([
@@ -327,7 +327,7 @@ class MessagesController extends Controller
             // get user data
             $user = User::where('id', $favorite->favorite_id)->first();
             $favoritesList .= view('Chatify::layouts.favorite', [
-                'user' => $user,
+                'user' => $user->makeHidden(config('chatify.user_hidden_fields')),
             ]);
         }
         // send the response

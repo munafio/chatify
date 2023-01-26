@@ -58,7 +58,7 @@ class MessagesController extends Controller
         // send the response
         return Response::json([
             'favorite' => $favorite,
-            'fetch' => $fetch ?? [],
+            'fetch' => $fetch->makeHidden(config('chatify.user_hidden_fields')) ?? [],
             'user_avatar' => $userAvatar ?? null,
         ]);
     }
@@ -257,7 +257,7 @@ class MessagesController extends Controller
     {
         $favorites = Favorite::where('user_id', Auth::user()->id)->get();
         foreach ($favorites as $favorite) {
-            $favorite->user = User::where('id', $favorite->favorite_id)->first();
+            $favorite->user = User::where('id', $favorite->favorite_id)->first()->makeHidden(config('chatify.user_hidden_fields'));
         }
         return Response::json([
             'total' => count($favorites),
