@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 
 - Keyboard overlaping on input issue on mobile #202.
+- Security issue and code enhancements #240.
 
 ## v1.5.5 (2023-01-21)
 
