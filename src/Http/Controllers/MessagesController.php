@@ -306,13 +306,14 @@ class MessagesController extends Controller
      */
     public function favorite(Request $request)
     {
+        $userId = $request['user_id'];
         // check action [star/unstar]
-        Chatify::makeInFavorite($request['user_id'], Chatify::inFavorite($request['user_id']) ? 0 : 1);
-        $status = Chatify::inFavorite($request['user_id']) ? 0 : 1;
+        $favoriteStatus = Chatify::inFavorite($userId) ? 0 : 1;
+        Chatify::makeInFavorite($userId, $favoriteStatus);
 
         // send the response
         return Response::json([
-            'status' => @$status,
+            'status' => @$favoriteStatus,
         ], 200);
     }
 
@@ -496,8 +497,11 @@ class MessagesController extends Controller
      */
     public function setActiveStatus(Request $request)
     {
+        $userId = $request['user_id'];
+        $activeStatus = $request['status'] > 0 ? 1 : 0;
+        $status = User::where('id', $userId)->update(['active_status' => $activeStatus]);
         return Response::json([
-            'status' => User::where('id', $request['user_id'])->update(['active_status' => $request['status'] > 0 ? 1 : 0]),
+            'status' => $status,
         ], 200);
     }
 }
