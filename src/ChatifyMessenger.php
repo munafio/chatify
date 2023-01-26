@@ -377,7 +377,7 @@ class ChatifyMessenger
     public function deleteMessage($id)
     {
         try {
-            $msg = Message::where('from_id', auth()->id())->where('id', $id)->fristOrFail();
+            $msg = Message::where('from_id', auth()->id())->where('id', $id)->firstOrFail();
                 if (isset($msg->attachment)) {
                     // delete file attached if exist
                     $path = config('chatify.attachments.folder') . '/' . json_decode($msg->attachment)->new_name;
