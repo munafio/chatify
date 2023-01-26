@@ -377,14 +377,12 @@ class ChatifyMessenger
     public function deleteMessage($id)
     {
         try {
-            $msg = Message::findOrFail($id);
-                if ($msg->from_id == auth()->id()) {
+            $msg = Message::where('from_id', auth()->id())->fristOrFail($id);
+                if (isset($msg->attachment)) {
                     // delete file attached if exist
-                    if (isset($msg->attachment)) {
-                        $path = config('chatify.attachments.folder') . '/' . json_decode($msg->attachment)->new_name;
-                        if (self::storage()->exists($path)) {
-                            self::storage()->delete($path);
-                        }
+                    $path = config('chatify.attachments.folder') . '/' . json_decode($msg->attachment)->new_name;
+                    if (self::storage()->exists($path)) {
+                        self::storage()->delete($path);
                     }
                     // delete from database
                     $msg->delete();

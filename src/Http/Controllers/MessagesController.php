@@ -96,11 +96,8 @@ class MessagesController extends Controller
      */
     public function download($fileName)
     {
-        if (Chatify::storage()->exists(config('chatify.attachments.folder') . '/' . $fileName)) {
-            return Chatify::storage()->download(config('chatify.attachments.folder') . '/' . $fileName);
-        } else {
-            return abort(404, "Sorry, File does not exist in our server or may have been deleted!");
-        }
+        return Chatify::storage()->exists(config('chatify.attachments.folder') . '/' . $fileName) ? Chatify::storage()->download(config('chatify.attachments.folder') . '/' . $fileName) 
+        : abort(404, "Sorry, File does not exist in our server or may have been deleted!");
     }
 
     /**
@@ -129,11 +126,11 @@ class MessagesController extends Controller
             $file = $request->file('file');
             // check file size
             if ($file->getSize() < Chatify::getMaxUploadSize()) {
-                if (in_array(strtolower($file->getClientOriginalExtension()), $allowed)) {
+                if (in_array(strtolower($file->extension()), $allowed)) {
                     // get attachment name
                     $attachment_title = $file->getClientOriginalName();
                     // upload attachment and store the new name
-                    $attachment = Str::uuid() . "." . $file->getClientOriginalExtension();
+                    $attachment = Str::uuid() . "." . $file->extension();
                     $file->storeAs(config('chatify.attachments.folder'), $attachment, config('chatify.storage_disk_name'));
                 } else {
                     $error->status = 1;
@@ -307,15 +304,8 @@ class MessagesController extends Controller
     public function favorite(Request $request)
     {
         // check action [star/unstar]
-        if (Chatify::inFavorite($request['user_id'])) {
-            // UnStar
-            Chatify::makeInFavorite($request['user_id'], 0);
-            $status = 0;
-        } else {
-            // Star
-            Chatify::makeInFavorite($request['user_id'], 1);
-            $status = 1;
-        }
+        Chatify::makeInFavorite($request['user_id'], Chatify::inFavorite($request['user_id']) ? 0 : 1);
+        $status = Chatify::inFavorite($request['user_id']) ? 0 : 1;
 
         // send the response
         return Response::json([
@@ -464,7 +454,7 @@ class MessagesController extends Controller
             $file = $request->file('avatar');
             // check file size
             if ($file->getSize() < Chatify::getMaxUploadSize()) {
-                if (in_array(strtolower($file->getClientOriginalExtension()), $allowed_images)) {
+                if (in_array(strtolower($file->extension()), $allowed_images)) {
                     // delete the older one
                     if (Auth::user()->avatar != config('chatify.user_avatar.default')) {
                         $avatar = Auth::user()->avatar;
@@ -473,7 +463,7 @@ class MessagesController extends Controller
                         }
                     }
                     // upload
-                    $avatar = Str::uuid() . "." . $file->getClientOriginalExtension();
+                    $avatar = Str::uuid() . "." . $file->extension();
                     $update = User::where('id', Auth::user()->id)->update(['avatar' => $avatar]);
                     $file->storeAs(config('chatify.user_avatar.folder'), $avatar, config('chatify.storage_disk_name'));
                     $success = $update ? 1 : 0;
@@ -503,12 +493,8 @@ class MessagesController extends Controller
      */
     public function setActiveStatus(Request $request)
     {
-        $update = $request['status'] > 0
-            ? User::where('id', $request['user_id'])->update(['active_status' => 1])
-            : User::where('id', $request['user_id'])->update(['active_status' => 0]);
-        // send the response
         return Response::json([
-            'status' => $update,
+            'status' => User::where('id', $request['user_id'])->update(['active_status' => $request['status'] > 0 ? 1 : 0]),
         ], 200);
     }
 }
