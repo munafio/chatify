@@ -96,8 +96,11 @@ class MessagesController extends Controller
      */
     public function download($fileName)
     {
-        return Chatify::storage()->exists(config('chatify.attachments.folder') . '/' . $fileName) ? Chatify::storage()->download(config('chatify.attachments.folder') . '/' . $fileName) 
-        : abort(404, "Sorry, File does not exist in our server or may have been deleted!");
+        $filePath = config('chatify.attachments.folder') . '/' . $fileName;
+        if (Chatify::storage()->exists($filePath)) {
+            return Chatify::storage()->download($filePath);
+        }
+        return abort(404, "Sorry, File does not exist in our server or may have been deleted!");
     }
 
     /**

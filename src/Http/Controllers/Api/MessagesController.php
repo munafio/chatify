@@ -240,7 +240,7 @@ class MessagesController extends Controller
         // check action [star/unstar]
         Chatify::makeInFavorite($request['user_id'], Chatify::inFavorite($request['user_id']) ? 0 : 1);
         $status = Chatify::inFavorite($request['user_id']) ? 0 : 1;
- 
+
         // send the response
         return Response::json([
             'status' => @$status,
