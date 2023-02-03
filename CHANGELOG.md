@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.6.0 (2023-02-xx)
+
+### Enhancements
+
+- Using UUIDs instead of random IDs on table primary column #243.
+
+### Fixed
+
+-
+
 ## v1.5.6 (2023-01-26)
 
 ### Fixed
