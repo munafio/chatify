@@ -853,6 +853,9 @@ div.loadingPlaceholder-date {
   }
 }
 @media (max-width: 980px) {
+  .messenger-listView.conversation-active {
+    display: none;
+  }
   .messenger-listView {
     position: fixed;
     left: 0;
