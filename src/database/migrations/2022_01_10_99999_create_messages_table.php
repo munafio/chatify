@@ -14,7 +14,7 @@ class CreateMessagesTable extends Migration
     public function up()
     {
         Schema::create('ch_messages', function (Blueprint $table) {
-            $table->bigInteger('id');
+            $table->uuid('id')->primary();
             $table->string('type');
             $table->bigInteger('from_id');
             $table->bigInteger('to_id');
@@ -22,8 +22,6 @@ class CreateMessagesTable extends Migration
             $table->string('attachment')->nullable();
             $table->boolean('seen')->default(false);
             $table->timestamps();
-
-            $table->primary('id');
         });
     }
 

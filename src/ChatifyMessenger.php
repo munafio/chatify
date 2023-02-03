@@ -186,18 +186,18 @@ class ChatifyMessenger
      * create a new message to database
      *
      * @param array $data
-     * @return void
+     * @return Message
      */
     public function newMessage($data)
     {
         $message = new Message();
-        $message->id = $data['id'];
         $message->type = $data['type'];
         $message->from_id = $data['from_id'];
         $message->to_id = $data['to_id'];
         $message->body = $data['body'];
         $message->attachment = $data['attachment'];
         $message->save();
+        return $message;
     }
 
     /**
@@ -305,7 +305,6 @@ class ChatifyMessenger
         if ($action > 0) {
             // Star
             $star = new Favorite();
-            $star->id = rand(9, 99999999);
             $star->user_id = Auth::user()->id;
             $star->favorite_id = $user_id;
             $star->save();
