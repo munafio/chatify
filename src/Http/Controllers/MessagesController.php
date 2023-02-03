@@ -159,7 +159,7 @@ class MessagesController extends Controller
             ]);
 
             // fetch message to send it with the response
-            $messageData = Chatify::fetchMessage($message->id);
+            $messageData = Chatify::fetchMessage(null, null, $message);
 
             // send to user using pusher
             Chatify::push("private-chatify.".$request['id'], 'messaging', [
@@ -209,7 +209,7 @@ class MessagesController extends Controller
         $allMessages = null;
         foreach ($messages->reverse() as $index => $message) {
             $allMessages .= Chatify::messageCard(
-                Chatify::fetchMessage($message->id, $index)
+                Chatify::fetchMessage(null, $index, $message)
             );
         }
         $response['messages'] = $allMessages;

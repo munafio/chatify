@@ -120,15 +120,20 @@ class ChatifyMessenger
      * @param int $id
      * @return array
      */
-    public function fetchMessage($id, $index = null)
+    public function fetchMessage($id, $index = null, $message = null)
     {
+        $msg = null;
         $attachment = null;
         $attachment_type = null;
         $attachment_title = null;
 
-        $msg = Message::where('id', $id)->first();
-        if(!$msg){
-            return [];
+        if (!!$message) {
+            $msg = $message;
+        } else {
+            $msg = Message::where('id', $id)->first();
+            if(!$msg){
+                return [];
+            }
         }
 
         if (isset($msg->attachment)) {
