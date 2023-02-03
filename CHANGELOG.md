@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 
 - Fetching messages multiple times at once on send/fetch requests.
+- Migrations duplicate class name.
 
 ## v1.5.6 (2023-01-26)
 
