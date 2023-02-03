@@ -14,6 +14,7 @@ var messenger,
 
 const messagesContainer = $(".messenger-messagingView .m-body"),
   messengerTitleDefault = $(".messenger-headTitle").text(),
+  messageInputContainer = $(".messenger-sendCard"),
   messageInput = $("#message-form .m-send"),
   auth_id = $("meta[name=url]").attr("data-user"),
   url = $("meta[name=url]").attr("content"),
@@ -298,8 +299,8 @@ function hScroller(scroller) {
  * Default : true
  *-------------------------------------------------------------
  */
-function disableOnLoad(action = true) {
-  if (action == true) {
+function disableOnLoad(disable = true) {
+  if (disable) {
     // hide star button
     $(".add-to-favorite").hide();
     // hide send card
@@ -368,6 +369,11 @@ function IDinfo(id, type) {
       data: { _token: access_token, id, type },
       dataType: "JSON",
       success: (data) => {
+        if (!data?.fetch) {
+          NProgress.done();
+          NProgress.remove();
+          return;
+        }
         // avatar photo
         $(".messenger-infoView")
           .find(".avatar")
@@ -396,7 +402,7 @@ function IDinfo(id, type) {
         messageInput.focus();
       },
       error: () => {
-        console.error("Error, check server response!");
+        console.error("Couldn't fetch user data!");
         // remove loading bar
         NProgress.done();
         NProgress.remove();

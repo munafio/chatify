@@ -58,7 +58,7 @@ class MessagesController extends Controller
         // send the response
         return Response::json([
             'favorite' => $favorite,
-            'fetch' => $fetch ?? [],
+            'fetch' => $fetch ?? null,
             'user_avatar' => $userAvatar ?? null,
         ]);
     }
