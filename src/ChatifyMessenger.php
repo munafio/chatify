@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Storage;
 use Pusher\Pusher;
 use Illuminate\Support\Facades\Auth;
 use Exception;
-use Illuminate\Support\Facades\File;
 
 class ChatifyMessenger
 {
