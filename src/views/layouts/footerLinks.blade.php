@@ -1,4 +1,4 @@
-<script src="https://js.pusher.com/7.0.3/pusher.min.js"></script>
+<script src="https://js.pusher.com/7.2.0/pusher.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@joeattardi/emoji-button@3.0.3/dist/index.min.js"></script>
 <script >
   // Enable pusher logging - don't include this in production
