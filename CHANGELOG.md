@@ -19,7 +19,8 @@ All notable changes to this project will be documented in this file.
 - Fetching messages multiple times at once on send/fetch requests.
 - Migrations duplicate class name.
 - Prevent chat for invalid user ids #246
-- Fix responsiveness when going to chat with specific ID #247
+- Fix responsiveness when going to chat with specific ID #247.
+- App URL should be changed when click the `back to contacts` button on small screens.
 
 ## v1.5.6 (2023-01-26)
 

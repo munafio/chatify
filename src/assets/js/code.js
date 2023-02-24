@@ -1297,6 +1297,7 @@ $(document).ready(function () {
     $(".messenger-listView").hide();
   });
   $(".show-listView").on("click", function () {
+    routerPush(document.title, `${url}/`);
     $(".messenger-listView").show();
   });
 
