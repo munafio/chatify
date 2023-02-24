@@ -1,12 +1,12 @@
 <img src="https://1.bp.blogspot.com/-vtmxKH8zJy8/XgveTWsEJkI/AAAAAAAAA7Q/yKslrOp0A2wj5VwrcNFF2ooR_f3bor3uwCLcBGAsYHQ/s1600/Untitled-12.png" style="width:100%;" />
 
-[![Latest Stable Version](https://poser.pugx.org/munafio/chatify/v/stable)](https://packagist.org/packages/munafio/chatify)
-[![Total Downloads](https://poser.pugx.org/munafio/chatify/downloads)](https://packagist.org/packages/munafio/chatify)
-[![License](https://poser.pugx.org/munafio/chatify/license)](https://packagist.org/packages/munafio/chatify)
+[![Latest Stable Version](https://poser.pugx.org/munafio/chatify/v/stable?style=flat-square)](https://packagist.org/packages/munafio/chatify)
+[![Total Downloads](https://poser.pugx.org/munafio/chatify/downloads?style=flat-square)](https://packagist.org/packages/munafio/chatify)
+[![License](https://poser.pugx.org/munafio/chatify/license?style=flat-square)](https://packagist.org/packages/munafio/chatify)
 
 # Chatify Laravel Package
 
-A Laravel package helps you add a complete real-time messaging system to your new / existing application with only one command.
+Laravel's #1 one-to-one chatting system package, helps you add a complete real-time chatting system to your new/existing Laravel application with only one command.
 
 # Need a Help? 📣
 
