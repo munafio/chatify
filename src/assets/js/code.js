@@ -18,6 +18,7 @@ const messagesContainer = $(".messenger-messagingView .m-body"),
   messageInput = $("#message-form .m-send"),
   auth_id = $("meta[name=url]").attr("data-user"),
   url = $("meta[name=url]").attr("content"),
+  messengerTheme = $("meta[name=messenger-theme]").attr("content"),
   defaultMessengerColor = $("meta[name=messenger-color]").attr("content"),
   access_token = $('meta[name="csrf-token"]').attr("content");
 
@@ -99,8 +100,8 @@ function listItemLoading(items) {
 <tr>
 <td style="width: 45px;"><div class="loadingPlaceholder-avatar"></div></td>
 <td>
-  <div class="loadingPlaceholder-name"></div>
-      <div class="loadingPlaceholder-date"></div>
+<div class="loadingPlaceholder-name"></div>
+   <div class="loadingPlaceholder-date"></div>
 </td>
 </tr>
 </table>
@@ -121,11 +122,11 @@ function avatarLoading(items) {
 <div class="loadingPlaceholder-wrapper">
 <div class="loadingPlaceholder-body">
 <table class="loadingPlaceholder-header">
-    <tr>
-        <td style="width: 45px;">
-            <div class="loadingPlaceholder-avatar" style="margin: 2px;"></div>
-        </td>
-    </tr>
+ <tr>
+     <td style="width: 45px;">
+         <div class="loadingPlaceholder-avatar" style="margin: 2px;"></div>
+     </td>
+ </tr>
 </table>
 </div>
 </div>
@@ -139,12 +140,12 @@ function avatarLoading(items) {
 function sendTempMessageCard(message, id) {
   return `
 <div class="message-card mc-sender" data-id="${id}">
-  <p>
-      ${message}
-      <sub>
-          <span class="far fa-clock"></span>
-      </sub>
-  </p>
+<p>
+   ${message}
+   <sub>
+       <span class="far fa-clock"></span>
+   </sub>
+</p>
 </div>
 `;
 }
@@ -1590,4 +1591,36 @@ window.visualViewport.addEventListener("resize", (e) => {
       $(".messenger-messagingView").css({ height: h + "px" });
     }
   }, 100);
+});
+
+/**
+ *-------------------------------------------------------------
+ * Emoji Picker
+ *-------------------------------------------------------------
+ */
+const emojiButton = document.querySelector(".emoji-button");
+
+const emojiPicker = new EmojiButton({
+  theme: messengerTheme,
+  autoHide: false,
+  position: "top-start",
+});
+
+emojiButton.addEventListener("click", (e) => {
+  e.preventDefault();
+  emojiPicker.togglePicker(emojiButton);
+});
+
+emojiPicker.on("emoji", (emoji) => {
+  const el = messageInput[0];
+  const startPos = el.selectionStart;
+  const endPos = el.selectionEnd;
+  const value = messageInput.val();
+  const newValue =
+    value.substring(0, startPos) +
+    emoji +
+    value.substring(endPos, value.length);
+  messageInput.val(newValue);
+  el.selectionStart = el.selectionEnd = startPos + emoji.length;
+  el.focus();
 });
