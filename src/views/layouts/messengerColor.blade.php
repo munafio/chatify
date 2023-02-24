@@ -45,7 +45,7 @@
   background: {{ $messengerColor }};
 }
 
-.messenger-sendCard button svg{
+.messenger-sendCard .send-button svg{
     color: {{ $messengerColor }};
 }
 
