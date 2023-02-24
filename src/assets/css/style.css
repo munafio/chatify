@@ -1,6 +1,36 @@
+html,
 body {
   margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 }
+
+:root {
+  /* General variables */
+  --icon-size: 20px;
+  --headers-padding: 1rem;
+  --listView-header-height: 155px;
+
+  /* Light theme variables */
+  --primary-bg-color: #fff;
+  --secondary-bg-color: #f7f7f7;
+  --border-color: #eee;
+  --messagingView-bg-color: #f6f7f9;
+  --scrollbar-thumb-color: #cfcfcf;
+  --modal-bg-color: #fff;
+  --send-input-icons-color: #8c8c8c;
+
+  /* Dark theme variables */
+  --dark-primary-bg-color: #232323;
+  --dark-secondary-bg-color: #2e2e2e;
+  --dark-border-color: #2e2e2e;
+  --dark-messagingView-bg-color: #1e1e1e;
+  --dark-scrollbar-thumb-color: #323232;
+  --dark-modal-bg-color: #1a1a1a;
+  --dark-send-input-icons-color: #c8c8c8;
+}
+
 /*internet connection*/
 .internet-connection {
   display: none;
@@ -40,6 +70,9 @@ body {
 .app-scroll-thin::-webkit-scrollbar-thumb {
   border-radius: 4px;
 }
+.messenger-headTitle {
+  margin: 0rem 0.7rem;
+}
 .messenger {
   display: inline-flex;
   width: 100%;
@@ -47,6 +80,9 @@ body {
   font-family: sans-serif;
 }
 .messenger-listView {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
   position: relative;
   top: 0px;
   left: 0px;
@@ -58,17 +94,10 @@ body {
   overflow: auto;
 }
 .messenger-listView .m-header {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  padding: 0px !important;
+  height: var(--listView-header-height);
 }
 .messenger-listView .m-header > nav {
-  margin: 10px;
-}
-.messenger-listView .m-body {
-  margin-top: 141px;
+  padding: var(--headers-padding);
 }
 .messenger-messagingView {
   display: flex;
@@ -76,6 +105,9 @@ body {
   gap: 5px;
   overflow: hidden;
   width: 100%;
+}
+.messenger-messagingView .m-header {
+  padding: var(--headers-padding);
 }
 .messenger-messagingView .m-body {
   position: relative;
@@ -85,12 +117,13 @@ body {
   height: 100%;
 }
 .m-header {
-  padding: 10px 15px;
   font-weight: 600;
   background: transparent;
 }
 .m-header-right {
-  display: inline-flex;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
   float: right;
 }
 .m-header-messaging {
@@ -98,8 +131,7 @@ body {
   box-shadow: 0px 5px 6px rgba(0, 0, 0, 0.06);
 }
 .m-header svg {
-  margin: 0px 8px;
-  font-size: 16px;
+  font-size: var(--icon-size);
   transition: transform 0.12s;
 }
 .m-header svg:active {
@@ -121,6 +153,10 @@ body {
   box-shadow: 0px 5px 6px rgba(0, 0, 0, 0.06);
 }
 .messenger-listView-tabs a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
   width: 100%;
   text-align: center;
   padding: 10px;
@@ -134,7 +170,7 @@ body {
 }
 .messenger-tab {
   overflow: auto;
-  height: calc(100vh - 143px);
+  height: calc(100vh - var(--listView-header-height) - 2px);
   display: none;
   position: relative;
 }
@@ -200,6 +236,7 @@ body {
 .avatar {
   text-align: center;
   border-radius: 100%;
+  border: 1px solid;
   overflow: hidden;
   background-image: url("");
   background-repeat: no-repeat;
@@ -252,15 +289,16 @@ body {
 }
 .messenger-infoView {
   display: block;
-  padding-top: 7px;
   overflow: auto;
   width: 40%;
   min-width: 200px;
 }
+.messenger-infoView nav {
+  padding: var(--headers-padding);
+}
 .messenger-infoView nav a {
   text-decoration: none;
-  padding: 5px 8px;
-  font-size: 18px;
+  font-size: var(--icon-size);
 }
 .messenger-infoView > div {
   margin: auto;
@@ -373,13 +411,16 @@ body {
 .messenger-sendCard {
   display: none;
   margin: 10px;
+  margin-bottom: 1rem;
   border-radius: 8px;
   padding-left: 8px;
   padding-right: 8px;
 }
 .messenger-sendCard form {
   width: 100%;
-  display: inline-flex;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin: 0;
 }
 .messenger-sendCard input[type="file"] {
@@ -617,7 +658,7 @@ body {
   color: #fff;
 }
 .a-btn-success {
-  background: #3fc380 !important;
+  background: #1e8a53 !important;
   color: #fff;
 }
 .a-btn-success:hover,

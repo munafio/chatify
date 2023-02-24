@@ -1,95 +1,107 @@
 /*app scroll*/
 .app-scroll::-webkit-scrollbar-thumb,
 .app-scroll-thin::-webkit-scrollbar-thumb {
-    background: #323232;
+  background: var(--dark-scrollbar-thumb-color);
 }
 .app-scroll-thin::-webkit-scrollbar {
-    background: #2c2c2c;
+  background: var(--dark-secondary-bg-color);
 }
 .app-scroll::-webkit-scrollbar:hover,
 .app-scroll-thin::-webkit-scrollbar:hover {
-    background: #2c2c2c;
+  background: var(--dark-secondary-bg-color);
 }
-
 .messenger {
-    background: #272727;
+  background: var(--dark-primary-bg-color);
 }
 .messenger-search[type="text"] {
-    background: #323232;
-    color: #fff;
+  background: var(--dark-secondary-bg-color);
+  color: #fff;
+}
+.messenger-search[type="text"]::placeholder {
+  color: #fff;
 }
 .messenger-listView {
-    background: #272727;
-    border: 1px solid #323232;
+  background: var(--dark-primary-bg-color);
+  border: 1px solid var(--dark-border-color);
 }
 .messenger-listView-tabs {
-    border-bottom: 1px solid #323232;
+  border-bottom: 1px solid var(--dark-border-color);
 }
 .messenger-listView-tabs a:hover,
 .messenger-listView-tabs a:focus {
-    background-color: #323232;
+  background-color: var(--dark-secondary-bg-color);
 }
 .messenger-favorites div.avatar {
-    border: 2px solid #272727;
+  border: 2px solid var(--dark-primary-bg-color);
 }
 .messenger-list-item:hover {
-    background: #323232;
+  background: var(--dark-secondary-bg-color);
 }
 .messenger-messagingView {
-    border-top: 1px solid #323232;
-    border-bottom: 1px solid #323232;
-    background: #272727;
+  border-top: 1px solid var(--dark-secondary-bg-color);
+  border-bottom: 1px solid var(--dark-secondary-bg-color);
+  background: var(--dark-messagingView-bg-color);
 }
 .m-header-messaging {
-    background: #323232;
+  background: var(--dark-primary-bg-color);
 }
 .messenger-infoView {
-    background: #272727;
-    border: 1px solid #323232;
+  background: var(--dark-primary-bg-color);
+  border: 1px solid var(--dark-border-color);
 }
 .messenger-infoView > p {
-    color: #fff;
+  color: #fff;
 }
 .divider {
-    border-top: 1px solid #2f2f2f;
+  border-top: 1px solid var(--dark-border-color);
 }
 .messenger-sendCard {
-    background: #323232;
-    border-top: 1px solid #272727;
+  background: var(--dark-secondary-bg-color);
+  border-top: 1px solid var(--dark-border-color);
 }
 .attachment-preview > p {
-    color: #fff;
+  color: #fff;
 }
 .m-send {
-    color: #fff;
+  color: #fff;
+}
+.m-send::placeholder {
+  color: #fff;
 }
 .message-card p {
-    background: #323232;
-    color: #fff;
+  background: var(--dark-secondary-bg-color);
+  color: #fff;
 }
 .m-li-divider {
-    border-bottom: 1px solid #323232;
+  border-bottom: 1px solid var(--dark-border-color);
 }
 .m-header a,
 .m-header a:hover,
 .m-header a:focus {
-    text-decoration: none;
-    color: #fff;
+  text-decoration: none;
+  color: #fff;
 }
 .messenger-list-item td p {
-    color: #fff;
+  color: #fff;
 }
 .activeStatus {
-    border: 2px solid #272727;
+  border: 2px solid var(--dark-border-color);
 }
 .messenger-list-item:hover .activeStatus {
-    border-color: #323232;
+  border-color: var(--dark-secondary-bg-color);
 }
 .messenger-favorites > div p {
-    color: #ffffff;
+  color: #ffffff;
 }
 .avatar {
-    background-color: #323232;
+  background-color: var(--dark-secondary-bg-color);
+  border-color: var(--dark-border-color);
+}
+.favorites-section {
+  border-bottom: 1px solid var(--dark-border-color);
+}
+.messenger-sendCard svg {
+  color: var(--dark-send-input-icons-color);
 }
 /*
 ***********************************************
@@ -98,14 +110,14 @@
 */
 .loadingPlaceholder-body div,
 .loadingPlaceholder-header tr td div {
-    background: #323232;
-    background-image: -webkit-linear-gradient(
-        left,
-        #323232 0%,
-        #323232 20%,
-        #323232 40%,
-        #323232 100%
-    );
+  background: var(--dark-secondary-bg-color);
+  background-image: -webkit-linear-gradient(
+    left,
+    var(--dark-secondary-bg-color) 0%,
+    var(--dark-secondary-bg-color) 20%,
+    var(--dark-secondary-bg-color) 40%,
+    var(--dark-secondary-bg-color) 100%
+  );
 }
 
 /*
@@ -115,19 +127,19 @@
 */
 
 .app-modal-card {
-    background: rgba(50, 50, 50, 0.94);
+  background: var(--dark-modal-bg-color);
 }
 .app-modal-header {
-    color: #fff;
+  color: #fff;
 }
 .app-modal-body {
-    color: #fff;
+  color: #fff;
 }
 
 .messages sub {
-    color: #fff;
+  color: #fff;
 }
 
 .chatify-hover-delete-btn {
-    color: #ffffff;
+  color: #fff;
 }
