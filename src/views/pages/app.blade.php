@@ -65,16 +65,16 @@
                     <a href="#" class="show-infoSide"><i class="fas fa-info-circle"></i></a>
                 </nav>
             </nav>
-        </div>
-
-        {{-- Messaging area --}}
-        <div class="m-body messages-container app-scroll">
-             {{-- Internet connection --}}
+            {{-- Internet connection --}}
             <div class="internet-connection">
                 <span class="ic-connected">Connected</span>
                 <span class="ic-connecting">Connecting...</span>
                 <span class="ic-noInternet">No internet access</span>
             </div>
+        </div>
+
+        {{-- Messaging area --}}
+        <div class="m-body messages-container app-scroll">
             <div class="messages">
                 <p class="message-hint center-el"><span>Please select a chat to start messaging</span></p>
             </div>
