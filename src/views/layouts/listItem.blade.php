@@ -17,7 +17,7 @@
     </table>
 @endif
 
-{{-- -------------------- All users/group list -------------------- --}}
+{{-- -------------------- Contact list -------------------- --}}
 @if($get == 'users')
 <table class="messenger-list-item" data-contact="{{ $user->id }}">
     <tr data-action="0">

@@ -43,14 +43,8 @@ class MessagesController extends Controller
      */
     public function index( $id = null)
     {
-        $routeName= FacadesRequest::route()->getName();
-        $type = in_array($routeName, ['user','group'])
-            ? $routeName
-            : 'user';
-
         return view('Chatify::pages.app', [
             'id' => $id ?? 0,
-            'type' => $type ?? 'user',
             'messengerColor' => Auth::user()->messenger_color ?? $this->messengerFallbackColor,
             'dark_mode' => Auth::user()->dark_mode < 1 ? 'light' : 'dark',
         ]);
@@ -58,25 +52,18 @@ class MessagesController extends Controller
 
 
     /**
-     * Fetch data by id for (user/group)
+     * Fetch data (user, favorite.. etc).
      *
      * @param Request $request
      * @return JsonResponse
      */
     public function idFetchData(Request $request)
     {
-        // Favorite
         $favorite = Chatify::inFavorite($request['id']);
-
-        // User data
-        if ($request['type'] == 'user') {
-            $fetch = User::where('id', $request['id'])->first();
-            if($fetch){
-                $userAvatar = Chatify::getUserWithAvatar($fetch)->avatar;
-            }
+        $fetch = User::where('id', $request['id'])->first();
+        if($fetch){
+            $userAvatar = Chatify::getUserWithAvatar($fetch)->avatar;
         }
-
-        // send the response
         return Response::json([
             'favorite' => $favorite,
             'fetch' => $fetch ?? null,
@@ -145,7 +132,6 @@ class MessagesController extends Controller
         if (!$error->status) {
             // send to database
             $message = Chatify::newMessage([
-                'type' => $request['type'],
                 'from_id' => Auth::user()->id,
                 'to_id' => $request['id'],
                 'body' => htmlentities(trim($request['message']), ENT_QUOTES, 'UTF-8'),
@@ -354,7 +340,6 @@ class MessagesController extends Controller
         foreach ($records->items() as $record) {
             $getRecords .= view('Chatify::layouts.listItem', [
                 'get' => 'search_item',
-                'type' => 'user',
                 'user' => Chatify::getUserWithAvatar($record),
             ])->render();
         }

@@ -195,7 +195,6 @@ class ChatifyMessenger
     public function newMessage($data)
     {
         $message = new Message();
-        $message->type = $data['type'];
         $message->from_id = $data['from_id'];
         $message->to_id = $data['to_id'];
         $message->body = $data['body'];

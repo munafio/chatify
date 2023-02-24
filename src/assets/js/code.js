@@ -23,9 +23,7 @@ const messagesContainer = $(".messenger-messagingView .m-body"),
   access_token = $('meta[name="csrf-token"]').attr("content");
 
 const getMessengerId = () => $("meta[name=id]").attr("content");
-const getMessengerType = () => $("meta[name=type]").attr("content");
 const setMessengerId = (id) => $("meta[name=id]").attr("content", id);
-const setMessengerType = (type) => $("meta[name=type]").attr("content", type);
 /**
  *-------------------------------------------------------------
  * Re-usable methods
@@ -101,7 +99,7 @@ function listItemLoading(items) {
 <td style="width: 45px;"><div class="loadingPlaceholder-avatar"></div></td>
 <td>
 <div class="loadingPlaceholder-name"></div>
-   <div class="loadingPlaceholder-date"></div>
+<div class="loadingPlaceholder-date"></div>
 </td>
 </tr>
 </table>
@@ -122,11 +120,11 @@ function avatarLoading(items) {
 <div class="loadingPlaceholder-wrapper">
 <div class="loadingPlaceholder-body">
 <table class="loadingPlaceholder-header">
- <tr>
-     <td style="width: 45px;">
-         <div class="loadingPlaceholder-avatar" style="margin: 2px;"></div>
-     </td>
- </tr>
+<tr>
+ <td style="width: 45px;">
+     <div class="loadingPlaceholder-avatar" style="margin: 2px;"></div>
+ </td>
+</tr>
 </table>
 </div>
 </div>
@@ -141,10 +139,10 @@ function sendTempMessageCard(message, id) {
   return `
 <div class="message-card mc-sender" data-id="${id}">
 <p>
-   ${message}
-   <sub>
-       <span class="far fa-clock"></span>
-   </sub>
+${message}
+<sub>
+   <span class="far fa-clock"></span>
+</sub>
 </p>
 </div>
 `;
@@ -351,7 +349,7 @@ function errorMessageCard(id) {
  * Fetch id data (user/group) and update the view
  *-------------------------------------------------------------
  */
-function IDinfo(id, type) {
+function IDinfo(id) {
   // clear temporary message id
   temporaryMsgId = 0;
   // clear typing now
@@ -367,7 +365,7 @@ function IDinfo(id, type) {
     $.ajax({
       url: url + "/idInfo",
       method: "POST",
-      data: { _token: access_token, id, type },
+      data: { _token: access_token, id },
       dataType: "JSON",
       success: (data) => {
         if (!data?.fetch) {
@@ -387,7 +385,7 @@ function IDinfo(id, type) {
         $(".messenger-infoView-btns .delete-conversation").show();
         $(".messenger-infoView-shared").show();
         // fetch messages
-        fetchMessages(id, type, true);
+        fetchMessages(id, true);
         // focus on messaging input
         messageInput.focus();
         // update info in view
@@ -429,7 +427,6 @@ function sendMessage() {
   if (inputValue.length > 0 || hasFile) {
     const formData = new FormData($("#message-form")[0]);
     formData.append("id", getMessengerId());
-    formData.append("type", getMessengerType());
     formData.append("temporaryMsgId", tempID);
     formData.append("_token", access_token);
     $.ajax({
@@ -520,7 +517,7 @@ function setMessagesLoading(loading = false) {
   }
   messagesLoading = loading;
 }
-function fetchMessages(id, type, newFetch = false) {
+function fetchMessages(id, newFetch = false) {
   if (newFetch) {
     messagesPage = 1;
     noMoreMessages = false;
@@ -534,7 +531,6 @@ function fetchMessages(id, type, newFetch = false) {
       data: {
         _token: access_token,
         id: id,
-        type: type,
         page: messagesPage,
       },
       dataType: "JSON",
@@ -1047,7 +1043,7 @@ function deleteConversation(id) {
         .find(".messenger-list-item[data-contact=" + id + "]")
         .remove();
       // refresh info
-      IDinfo(id, getMessengerType());
+      IDinfo(id);
 
       if (!data.deleted)
         console.error("Error occurred, messages can not be deleted!");
@@ -1230,7 +1226,7 @@ $(document).ready(function () {
         ) {
           $(".messenger-listView").hide();
         }
-        IDinfo(getMessengerId(), getMessengerType());
+        IDinfo(getMessengerId());
       }
     });
   });
@@ -1246,12 +1242,6 @@ $(document).ready(function () {
 
   // set item active on click
   $("body").on("click", ".messenger-list-item", function () {
-    const dataView = $(".messenger-list-item")
-      .find("p[data-type]")
-      .attr("data-type");
-    $(".messenger-tab").hide();
-    $(".messenger-tab[data-view=" + dataView + "s]").show();
-
     $(".messenger-list-item").removeClass("m-list-active");
     $(this).addClass("m-list-active");
     const userID = $(this).attr("data-contact");
@@ -1273,10 +1263,8 @@ $(document).ready(function () {
       $(".messenger-listView").hide();
     }
     const dataId = $(this).find("p[data-id]").attr("data-id");
-    const dataType = $(this).find("p[data-type]").attr("data-type");
     setMessengerId(dataId);
-    setMessengerType(dataType);
-    IDinfo(dataId, dataType);
+    IDinfo(dataId);
   });
 
   // click action for favorite button
@@ -1286,8 +1274,7 @@ $(document).ready(function () {
     }
     const uid = $(this).find("div.avatar").attr("data-id");
     setMessengerId(uid);
-    setMessengerType("user");
-    IDinfo(uid, "user");
+    IDinfo(uid);
     updateSelectedContact(uid);
     routerPush(document.title, `${url}/${uid}`);
   });
@@ -1541,11 +1528,11 @@ $(document).ready(function () {
   actionOnScroll(
     ".m-body.messages-container",
     function () {
-      fetchMessages(getMessengerId(), getMessengerType());
+      fetchMessages(getMessengerId());
     },
     true
   );
-  //Contacts (users) pagination
+  //Contacts pagination
   actionOnScroll(".messenger-tab.users-tab", function () {
     getContacts();
   });

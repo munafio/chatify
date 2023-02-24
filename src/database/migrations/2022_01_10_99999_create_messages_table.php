@@ -15,7 +15,6 @@ class CreateChMessagesTable extends Migration
     {
         Schema::create('ch_messages', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('type');
             $table->bigInteger('from_id');
             $table->bigInteger('to_id');
             $table->string('body',5000)->nullable();
