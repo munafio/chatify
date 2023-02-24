@@ -7,12 +7,12 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - Emoji's support.
+- Css variables.
 
 ### Enhancements
 
 - Using UUIDs instead of random IDs on table primary column #243.
 - UI/UX changes and enhancements.
-- Using css variables.
 
 ### Fixed
 
