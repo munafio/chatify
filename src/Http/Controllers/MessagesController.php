@@ -477,9 +477,8 @@ class MessagesController extends Controller
      */
     public function setActiveStatus(Request $request)
     {
-        $userId = $request['user_id'];
         $activeStatus = $request['status'] > 0 ? 1 : 0;
-        $status = User::where('id', $userId)->update(['active_status' => $activeStatus]);
+        $status = User::where('id', Auth::user()->id)->update(['active_status' => $activeStatus]);
         return Response::json([
             'status' => $status,
         ], 200);
