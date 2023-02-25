@@ -64,7 +64,7 @@
   color: #333;
 }
 .message-card p {
-  background: var(--primary-bg-color);
+  background: var(--message-card-color);
   color: #656b75;
   box-shadow: 0px 6px 11px rgba(18, 67, 105, 0.03);
 }
@@ -75,10 +75,13 @@
 .m-header a:hover,
 .m-header a:focus {
   text-decoration: none;
-  color: #606679;
+  color: #202020;
 }
 .messenger-list-item td p {
-  color: #606679;
+  color: #3c3c3c;
+}
+.messenger-list-item td span {
+  color: #929292;
 }
 .activeStatus {
   border: 2px solid var(--primary-bg-color);
@@ -94,11 +97,21 @@
   background-color: var(--secondary-bg-color);
   border-color: var(--border-color);
 }
-.favorites-section {
-  border-bottom: 1px solid var(--border-color);
-}
 .messenger-sendCard svg {
   color: var(--send-input-icons-color);
+}
+.messenger-title {
+  color: #797979;
+}
+.messenger-title > span {
+  background-color: var(--primary-bg-color);
+}
+.messenger-title::before {
+  background-color: var(--border-color);
+}
+.message-hint span {
+  background: var(--message-hint-bg-color);
+  color: var(--message-hint-color);
 }
 /*
 ***********************************************
@@ -116,7 +129,9 @@
     var(--secondary-bg-color) 100%
   );
 }
-
+.messenger-infoView > nav > p {
+  color: #333;
+}
 /*
 ***********************************************
 * App Modal

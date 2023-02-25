@@ -15,10 +15,10 @@
             {{-- Search input --}}
             <input type="text" class="messenger-search" placeholder="Search" />
             {{-- Tabs --}}
-            <div class="messenger-listView-tabs">
+            {{-- <div class="messenger-listView-tabs">
                 <a href="#" class="active-tab" data-view="users">
                     <span class="far fa-user"></span> Contacts</a>
-            </div>
+            </div> --}}
         </div>
         {{-- tabs and lists --}}
         <div class="m-body contacts-container">
@@ -27,18 +27,20 @@
            <div class="show messenger-tab users-tab app-scroll" data-view="users">
                {{-- Favorites --}}
                <div class="favorites-section">
-                <p class="messenger-title">Favorites</p>
+                <p class="messenger-title"><span>Favorites</span></p>
                 <div class="messenger-favorites app-scroll-thin"></div>
                </div>
                {{-- Saved Messages --}}
+               <p class="messenger-title"><span>Your Space</span></p>
                {!! view('Chatify::layouts.listItem', ['get' => 'saved']) !!}
                {{-- Contact --}}
-               <div class="listOfContacts" style="width: 100%;height: calc(100% - 200px);position: relative;"></div>
+               <p class="messenger-title"><span>All Messages</span></p>
+               <div class="listOfContacts" style="width: 100%;height: calc(100% - 270px);position: relative;"></div>
            </div>
              {{-- ---------------- [ Search Tab ] ---------------- --}}
            <div class="messenger-tab search-tab app-scroll" data-view="search">
                 {{-- items --}}
-                <p class="messenger-title">Search</p>
+                <p class="messenger-title"><span>Search</span></p>
                 <div class="search-records">
                     <p class="message-hint center-el"><span>Type to search..</span></p>
                 </div>
@@ -99,6 +101,7 @@
     <div class="messenger-infoView app-scroll">
         {{-- nav actions --}}
         <nav>
+            <p>User Details</p>
             <a href="#"><i class="fas fa-times"></i></a>
         </nav>
         {!! view('Chatify::layouts.info')->render() !!}

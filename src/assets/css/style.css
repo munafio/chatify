@@ -7,10 +7,17 @@ body {
 }
 
 :root {
+  /*
+    * --------------------------------------------------
+    * NOTE: `--primary-color` variable set in
+    *       `headLinks.blade.php` view file.
+    * --------------------------------------------------
+    */
+
   /* General variables */
   --icon-size: 20px;
   --headers-padding: 1rem;
-  --listView-header-height: 155px;
+  --listView-header-height: 110px;
 
   /* Light theme variables */
   --primary-bg-color: #fff;
@@ -19,16 +26,34 @@ body {
   --messagingView-bg-color: #f6f7f9;
   --scrollbar-thumb-color: #cfcfcf;
   --modal-bg-color: #fff;
-  --send-input-icons-color: #8c8c8c;
+  --send-input-icons-color: #4b4b4b;
+  --message-hint-bg-color: #ededed;
+  --message-hint-color: #4b4b4b;
+  --message-card-color: #fff;
 
   /* Dark theme variables */
-  --dark-primary-bg-color: #232323;
-  --dark-secondary-bg-color: #2e2e2e;
-  --dark-border-color: #2e2e2e;
-  --dark-messagingView-bg-color: #1e1e1e;
-  --dark-scrollbar-thumb-color: #323232;
+  --dark-primary-bg-color: #121212;
+  --dark-secondary-bg-color: #202020;
+  --dark-border-color: #202020;
+  --dark-messagingView-bg-color: #1b1b1b;
+  --dark-scrollbar-thumb-color: #212121;
   --dark-modal-bg-color: #1a1a1a;
   --dark-send-input-icons-color: #c8c8c8;
+  --dark-message-hint-bg-color: #292929;
+  --dark-message-hint-color: #ffffff;
+  --dark-message-card-color: #292929;
+}
+
+/* NProgress background */
+#nprogress .bar {
+  background: var(--primary-color) !important;
+}
+#nprogress .peg {
+  box-shadow: 0 0 10px var(--primary-color), 0 0 5px var(--primary-color) !important;
+}
+#nprogress .spinner-icon {
+  border-top-color: var(--primary-color) !important;
+  border-left-color: var(--primary-color) !important;
 }
 
 /*internet connection*/
@@ -36,7 +61,9 @@ body {
   display: none;
   background: rgba(0, 0, 0, 0.76);
   position: absolute;
-  bottom: calc(-100% + (var(--headers-padding) + var(--headers-padding)));
+  bottom: calc(
+    -100% + (var(--headers-padding) + var(--headers-padding)) - 8px
+  ); /* 8px = 4px padding-top + 4px padding-bottom */
   left: 0;
   right: 0;
   text-align: center;
@@ -133,6 +160,7 @@ body {
   box-shadow: 0px 5px 6px rgba(0, 0, 0, 0.06);
 }
 .m-header svg {
+  color: var(--primary-color);
   font-size: var(--icon-size);
   transition: transform 0.12s;
 }
@@ -170,6 +198,14 @@ body {
 .messenger-listView-tabs a:focus {
   text-decoration: none;
 }
+.messenger-listView-tabs a,
+.messenger-listView-tabs a:hover,
+.messenger-listView-tabs a:focus {
+  color: var(--primary-color);
+}
+.active-tab {
+  border-bottom: 2px solid var(--primary-color);
+}
 .messenger-tab {
   overflow: auto;
   height: calc(100vh - var(--listView-header-height) - 2px);
@@ -205,6 +241,18 @@ body {
   color: #fff !important;
 }
 
+.m-list-active,
+.m-list-active:hover,
+.m-list-active:focus {
+  background: var(--primary-color) !important;
+}
+.m-list-active b {
+  background: #fff !important;
+  color: var(--primary-color) !important;
+}
+.m-list-active .activeStatus {
+  border-color: var(--primary-color) !important;
+}
 .messenger-list-item td {
   padding: 10px;
 }
@@ -215,7 +263,6 @@ body {
 .messenger-list-item td p {
   margin-bottom: 4px;
   font-size: 14px;
-  font-weight: 600;
 }
 .messenger-list-item td p span {
   float: right;
@@ -223,11 +270,12 @@ body {
 .messenger-list-item td span {
   color: #cacaca;
   font-weight: 400;
-  font-size: 13px;
+  font-size: 12px;
 }
 .messenger-list-item td b {
   float: right;
   color: #fff;
+  background: var(--primary-color);
   padding: 0px 4px;
   border-radius: 20px;
   font-size: 13px;
@@ -276,18 +324,35 @@ body {
 .messenger-favorites div.avatar {
   border: 2px solid #fff;
   margin: 0px 4px;
+  box-shadow: 0px 0px 0px 2px var(--primary-color);
 }
 .messenger-favorites > div:active {
   transform: scale(0.9);
 }
 .messenger-title {
+  position: relative;
   margin: 0;
-  padding: 10px;
-  padding-bottom: 0px;
-  text-transform: uppercase;
-  color: #aeaeb7;
+  padding: 10px !important;
+  text-transform: capitalize;
   font-size: 12px;
-  font-weight: 600;
+  text-align: center;
+  z-index: 1;
+}
+.messenger-title > span {
+  position: relative;
+  padding: 0px 10px;
+  z-index: 1;
+}
+.messenger-title::before {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 1px;
+  position: absolute;
+  bottom: 50%;
+  left: 0;
+  right: 0;
+  z-index: 0;
 }
 .messenger-infoView {
   display: block;
@@ -296,9 +361,13 @@ body {
   min-width: 200px;
 }
 .messenger-infoView nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: var(--headers-padding);
 }
 .messenger-infoView nav a {
+  color: var(--primary-color);
   text-decoration: none;
   font-size: var(--icon-size);
 }
@@ -322,6 +391,9 @@ body {
   border-radius: 3px;
   font-size: 14px;
   transition: background 0.3s;
+}
+.messenger-infoView-btns a.default {
+  color: var(--primary-color);
 }
 .messenger-infoView-btns a.default:hover {
   background: #f0f6ff;
@@ -394,6 +466,7 @@ body {
 .mc-sender p {
   direction: ltr;
   color: #fff !important;
+  background: var(--primary-color) !important;
 }
 .mc-sender p sub {
   color: rgba(255, 255, 255, 0.67);
@@ -405,6 +478,9 @@ body {
 }
 .mc-error p sub {
   color: #ff0000 !important;
+}
+.messenger-sendCard .send-button svg {
+  color: var(--primary-color);
 }
 .listView-x,
 .show-listView {
@@ -546,10 +622,8 @@ body {
   transform: translate(-50%, -50%);
 }
 .message-hint span {
-  background: rgba(154, 161, 170, 0.13);
   padding: 3px 10px;
   border-radius: 20px;
-  color: rgb(135, 147, 164);
   display: inline-block;
 }
 .upload-avatar-details {
@@ -593,6 +667,7 @@ body {
 .dark-mode-switch {
   margin: 0px 5px;
   cursor: pointer;
+  color: var(--primary-color);
 }
 .activeStatus {
   width: 12px;
@@ -603,6 +678,9 @@ body {
   bottom: 12%;
   right: 6%;
   transition: border 0.1s;
+}
+.lastMessageIndicator {
+  color: var(--primary-color) !important;
 }
 
 /*
@@ -1006,6 +1084,13 @@ div.loadingPlaceholder-date {
   margin-bottom: 0.5rem; /* 8px */
 }
 
+.messenger [type="text"]:focus {
+  outline: 1px solid var(--primary-color);
+  border-color: var(--primary-color) !important;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 2px var(--primary-color);
+}
+
 .messenger textarea:focus {
   outline: none;
   border: none;
@@ -1020,6 +1105,7 @@ div.loadingPlaceholder-date {
 .message-card:hover .chatify-hover-delete-btn {
   display: block;
 }
+
 /*
 *****************************************
 * Emoji Button scroll-bars

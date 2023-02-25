@@ -56,7 +56,7 @@
   border-top: 1px solid var(--dark-border-color);
 }
 .messenger-sendCard {
-  background: var(--dark-secondary-bg-color);
+  background: var(--dark-primary-bg-color);
   border-top: 1px solid var(--dark-border-color);
 }
 .attachment-preview > p {
@@ -69,7 +69,7 @@
   color: #fff;
 }
 .message-card p {
-  background: var(--dark-secondary-bg-color);
+  background: var(--dark-message-card-color);
   color: #fff;
 }
 .m-li-divider {
@@ -97,11 +97,24 @@
   background-color: var(--dark-secondary-bg-color);
   border-color: var(--dark-border-color);
 }
-.favorites-section {
-  border-bottom: 1px solid var(--dark-border-color);
-}
 .messenger-sendCard svg {
   color: var(--dark-send-input-icons-color);
+}
+.messenger-title {
+  color: #dbdbdb;
+}
+.messenger-title > span {
+  background-color: var(--dark-primary-bg-color);
+}
+.messenger-title::before {
+  background-color: var(--dark-border-color);
+}
+.message-hint span {
+  background: var(--dark-message-hint-bg-color);
+  color: var(--dark-message-hint-color);
+}
+.messenger-infoView > nav > p {
+  color: #fff;
 }
 /*
 ***********************************************
