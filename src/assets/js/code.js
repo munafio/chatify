@@ -438,7 +438,7 @@ function sendMessage() {
       contentType: false,
       beforeSend: () => {
         // remove message hint
-        $(".messages").find(".message-hint").remove();
+        $(".messages").find(".message-hint").hide();
         // append a temporary message card
         if (hasFile) {
           messagesContainer
@@ -652,10 +652,12 @@ clientListenChannel.bind("client-seen", function (data) {
 
 // listen to contact item updates event
 clientListenChannel.bind("client-contactItem", function (data) {
-  if (data.update_for == auth_id) {
-    data.updating == true
-      ? updateContactItem(data.update_to)
-      : console.error("[Contact Item updates] Updating failed!");
+  if (data.to == auth_id) {
+    if (data.update) {
+      updateContactItem(data.from);
+    } else {
+      console.error("Can not update contact item!");
+    }
   }
 });
 
@@ -663,7 +665,13 @@ clientListenChannel.bind("client-contactItem", function (data) {
 clientListenChannel.bind("client-messageDelete", function (data) {
   $("body").find(`.message-card[data-id=${data.id}]`).remove();
 });
-
+// listen on delete conversation event
+clientListenChannel.bind("client-deleteConversation", function (data) {
+  if (data.from == getMessengerId() && data.to == auth_id) {
+    $("body").find(`.messages`).html("");
+    $(".messages").find(".message-hint").show();
+  }
+});
 // -------------------------------------
 // presence channel [User Active Status]
 var activeStatusChannel = pusher.subscribe("presence-activeStatus");
@@ -742,9 +750,9 @@ function makeSeen(status) {
  */
 function sendContactItemUpdates(status) {
   return clientSendChannel.trigger("client-contactItem", {
-    update_for: getMessengerId(), // Messenger
-    update_to: auth_id, // Me
-    updating: status,
+    from: auth_id, // Me
+    to: getMessengerId(), // Messenger
+    update: status,
   });
 }
 
@@ -756,6 +764,17 @@ function sendContactItemUpdates(status) {
 function sendMessageDeleteEvent(messageId) {
   return clientSendChannel.trigger("client-messageDelete", {
     id: messageId,
+  });
+}
+/**
+ *-------------------------------------------------------------
+ * Trigger delete conversation
+ *-------------------------------------------------------------
+ */
+function sendDeleteConversationEvent() {
+  return clientSendChannel.trigger("client-deleteConversation", {
+    from: auth_id,
+    to: getMessengerId(),
   });
 }
 
@@ -858,9 +877,6 @@ function getContacts() {
  */
 function updateContactItem(user_id) {
   if (user_id != auth_id) {
-    let listItem = $("body")
-      .find(".listOfContacts")
-      .find(".messenger-list-item[data-contact=" + user_id + "]");
     $.ajax({
       url: url + "/updateContacts",
       method: "POST",
@@ -870,18 +886,24 @@ function updateContactItem(user_id) {
       },
       dataType: "JSON",
       success: (data) => {
+        $(".listOfContacts")
+          .find(".messenger-list-item[data-contact=" + user_id + "]")
+          .remove();
+        if (data.contactItem) $(".listOfContacts").prepend(data.contactItem);
+        if (user_id == getMessengerId()) updateSelectedContact(user_id);
+        // show/hide message hint (empty state message)
         const totalContacts =
           $(".listOfContacts").find(".messenger-list-item")?.length || 0;
-        if (totalContacts < 1)
-          $(".listOfContacts").find(".message-hint").remove();
-        listItem.remove();
-        $(".listOfContacts").prepend(data.contactItem);
+        if (totalContacts > 0) {
+          $(".listOfContacts").find(".message-hint").hide();
+        } else {
+          $(".listOfContacts").find(".message-hint").show();
+        }
         // update data-action required with [responsive design]
         cssMediaQueries();
-        updateSelectedContact(user_id);
       },
-      error: () => {
-        console.error("Server error, check your response");
+      error: (error) => {
+        console.error(error);
       },
     });
   }
@@ -1051,7 +1073,7 @@ function deleteConversation(id) {
       IDinfo(id);
 
       if (!data.deleted)
-        console.error("Error occurred, messages can not be deleted!");
+        return alert("Error occurred, messages can not be deleted!");
 
       // Hide waiting alert modal
       app_modal({
@@ -1060,6 +1082,11 @@ function deleteConversation(id) {
         buttons: true,
         body: "",
       });
+
+      sendDeleteConversationEvent();
+
+      // update contact list item
+      sendContactItemUpdates(true);
     },
     error: () => {
       console.error("Server error, check your response");

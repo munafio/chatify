@@ -24,6 +24,8 @@ All notable changes to this project will be documented in this file.
 - App URL should be changed when click the `back to contacts` button on small screens.
 - Internet connection UI.
 - Prevent Users from updating each others statuses #254
+- Contact list realtime updates issues.
+- Delete messages issues.
 
 ## v1.5.6 (2023-01-26)
 

@@ -251,18 +251,20 @@ class ChatifyMessenger
      */
     public function getContactItem($user)
     {
-        // get last message
-        $lastMessage = $this->getLastMessageQuery($user->id);
-
-        // Get Unseen messages counter
-        $unseenCounter = $this->countUnseenMessages($user->id);
-
-        return view('Chatify::layouts.listItem', [
-            'get' => 'users',
-            'user' => $this->getUserWithAvatar($user),
-            'lastMessage' => $lastMessage,
-            'unseenCounter' => $unseenCounter,
-        ])->render();
+        try {
+            // get last message
+            $lastMessage = $this->getLastMessageQuery($user->id);
+            // Get Unseen messages counter
+            $unseenCounter = $this->countUnseenMessages($user->id);
+            return view('Chatify::layouts.listItem', [
+                'get' => 'users',
+                'user' => $this->getUserWithAvatar($user),
+                'lastMessage' => $lastMessage,
+                'unseenCounter' => $unseenCounter,
+                ])->render();
+        } catch (\Throwable $th) {
+            return '';
+        }
     }
 
     /**
