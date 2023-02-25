@@ -22,6 +22,7 @@ All notable changes to this project will be documented in this file.
 - Fix responsiveness when going to chat with specific ID #247.
 - App URL should be changed when click the `back to contacts` button on small screens.
 - Internet connection UI.
+- Prevent Users from updating each others statuses #254
 
 ## v1.5.6 (2023-01-26)
 
