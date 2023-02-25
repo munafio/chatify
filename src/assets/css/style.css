@@ -1020,3 +1020,19 @@ div.loadingPlaceholder-date {
 .message-card:hover .chatify-hover-delete-btn {
   display: block;
 }
+/*
+*****************************************
+* Emoji Button scroll-bars
+*****************************************
+*/
+.emoji-picker__emojis::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+  border-radius: 4px;
+  background: transparent;
+  transition: all 0.3s ease;
+}
+.emoji-picker__emojis::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background: transparent;
+}
