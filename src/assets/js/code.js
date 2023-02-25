@@ -665,7 +665,7 @@ var activeStatusChannel = pusher.subscribe("presence-activeStatus");
 
 // Joined
 activeStatusChannel.bind("pusher:member_added", function (member) {
-  setActiveStatus(1, member.id);
+  setActiveStatus(1);
   $(".messenger-list-item[data-contact=" + member.id + "]")
     .find(".activeStatus")
     .remove();
@@ -676,7 +676,7 @@ activeStatusChannel.bind("pusher:member_added", function (member) {
 
 // Leaved
 activeStatusChannel.bind("pusher:member_removed", function (member) {
-  setActiveStatus(0, member.id);
+  setActiveStatus(0);
   $(".messenger-list-item[data-contact=" + member.id + "]")
     .find(".activeStatus")
     .remove();
@@ -1175,11 +1175,11 @@ function updateSettings() {
  * Set Active status
  *-------------------------------------------------------------
  */
-function setActiveStatus(status, user_id) {
+function setActiveStatus(status) {
   $.ajax({
     url: url + "/setActiveStatus",
     method: "POST",
-    data: { _token: access_token, user_id: user_id, status: status },
+    data: { _token: access_token, status: status },
     dataType: "JSON",
     success: (data) => {
       // Nothing to do
