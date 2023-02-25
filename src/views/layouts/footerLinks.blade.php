@@ -20,5 +20,10 @@
     const allowedFiles = {!! json_encode(config('chatify.attachments.allowed_files')) !!} || [];
     const getAllowedExtensions = [...allowedImages, ...allowedFiles];
     const getMaxUploadSize = {{ Chatify::getMaxUploadSize() }};
+
+    // setting gloabl Chatify variables
+    window.chatify = {
+        sounds: {!! json_encode(config('chatify.sounds')) !!},
+    };
 </script>
 <script src="{{ asset('js/chatify/code.js') }}"></script>

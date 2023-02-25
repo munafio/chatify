@@ -121,9 +121,9 @@ function avatarLoading(items) {
 <div class="loadingPlaceholder-body">
 <table class="loadingPlaceholder-header">
 <tr>
- <td style="width: 45px;">
-     <div class="loadingPlaceholder-avatar" style="margin: 2px;"></div>
- </td>
+<td style="width: 45px;">
+  <div class="loadingPlaceholder-avatar" style="margin: 2px;"></div>
+</td>
 </tr>
 </table>
 </div>
@@ -141,7 +141,7 @@ function sendTempMessageCard(message, id) {
 <p>
 ${message}
 <sub>
-   <span class="far fa-clock"></span>
+<span class="far fa-clock"></span>
 </sub>
 </p>
 </div>
@@ -620,6 +620,11 @@ channel.bind("messaging", function (data) {
       .find("tr>td>b")
       .remove();
   }
+
+  playNotificationSound(
+    "new_message",
+    !(data.from_id == getMessengerId() && data.to_id == auth_id)
+  );
 });
 
 // listen to typing indicator
@@ -1612,3 +1617,17 @@ emojiPicker.on("emoji", (emoji) => {
   el.selectionStart = el.selectionEnd = startPos + emoji.length;
   el.focus();
 });
+
+/**
+ *-------------------------------------------------------------
+ * Notification sounds
+ *-------------------------------------------------------------
+ */
+function playNotificationSound(soundName, condition = false) {
+  if (document.hidden || condition) {
+    const sound = new Audio(
+      `/${chatify.sounds.public_path}/${chatify.sounds[soundName]}`
+    );
+    sound.play();
+  }
+}

@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 
 - Emoji's support.
 - Css variables.
+- Notification sounds.
 
 ### Enhancements
 

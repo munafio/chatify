@@ -101,4 +101,18 @@ return [
         '#ff2522',
         '#9C27B0',
     ],
+    /*
+    |-------------------------------------
+    | Sounds
+    | You can enable/disable the sounds and
+    | change sound's name/path placed at
+    | `public/` directory of your app.
+    |
+    |-------------------------------------
+    */
+    'sounds' => [
+        'enabled' => true,
+        'public_path' => 'sounds/chatify',
+        'new_message' => 'new-message-sound.mp3',
+    ]
 ];
