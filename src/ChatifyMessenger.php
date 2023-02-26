@@ -265,7 +265,7 @@ class ChatifyMessenger
                 'unseenCounter' => $unseenCounter,
                 ])->render();
         } catch (\Throwable $th) {
-            return '';
+            throw new Exception($th->getMessage());
         }
     }
 
