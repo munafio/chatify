@@ -4,8 +4,8 @@
         <tr data-action="0">
             {{-- Avatar side --}}
             <td>
-            <div class="avatar av-m" style="background-color: #d9efff; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                <span class="far fa-bookmark" style="font-size: 22px; color: #68a5ff;"></span>
+            <div class="saved-messages avatar av-m">
+                <span class="far fa-bookmark"></span>
             </div>
             </td>
             {{-- center side --}}

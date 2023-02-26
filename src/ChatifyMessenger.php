@@ -113,47 +113,47 @@ class ChatifyMessenger
     }
 
     /**
-     * Fetch message by id and return the message card
+     * Fetch & parse message and return the message card
      * view as a response.
      *
+     * @param Message $prefetchedMessage
      * @param int $id
      * @return array
      */
-    public function fetchMessage($id, $index = null, $message = null)
+    public function parseMessage($prefetchedMessage = null, $id = null)
     {
         $msg = null;
         $attachment = null;
         $attachment_type = null;
         $attachment_title = null;
-
-        if (!!$message) {
-            $msg = $message;
+        if (!!$prefetchedMessage) {
+            $msg = $prefetchedMessage;
         } else {
             $msg = Message::where('id', $id)->first();
             if(!$msg){
                 return [];
             }
         }
-
         if (isset($msg->attachment)) {
             $attachmentOBJ = json_decode($msg->attachment);
             $attachment = $attachmentOBJ->new_name;
             $attachment_title = htmlentities(trim($attachmentOBJ->old_name), ENT_QUOTES, 'UTF-8');
-
             $ext = pathinfo($attachment, PATHINFO_EXTENSION);
             $attachment_type = in_array($ext, $this->getAllowedImages()) ? 'image' : 'file';
         }
-
         return [
-            'index' => $index,
             'id' => $msg->id,
             'from_id' => $msg->from_id,
             'to_id' => $msg->to_id,
             'message' => $msg->body,
-            'attachment' => [$attachment, $attachment_title, $attachment_type],
+            'attachment' => (object) [
+                'file' => $attachment,
+                'title' => $attachment_title,
+                'type' => $attachment_type
+            ],
             'time' => $msg->created_at->diffForHumans(),
             'fullTime' => $msg->created_at,
-            'viewType' => ($msg->from_id == Auth::user()->id) ? 'sender' : 'default',
+            'isSender' => ($msg->from_id == Auth::user()->id),
             'seen' => $msg->seen,
         ];
     }
@@ -161,16 +161,18 @@ class ChatifyMessenger
     /**
      * Return a message card with the given data.
      *
-     * @param array $data
-     * @param string $viewType
+     * @param Message $data
+     * @param boolean $isSender
      * @return string
      */
-    public function messageCard($data, $viewType = null)
+    public function messageCard($data, $renderDefaultCard = false)
     {
         if (!$data) {
             return '';
         }
-        $data['viewType'] = ($viewType) ? $viewType : $data['viewType'];
+        if($renderDefaultCard) {
+            $data['isSender'] =  false;
+        }
         return view('Chatify::layouts.messageCard', $data)->render();
     }
 

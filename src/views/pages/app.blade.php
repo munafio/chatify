@@ -28,7 +28,7 @@
                {{-- Favorites --}}
                <div class="favorites-section">
                 <p class="messenger-title"><span>Favorites</span></p>
-                <div class="messenger-favorites app-scroll-thin"></div>
+                <div class="messenger-favorites app-scroll-hidden"></div>
                </div>
                {{-- Saved Messages --}}
                <p class="messenger-title"><span>Your Space</span></p>
@@ -83,13 +83,13 @@
             {{-- Typing indicator --}}
             <div class="typing-indicator">
                 <div class="message-card typing">
-                    <p>
+                    <div class="message">
                         <span class="typing-dots">
                             <span class="dot dot-1"></span>
                             <span class="dot dot-2"></span>
                             <span class="dot dot-3"></span>
                         </span>
-                    </p>
+                    </div>
                 </div>
             </div>
 
