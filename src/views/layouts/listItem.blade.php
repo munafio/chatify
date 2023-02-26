@@ -4,8 +4,8 @@
         <tr data-action="0">
             {{-- Avatar side --}}
             <td>
-            <div class="avatar av-m" style="background-color: #d9efff; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                <span class="far fa-bookmark" style="font-size: 22px; color: #68a5ff;"></span>
+            <div class="saved-messages avatar av-m">
+                <span class="far fa-bookmark"></span>
             </div>
             </td>
             {{-- center side --}}
@@ -18,7 +18,11 @@
 @endif
 
 {{-- -------------------- Contact list -------------------- --}}
-@if($get == 'users')
+@if($get == 'users' && !!$lastMessage)
+<?php
+$lastMessageBody = mb_convert_encoding($lastMessage->body, 'UTF-8', 'UTF-8');
+$lastMessageBody = strlen($lastMessageBody) > 30 ? mb_substr($lastMessageBody, 0, 30, 'UTF-8').'..' : $lastMessageBody;
+?>
 <table class="messenger-list-item" data-contact="{{ $user->id }}">
     <tr data-action="0">
         {{-- Avatar side --}}
@@ -45,9 +49,7 @@
             {{-- Last message body --}}
             @if($lastMessage->attachment == null)
             {!!
-                strlen($lastMessage->body) > 30
-                ? trim(substr($lastMessage->body, 0, 30)).'..'
-                : $lastMessage->body
+                $lastMessageBody
             !!}
             @else
             <span class="fas fa-file"></span> Attachment
@@ -56,7 +58,6 @@
         {{-- New messages counter --}}
             {!! $unseenCounter > 0 ? "<b>".$unseenCounter."</b>" : '' !!}
         </td>
-
     </tr>
 </table>
 @endif

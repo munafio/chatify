@@ -122,7 +122,7 @@ function avatarLoading(items) {
 <table class="loadingPlaceholder-header">
 <tr>
 <td style="width: 45px;">
-  <div class="loadingPlaceholder-avatar" style="margin: 2px;"></div>
+<div class="loadingPlaceholder-avatar" style="margin: 2px;"></div>
 </td>
 </tr>
 </table>
@@ -138,12 +138,12 @@ function avatarLoading(items) {
 function sendTempMessageCard(message, id) {
   return `
 <div class="message-card mc-sender" data-id="${id}">
-<p>
+<div class="message">
 ${message}
 <sub>
 <span class="far fa-clock"></span>
 </sub>
-</p>
+</div>
 </div>
 `;
 }
@@ -1446,7 +1446,7 @@ $(document).ready(function () {
     });
   });
   // Delete Message Button
-  $("body").on("click", ".chatify-hover-delete-btn", function () {
+  $("body").on("click", ".message-card .actions .delete-btn", function () {
     app_modal({
       name: "delete",
       data: $(this).data("id"),

@@ -130,7 +130,6 @@ class MessagesController extends Controller
         }
 
         if (!$error->status) {
-            // send to database
             $message = Chatify::newMessage([
                 'from_id' => Auth::user()->id,
                 'to_id' => $request['id'],
@@ -140,15 +139,11 @@ class MessagesController extends Controller
                     'old_name' => htmlentities(trim($attachment_title), ENT_QUOTES, 'UTF-8'),
                 ]) : null,
             ]);
-
-            // fetch message to send it with the response
-            $messageData = Chatify::fetchMessage(null, null, $message);
-
-            // send to user using pusher
+            $messageData = Chatify::parseMessage($message);
             Chatify::push("private-chatify.".$request['id'], 'messaging', [
                 'from_id' => Auth::user()->id,
                 'to_id' => $request['id'],
-                'message' => Chatify::messageCard($messageData, 'default')
+                'message' => Chatify::messageCard($messageData, true)
             ]);
         }
 
@@ -190,9 +185,9 @@ class MessagesController extends Controller
             return Response::json($response);
         }
         $allMessages = null;
-        foreach ($messages->reverse() as $index => $message) {
+        foreach ($messages->reverse() as $message) {
             $allMessages .= Chatify::messageCard(
-                Chatify::fetchMessage(null, $index, $message)
+                Chatify::parseMessage($message)
             );
         }
         $response['messages'] = $allMessages;

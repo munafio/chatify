@@ -141,13 +141,13 @@ class MessagesController extends Controller
             ]);
 
             // fetch message to send it with the response
-            $messageData = Chatify::fetchMessage(null, null, $message);
+            $messageData = Chatify::parseMessage($message);
 
             // send to user using pusher
             Chatify::push("private-chatify.".$request['id'], 'messaging', [
                 'from_id' => Auth::user()->id,
                 'to_id' => $request['id'],
-                'message' => Chatify::messageCard($messageData, 'default')
+                'message' => $messageData
             ]);
         }
 

@@ -26,6 +26,7 @@ All notable changes to this project will be documented in this file.
 - Prevent Users from updating each others statuses #254
 - Contact list realtime updates issues.
 - Delete messages issues.
+- Fix contact list error `Malformed UTF-8 characters, possibly incorrectly encoded`
 
 ## v1.5.6 (2023-01-26)
 
