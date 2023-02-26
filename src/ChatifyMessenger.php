@@ -382,20 +382,16 @@ class ChatifyMessenger
     {
         try {
             $msg = Message::where('from_id', auth()->id())->where('id', $id)->firstOrFail();
-                if (isset($msg->attachment)) {
-                    // delete file attached if exist
-                    $path = config('chatify.attachments.folder') . '/' . json_decode($msg->attachment)->new_name;
-                    if (self::storage()->exists($path)) {
-                        self::storage()->delete($path);
-                    }
-                    // delete from database
-                    $msg->delete();
-                } else {
-                    return 0;
+            if (isset($msg->attachment)) {
+                $path = config('chatify.attachments.folder') . '/' . json_decode($msg->attachment)->new_name;
+                if (self::storage()->exists($path)) {
+                    self::storage()->delete($path);
                 }
+            }
+            $msg->delete();
             return 1;
         } catch (Exception $e) {
-            return 0;
+            throw new Exception($e->getMessage());
         }
     }
 
