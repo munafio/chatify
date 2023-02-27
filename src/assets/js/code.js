@@ -20,10 +20,27 @@ const messagesContainer = $(".messenger-messagingView .m-body"),
   url = $("meta[name=url]").attr("content"),
   messengerTheme = $("meta[name=messenger-theme]").attr("content"),
   defaultMessengerColor = $("meta[name=messenger-color]").attr("content"),
-  access_token = $('meta[name="csrf-token"]').attr("content");
+  csrfToken = $('meta[name="csrf-token"]').attr("content");
 
 const getMessengerId = () => $("meta[name=id]").attr("content");
 const setMessengerId = (id) => $("meta[name=id]").attr("content", id);
+
+/**
+ *-------------------------------------------------------------
+ * Pusher initialization
+ *-------------------------------------------------------------
+ */
+Pusher.logToConsole = chatify.pusher.debug;
+const pusher = new Pusher(chatify.pusher.key, {
+  encrypted: chatify.pusher.options.encrypted,
+  cluster: chatify.pusher.options.cluster,
+  authEndpoint: chatify.pusherAuthEndpoint,
+  auth: {
+    headers: {
+      "X-CSRF-TOKEN": csrfToken,
+    },
+  },
+});
 /**
  *-------------------------------------------------------------
  * Re-usable methods
@@ -365,7 +382,7 @@ function IDinfo(id) {
     $.ajax({
       url: url + "/idInfo",
       method: "POST",
-      data: { _token: access_token, id },
+      data: { _token: csrfToken, id },
       dataType: "JSON",
       success: (data) => {
         if (!data?.fetch) {
@@ -428,7 +445,7 @@ function sendMessage() {
     const formData = new FormData($("#message-form")[0]);
     formData.append("id", getMessengerId());
     formData.append("temporaryMsgId", tempID);
-    formData.append("_token", access_token);
+    formData.append("_token", csrfToken);
     $.ajax({
       url: $("#message-form").attr("action"),
       method: "POST",
@@ -529,7 +546,7 @@ function fetchMessages(id, newFetch = false) {
       url: url + "/fetchMessages",
       method: "POST",
       data: {
-        _token: access_token,
+        _token: csrfToken,
         id: id,
         page: messagesPage,
       },
@@ -733,7 +750,7 @@ function makeSeen(status) {
   $.ajax({
     url: url + "/makeSeen",
     method: "POST",
-    data: { _token: access_token, id: getMessengerId() },
+    data: { _token: csrfToken, id: getMessengerId() },
     dataType: "JSON",
   });
   return clientSendChannel.trigger("client-seen", {
@@ -846,7 +863,7 @@ function getContacts() {
     $.ajax({
       url: url + "/getContacts",
       method: "GET",
-      data: { _token: access_token, page: contactsPage },
+      data: { _token: csrfToken, page: contactsPage },
       dataType: "JSON",
       success: (data) => {
         setContactsLoading(false);
@@ -881,7 +898,7 @@ function updateContactItem(user_id) {
       url: url + "/updateContacts",
       method: "POST",
       data: {
-        _token: access_token,
+        _token: csrfToken,
         user_id,
       },
       dataType: "JSON",
@@ -920,7 +937,7 @@ function star(user_id) {
     $.ajax({
       url: url + "/star",
       method: "POST",
-      data: { _token: access_token, user_id: user_id },
+      data: { _token: csrfToken, user_id: user_id },
       dataType: "JSON",
       success: (data) => {
         data.status > 0
@@ -944,7 +961,7 @@ function getFavoritesList() {
   $.ajax({
     url: url + "/favorites",
     method: "POST",
-    data: { _token: access_token },
+    data: { _token: csrfToken },
     dataType: "JSON",
     success: (data) => {
       if (data.count > 0) {
@@ -971,7 +988,7 @@ function getSharedPhotos(user_id) {
   $.ajax({
     url: url + "/shared",
     method: "POST",
-    data: { _token: access_token, user_id: user_id },
+    data: { _token: csrfToken, user_id: user_id },
     dataType: "JSON",
     success: (data) => {
       $(".shared-photos-list").html(data.shared);
@@ -1016,7 +1033,7 @@ function messengerSearch(input) {
     $.ajax({
       url: url + "/search",
       method: "GET",
-      data: { _token: access_token, input: input, page: searchPage },
+      data: { _token: csrfToken, input: input, page: searchPage },
       dataType: "JSON",
       success: (data) => {
         setSearchLoading(false);
@@ -1048,7 +1065,7 @@ function deleteConversation(id) {
   $.ajax({
     url: url + "/deleteConversation",
     method: "POST",
-    data: { _token: access_token, id: id },
+    data: { _token: csrfToken, id: id },
     dataType: "JSON",
     beforeSend: () => {
       // hide delete modal
@@ -1103,7 +1120,7 @@ function deleteMessage(id) {
   $.ajax({
     url: url + "/deleteMessage",
     method: "POST",
-    data: { _token: access_token, id: id },
+    data: { _token: csrfToken, id: id },
     dataType: "JSON",
     beforeSend: () => {
       // hide delete modal
@@ -1211,7 +1228,7 @@ function setActiveStatus(status) {
   $.ajax({
     url: url + "/setActiveStatus",
     method: "POST",
-    data: { _token: access_token, status: status },
+    data: { _token: csrfToken, status: status },
     dataType: "JSON",
     success: (data) => {
       // Nothing to do
@@ -1378,14 +1395,16 @@ $(document).ready(function () {
     const { name: fileName, size: fileSize } = file;
     const fileExtension = fileName.split(".").pop();
     if (
-      !getAllowedExtensions.includes(fileExtension.toString().toLowerCase())
+      !chatify.allAllowedExtensions.includes(
+        fileExtension.toString().toLowerCase()
+      )
     ) {
       alert("file type not allowed");
       fileElement.val("");
       return false;
     }
     // Validate file size.
-    if (fileSize > getMaxUploadSize) {
+    if (fileSize > chatify.maxUploadSize) {
       alert("File is too large!");
       return false;
     }

@@ -10,10 +10,11 @@ All notable changes to this project will be documented in this file.
 - Css variables.
 - Notification sounds.
 
-### Enhancements
+### Changed
 
 - Using UUIDs instead of random IDs on table primary column #243.
 - UI/UX changes and enhancements.
+- Code refactored (part of it).
 
 ### Fixed
 
