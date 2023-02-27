@@ -1651,7 +1651,7 @@ emojiPicker.on("emoji", (emoji) => {
  *-------------------------------------------------------------
  */
 function playNotificationSound(soundName, condition = false) {
-  if (document.hidden || condition) {
+  if ((document.hidden || condition) && chatify.sounds.enabled) {
     const sound = new Audio(
       `/${chatify.sounds.public_path}/${chatify.sounds[soundName]}`
     );
