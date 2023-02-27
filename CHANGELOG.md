@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 - Using UUIDs instead of random IDs on table primary column #243.
 - UI/UX changes and enhancements.
 - Code refactored (part of it).
+- Messenger primary color fallback.
 
 ### Fixed
 
