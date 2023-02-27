@@ -65,6 +65,17 @@ class ChatifyMessenger
     }
 
     /**
+     * Returns a fallback primary color.
+     *
+     * @return array
+     */
+    public function getFallbackColor()
+    {
+        $colors = $this->getMessengerColors();
+        return count($colors) > 0 ? $colors[0] : '#000000';
+    }
+
+    /**
      * Trigger an event using Pusher
      *
      * @param string $channel
