@@ -32,14 +32,10 @@ function dateStringToTimeAgo(dateString) {
  */
 function debounce(callback, delay) {
   let timerId;
-
-  return function () {
-    const context = this;
-    const args = arguments;
-
+  return function (...args) {
     clearTimeout(timerId);
-    timerId = setTimeout(function () {
-      callback.apply(context, args);
+    timerId = setTimeout(() => {
+      callback.apply(this, args);
     }, delay);
   };
 }

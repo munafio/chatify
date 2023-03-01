@@ -30,6 +30,7 @@ All notable changes to this project will be documented in this file.
 - Contact list realtime updates issues.
 - Delete messages issues.
 - Fix contact list error `Malformed UTF-8 characters, possibly incorrectly encoded`
+- Search multiple request on typing, debouncing used.
 
 ## v1.5.6 (2023-01-26)
 

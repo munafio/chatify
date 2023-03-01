@@ -1451,11 +1451,19 @@ $(document).ready(function () {
     }, 200);
   });
   // Search action on keyup
+  const debouncedSearch = debounce(function () {
+    const value = $(".messenger-search").val();
+    messengerSearch(value);
+  }, 500);
   $(".messenger-search").on("keyup", function (e) {
-    $.trim($(this).val()).length > 0
-      ? $(".messenger-search").trigger("focus") + messengerSearch($(this).val())
-      : $(".messenger-tab").hide() +
-        $('.messenger-listView-tabs a[data-view="users"]').trigger("click");
+    const value = $(this).val();
+    if ($.trim(value).length > 0) {
+      $(".messenger-search").trigger("focus");
+      debouncedSearch();
+    } else {
+      $(".messenger-tab").hide();
+      $('.messenger-listView-tabs a[data-view="users"]').trigger("click");
+    }
   });
 
   // Delete Conversation button
