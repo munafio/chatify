@@ -2,13 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
-## v1.6.0 (2023-02-xx)
+## v1.6.0 (2023-03-xx)
 
 ### Added
 
 - Emoji's support.
 - Css variables.
 - Notification sounds.
+- Auto-time updates.
 
 ### Changed
 

@@ -483,7 +483,7 @@ body {
   font-size: 11px;
   color: #fff;
 }
-.message-card:hover .image-wrapper .image-file > div {
+.message-card-content:hover .image-wrapper .image-file > div {
   display: block;
 }
 .message-card div {
@@ -499,15 +499,15 @@ body {
   word-break: break-word;
   display: table-cell;
 }
-.message-card .message sub {
+.message-card .message-time {
   display: inline-block;
   font-size: 11px;
 }
-.message-card .message sub:before {
+.message-card .message .message-time:before {
   content: "";
   background: transparent;
-  width: 10px;
-  height: 10px;
+  width: 4px;
+  height: 4px;
   display: inline-block;
 }
 .message-card.mc-sender {
@@ -518,7 +518,7 @@ body {
   color: #fff !important;
   background: var(--primary-color) !important;
 }
-.message-card.mc-sender .message sub {
+.message-card.mc-sender .message .message-time {
   color: rgba(255, 255, 255, 0.67);
 }
 
@@ -526,7 +526,7 @@ body {
   background: rgba(255, 0, 0, 0.27) !important;
   color: #ff0000 !important;
 }
-.mc-error .message sub {
+.mc-error .message .message-time {
   color: #ff0000 !important;
 }
 .messenger-sendCard .send-button svg {
