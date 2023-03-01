@@ -154,14 +154,16 @@ function avatarLoading(items) {
 // While sending a message, show this temporary message card.
 function sendTempMessageCard(message, id) {
   return `
-<div class="message-card mc-sender" data-id="${id}">
-<div class="message">
-${message}
-<sub>
-<span class="far fa-clock"></span>
-</sub>
-</div>
-</div>
+ <div class="message-card mc-sender" data-id="${id}">
+     <div class="message-card-content">
+         <div class="message">
+             ${message}
+             <sub>
+                 <span class="far fa-clock"></span>
+             </sub>
+         </div>
+     </div>
+ </div>
 `;
 }
 // upload image preview card.
@@ -169,23 +171,23 @@ function attachmentTemplate(fileType, fileName, imgURL = null) {
   if (fileType != "image") {
     return (
       `
-<div class="attachment-preview">
-<span class="fas fa-times cancel"></span>
-<p style="padding:0px 30px;"><span class="fas fa-file"></span> ` +
+ <div class="attachment-preview">
+     <span class="fas fa-times cancel"></span>
+     <p style="padding:0px 30px;"><span class="fas fa-file"></span> ` +
       escapeHtml(fileName) +
       `</p>
-</div>
+ </div>
 `
     );
   } else {
     return (
       `
 <div class="attachment-preview">
-<span class="fas fa-times cancel"></span>
-<div class="image-file chat-image" style="background-image: url('` +
+ <span class="fas fa-times cancel"></span>
+ <div class="image-file chat-image" style="background-image: url('` +
       imgURL +
       `');"></div>
-<p><span class="fas fa-file-image"></span> ` +
+ <p><span class="fas fa-file-image"></span> ` +
       escapeHtml(fileName) +
       `</p>
 </div>
