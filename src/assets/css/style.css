@@ -460,7 +460,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  max-width: 80%;
+  max-width: 60%;
 }
 .message-card.mc-sender .message-card-content {
   align-items: end;
