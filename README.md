@@ -40,7 +40,7 @@ So, [join now](https://discord.gg/RaxyKVykYJ) and keep updated.
 ## Demo
 
 - Demo app - [Click Here](https://github.com/munafio/chatify-demo).
-- Demo video on YouTube - [Click Here](https://youtu.be/gjo74FUJJPI)
+<!-- - Demo video on YouTube - [Click Here](https://youtu.be/gjo74FUJJPI) -->
 
 ## Official Documentation
 
