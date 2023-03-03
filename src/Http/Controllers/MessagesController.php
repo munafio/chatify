@@ -17,7 +17,6 @@ use Illuminate\Support\Str;
 class MessagesController extends Controller
 {
     protected $perPage = 30;
-    protected $messengerFallbackColor = '#2180f3';
 
     /**
      * Authenticate the connection for pusher
@@ -43,9 +42,10 @@ class MessagesController extends Controller
      */
     public function index( $id = null)
     {
+        $messenger_color = Auth::user()->messenger_color;
         return view('Chatify::pages.app', [
             'id' => $id ?? 0,
-            'messengerColor' => Auth::user()->messenger_color ?? $this->messengerFallbackColor,
+            'messengerColor' => $messenger_color ? $messenger_color : Chatify::getFallbackColor(),
             'dark_mode' => Auth::user()->dark_mode < 1 ? 'light' : 'dark',
         ]);
     }
@@ -140,11 +140,13 @@ class MessagesController extends Controller
                 ]) : null,
             ]);
             $messageData = Chatify::parseMessage($message);
-            Chatify::push("private-chatify.".$request['id'], 'messaging', [
-                'from_id' => Auth::user()->id,
-                'to_id' => $request['id'],
-                'message' => Chatify::messageCard($messageData, true)
-            ]);
+            if (Auth::user()->id != $request['id']) {
+                Chatify::push("private-chatify.".$request['id'], 'messaging', [
+                    'from_id' => Auth::user()->id,
+                    'to_id' => $request['id'],
+                    'message' => Chatify::messageCard($messageData, true)
+                ]);
+            }
         }
 
         // send the response

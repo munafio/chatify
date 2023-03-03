@@ -65,6 +65,17 @@ class ChatifyMessenger
     }
 
     /**
+     * Returns a fallback primary color.
+     *
+     * @return array
+     */
+    public function getFallbackColor()
+    {
+        $colors = $this->getMessengerColors();
+        return count($colors) > 0 ? $colors[0] : '#000000';
+    }
+
+    /**
      * Trigger an event using Pusher
      *
      * @param string $channel
@@ -151,8 +162,8 @@ class ChatifyMessenger
                 'title' => $attachment_title,
                 'type' => $attachment_type
             ],
-            'time' => $msg->created_at->diffForHumans(),
-            'fullTime' => $msg->created_at,
+            'timeAgo' => $msg->created_at->diffForHumans(),
+            'created_at' => $msg->created_at->toIso8601String(),
             'isSender' => ($msg->from_id == Auth::user()->id),
             'seen' => $msg->seen,
         ];
@@ -258,6 +269,10 @@ class ChatifyMessenger
             $lastMessage = $this->getLastMessageQuery($user->id);
             // Get Unseen messages counter
             $unseenCounter = $this->countUnseenMessages($user->id);
+            if ($lastMessage) {
+                $lastMessage->created_at = $lastMessage->created_at->toIso8601String();
+                $lastMessage->timeAgo = $lastMessage->created_at->diffForHumans();
+            }
             return view('Chatify::layouts.listItem', [
                 'get' => 'users',
                 'user' => $this->getUserWithAvatar($user),

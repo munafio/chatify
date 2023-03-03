@@ -1,11 +1,11 @@
 <?php
 $seenIcon = (!!$seen ? 'check-double' : 'check');
-$timeAndSeen = "<sub title='$fullTime' class='message-time'>
-        ".($isSender ? "<span class='fas fa-$seenIcon' seen'></span>" : '' )." $time
-    </sub>";
+$timeAndSeen = "<span data-time='$created_at' class='message-time'>
+        ".($isSender ? "<span class='fas fa-$seenIcon' seen'></span>" : '' )." <span class='time'>$timeAgo</span>
+    </span>";
 ?>
 
-<div class="message-card @if($isSender) mc-sender @endif" title="{{ $fullTime }}" data-id="{{ $id }}">
+<div class="message-card @if($isSender) mc-sender @endif" data-id="{{ $id }}">
     {{-- Delete Message Button --}}
     @if ($isSender)
         <div class="actions">
@@ -26,7 +26,7 @@ $timeAndSeen = "<sub title='$fullTime' class='message-time'>
             </div>
         @endif
         @if(@$attachment->type == 'image')
-        <div class="image-wrapper" style="text-align: end">
+        <div class="image-wrapper" style="text-align: {{$isSender ? 'end' : 'start'}}">
             <div class="image-file chat-image" style="background-image: url('{{ Chatify::getAttachmentUrl($attachment->file) }}')">
                 <div>{{ $attachment->title }}</div>
             </div>
