@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.6.1 (2023-03-03)
+
+### Fixed
+
+- Migration files issue (Cannot redeclare class...).
+
 ## v1.6.0 (2023-03-03)
 
 ### Added
