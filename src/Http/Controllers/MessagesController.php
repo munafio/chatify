@@ -181,7 +181,7 @@ class MessagesController extends Controller
         if ($totalMessages < 1) {
             // message translation
             $msg_text = __("Say \'hi\' and start messaging");
-            $response['messages'] ='<p class="message-hint center-el"><span>'.$msg_text'</span></p>';
+            $response['messages'] ='<p class="message-hint center-el"><span>'.$msg_text.'</span></p>';
             return Response::json($response);
         }
         if (count($messages->items()) < 1) {
@@ -347,7 +347,7 @@ class MessagesController extends Controller
         if($records->total() < 1){
             // message translation
             $msg_text = __("Nothing to show.");
-            $getRecords = '<p class="message-hint center-el"><span>'.$msg_text'</span></p>';
+            $getRecords = '<p class="message-hint center-el"><span>'.$msg_text.'</span></p>';
         }
         // send the response
         return Response::json([
