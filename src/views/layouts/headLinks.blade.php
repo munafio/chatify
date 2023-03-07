@@ -6,7 +6,11 @@
 <meta name="messenger-color" content="{{ $messengerColor }}">
 <meta name="messenger-theme" content="{{ $dark_mode }}">
 <meta name="csrf-token" content="{{ csrf_token() }}">
+@if (config('chatify.translations.enabled') == true)
+  <meta name="url" content="{{ url('').'/'.app()->getLocale().'/'.config('chatify.routes.prefix') }}" data-user="{{ Auth::user()->id }}">
+@else
 <meta name="url" content="{{ url('').'/'.config('chatify.routes.prefix') }}" data-user="{{ Auth::user()->id }}">
+@endif
 
 {{-- scripts --}}
 <script

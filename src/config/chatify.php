@@ -115,5 +115,19 @@ return [
         'enabled' => true,
         'public_path' => 'sounds/chatify',
         'new_message' => 'new-message-sound.mp3',
+    ],
+
+    /*
+    |-------------------------------------
+    | Translations
+    | You can enable/disable translations
+    |
+    | Must have: Laravel Localization setup
+    | https://laravel.com/docs/master/localization
+    |
+    |-------------------------------------
+    */
+    'translations' => [
+        'enabled' => false,
     ]
 ];

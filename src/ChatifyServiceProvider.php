@@ -102,12 +102,38 @@ class ChatifyServiceProvider extends ServiceProvider
      */
     protected function loadRoutes()
     {
-        Route::group($this->routesConfigurations(), function () {
-            $this->loadRoutesFrom(__DIR__ . '/routes/web.php');
-        });
-        Route::group($this->apiRoutesConfigurations(), function () {
-            $this->loadRoutesFrom(__DIR__ . '/routes/api.php');
-        });
+        /**
+         * Check if translations enabled
+         */
+        if(config('chatify.translations.enabled') == true){
+            /**
+             * Set route prefix for locale
+             */
+            Route::group([
+                'prefix' => '{locale}',
+                'where' => ['locale' => '[a-z]{2}_[A-Z]{2}|[a-z]{2}'],
+                'middleware' => 'setlocale'], function () {
+
+                Route::group($this->routesConfigurations(), function () {
+                    $this->loadRoutesFrom(__DIR__ . '/routes/web.php');
+                });
+                Route::group($this->apiRoutesConfigurations(), function () {
+                    $this->loadRoutesFrom(__DIR__ . '/routes/api.php');
+                });
+
+            });  
+        } 
+        else {
+            /**
+             * Use non-localised routes
+             */
+            Route::group($this->routesConfigurations(), function () {
+                $this->loadRoutesFrom(__DIR__ . '/routes/web.php');
+            });
+            Route::group($this->apiRoutesConfigurations(), function () {
+                $this->loadRoutesFrom(__DIR__ . '/routes/api.php');
+            });
+        }
     }
 
     /**

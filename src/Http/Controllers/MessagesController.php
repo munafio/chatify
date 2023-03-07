@@ -84,7 +84,7 @@ class MessagesController extends Controller
         if (Chatify::storage()->exists($filePath)) {
             return Chatify::storage()->download($filePath);
         }
-        return abort(404, "Sorry, File does not exist in our server or may have been deleted!");
+        return abort(404, __("Sorry, File does not exist in our server or may have been deleted!"));
     }
 
     /**
@@ -121,11 +121,11 @@ class MessagesController extends Controller
                     $file->storeAs(config('chatify.attachments.folder'), $attachment, config('chatify.storage_disk_name'));
                 } else {
                     $error->status = 1;
-                    $error->message = "File extension not allowed!";
+                    $error->message = __("File extension not allowed!");
                 }
             } else {
                 $error->status = 1;
-                $error->message = "File size you are trying to upload is too large!";
+                $error->message = __("File size you are trying to upload is too large!");
             }
         }
 
@@ -179,7 +179,9 @@ class MessagesController extends Controller
 
         // if there is no messages yet.
         if ($totalMessages < 1) {
-            $response['messages'] ='<p class="message-hint center-el"><span>Say \'hi\' and start messaging</span></p>';
+            // message translation
+            $msg_text = __("Say \'hi\' and start messaging");
+            $response['messages'] ='<p class="message-hint center-el"><span>'.$msg_text'</span></p>';
             return Response::json($response);
         }
         if (count($messages->items()) < 1) {
@@ -243,7 +245,9 @@ class MessagesController extends Controller
                 $contacts .= Chatify::getContactItem($user);
             }
         } else {
-            $contacts = '<p class="message-hint center-el"><span>Your contact list is empty</span></p>';
+            // message translation
+            $msg_text = __("Your contact list is empty");
+            $contacts = '<p class="message-hint center-el"><span>'.$msg_text.'</span></p>';
         }
 
         return Response::json([
@@ -341,7 +345,9 @@ class MessagesController extends Controller
             ])->render();
         }
         if($records->total() < 1){
-            $getRecords = '<p class="message-hint center-el"><span>Nothing to show.</span></p>';
+            // message translation
+            $msg_text = __("Nothing to show.");
+            $getRecords = '<p class="message-hint center-el"><span>'.$msg_text'</span></p>';
         }
         // send the response
         return Response::json([
@@ -369,9 +375,12 @@ class MessagesController extends Controller
                 'image' => Chatify::getAttachmentUrl($shared[$i]),
             ])->render();
         }
+
+        // message translation
+        $msg_text = __("Nothing shared yet");
         // send the response
         return Response::json([
-            'shared' => count($shared) > 0 ? $sharedPhotos : '<p class="message-hint"><span>Nothing shared yet</span></p>',
+            'shared' => count($shared) > 0 ? $sharedPhotos : '<p class="message-hint"><span>'.$msg_text.'</span></p>',
         ], 200);
     }
 
@@ -449,11 +458,11 @@ class MessagesController extends Controller
                     $file->storeAs(config('chatify.user_avatar.folder'), $avatar, config('chatify.storage_disk_name'));
                     $success = $update ? 1 : 0;
                 } else {
-                    $msg = "File extension not allowed!";
+                    $msg = __("File extension not allowed!");
                     $error = 1;
                 }
             } else {
-                $msg = "File size you are trying to upload is too large!";
+                $msg = __("File size you are trying to upload is too large!");
                 $error = 1;
             }
         }
