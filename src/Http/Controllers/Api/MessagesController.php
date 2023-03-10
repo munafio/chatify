@@ -13,9 +13,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Chatify\Http\Controllers\BaseController;
 
 
-class MessagesController extends Controller
+class MessagesController extends BaseController
 {
     protected $perPage = 30;
 

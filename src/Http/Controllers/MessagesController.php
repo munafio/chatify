@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request as FacadesRequest;
 use Illuminate\Support\Str;
-class MessagesController extends Controller
+class MessagesController extends BaseController
 {
     protected $perPage = 30;
 
