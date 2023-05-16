@@ -107,20 +107,20 @@ class ChatifyMessenger
                 'name' => $authUser->name
             ]
         ]);
+        
         // check if user authenticated
-        if (Auth::check()) {
-            if($requestUser->id == $authUser->id){
-                return $this->pusher->socket_auth(
-                    $channelName,
-                    $socket_id,
-                    $authData
-                );
-            }
-            // if not authorized
-            return response()->json(['message'=>'Unauthorized'], 401);
+        if (!Auth::check()) {
+            return response()->json(['message'=>'Not authenticated'], 403);
         }
-        // if not authenticated
-        return response()->json(['message'=>'Not authenticated'], 403);
+
+        // if not authorized
+        if($requestUser->id != $authUser->id){
+            return response()->json(['message'=>'Unauthorized'], 401);  
+        }
+    
+        return $channelName == 'presence-activeStatus' 
+        ? $this->pusher->socket_auth($channelName, $socket_id, $authData) 
+        : $this->pusher->socket_auth($channelName, $socket_id);
     }
 
     /**
