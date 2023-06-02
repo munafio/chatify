@@ -397,4 +397,17 @@ class MessagesController extends Controller
             'status' => $status,
         ], 200);
     }
+
+
+     // delete message
+
+     public function deleteMessage(Request $request)
+     {
+         // delete
+         $delete = Chatify::deleteMessage($request->id);
+         // send the response
+         return Response::json([
+             'deleted' => $delete ? 1 : 0,
+         ], 200);
+     }
 }

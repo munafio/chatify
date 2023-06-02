@@ -2,6 +2,13 @@
 
 use Illuminate\Support\Facades\Route;
 
+
+
+
+// for sanctum auth api it will help to get logged in user data 
+
+Route::middleware(['auth:sanctum'])->group(function(){
+
 /**
  * Authentication for pusher private channels
  */
@@ -73,3 +80,11 @@ Route::post('/updateSettings', 'MessagesController@updateSettings')->name('api.a
 Route::post('/setActiveStatus', 'MessagesController@setActiveStatus')->name('api.activeStatus.set');
 
 
+/**
+ * Delete Single Message 
+ */
+Route::post('/deleteMessage', 'MessagesController@deleteMessage')->name('api.message.delete');
+
+
+
+});
