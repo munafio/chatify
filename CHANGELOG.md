@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.6.2 (2023-07-27)
+
+### Added
+
+- Support for a custom WS server #291.
+
 ## v1.6.1 (2023-03-03)
 
 ### Fixed
