@@ -17,7 +17,7 @@ class ChatifyServiceProvider extends ServiceProvider
     public function register()
     {
         app()->bind('ChatifyMessenger', function () {
-            return new \Chatify\ChatifyMessenger;
+            return new config('chatify.chatManager');
         });
     }
 
