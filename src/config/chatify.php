@@ -52,6 +52,7 @@ return [
         ],
     ],
     'pusher-client' => [
+        'debug' => env('APP_DEBUG', false),
         'key' => env('PUSHER_APP_KEY'),
         'options' => [
             'cluster' => env('PUSHER_APP_CLUSTER', 'mt1'),
