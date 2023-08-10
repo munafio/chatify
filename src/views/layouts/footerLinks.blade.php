@@ -8,7 +8,7 @@
         allowedImages: {!! json_encode(config('chatify.attachments.allowed_images')) !!},
         allowedFiles: {!! json_encode(config('chatify.attachments.allowed_files')) !!},
         maxUploadSize: {{ Chatify::getMaxUploadSize() }},
-        pusher: {!! json_encode(config('chatify.pusher')) !!},
+        pusher: {!! json_encode(config('chatify.pusher-client')) !!},
         pusherAuthEndpoint: '{{route("pusher.auth")}}'
     };
     window.chatify.allAllowedExtensions = chatify.allowedImages.concat(chatify.allowedFiles);
