@@ -157,12 +157,12 @@ body {
   background: #fff;
   box-shadow: 0px 5px 6px rgba(0, 0, 0, 0.06);
 }
-.m-header svg {
+.m-header .fas {
   color: var(--primary-color);
   font-size: var(--icon-size);
   transition: transform 0.12s;
 }
-.m-header svg:active {
+.m-header .fas:active {
   transform: scale(0.9);
 }
 .messenger-search[type="text"] {
@@ -213,13 +213,13 @@ body {
 .add-to-favorite {
   display: none;
 }
-.add-to-favorite svg {
+.add-to-favorite .fas {
   color: rgba(180, 180, 180, 0.52) !important;
 }
-.favorite-added svg {
+.favorite-added .fas {
   color: #ffc107 !important;
 }
-.favorite svg {
+.favorite .fas {
   color: #ffc107 !important;
 }
 .show {
@@ -311,11 +311,11 @@ body {
   align-items: center;
   justify-content: center;
 }
-.saved-messages.avatar > svg {
+.saved-messages.avatar > .fas {
   font-size: 22px;
   color: var(--primary-color);
 }
-.messenger-list-item.m-list-active .saved-messages.avatar > svg {
+.messenger-list-item.m-list-active .saved-messages.avatar > .fas {
   color: #fff;
 }
 .messenger-list-item.m-list-active .saved-messages.avatar {
@@ -529,7 +529,7 @@ body {
 .mc-error .message .message-time {
   color: #ff0000 !important;
 }
-.messenger-sendCard .send-button svg {
+.messenger-sendCard .send-button .fas {
   color: var(--primary-color);
 }
 .listView-x,
@@ -566,7 +566,7 @@ body {
 .messenger-sendCard label {
   margin: 0;
 }
-.messenger-sendCard svg {
+.messenger-sendCard .fas {
   margin: 9px 10px;
   color: #bdcbd6;
   cursor: pointer;
@@ -574,7 +574,7 @@ body {
   transition: transform 0.15s;
 }
 
-.messenger-sendCard svg:active {
+.messenger-sendCard .fas:active {
   transform: scale(0.9);
 }
 .m-send {
@@ -600,13 +600,13 @@ body {
   padding: 0px;
   padding-top: 10px;
 }
-.attachment-preview > p > svg {
+.attachment-preview > p > .fas {
   font-size: 16px;
   margin: 0;
   margin-bottom: -1px;
   color: #737373;
 }
-.attachment-preview svg:active {
+.attachment-preview .fas:active {
   transform: none;
 }
 .message-card .image-file,
@@ -623,7 +623,7 @@ body {
   background-repeat: no-repeat;
   background-position: center center;
 }
-.attachment-preview > svg:first-child {
+.attachment-preview > .fas:first-child {
   position: absolute;
   background: rgba(0, 0, 0, 0.33);
   width: 20px;
