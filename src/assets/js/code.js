@@ -1636,7 +1636,7 @@ observer.observe(document, config);
  * to fit the new height.
  *-------------------------------------------------------------
  */
-var resizeTimeout;
+/*var resizeTimeout;
 window.visualViewport.addEventListener("resize", (e) => {
   clearTimeout(resizeTimeout);
   resizeTimeout = setTimeout(function () {
@@ -1645,7 +1645,7 @@ window.visualViewport.addEventListener("resize", (e) => {
       $(".messenger-messagingView").css({ height: h + "px" });
     }
   }, 100);
-});
+});*/
 
 /**
  *-------------------------------------------------------------
