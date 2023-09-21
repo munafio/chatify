@@ -60,7 +60,7 @@ class MessagesController extends Controller
     public function idFetchData(Request $request)
     {
         $favorite = Chatify::inFavorite($request['id']);
-        $fetch = User::where('id', $request['id'])->first();
+        $fetch = Auth::user()->where('id', $request['id'])->first();
         if($fetch){
             $userAvatar = Chatify::getUserWithAvatar($fetch)->avatar;
         }
@@ -230,7 +230,7 @@ class MessagesController extends Controller
             ->orWhere('ch_messages.to_id', Auth::user()->id);
         })
         ->where('users.id','!=',Auth::user()->id)
-        ->select('users.*',DB::raw('MAX(ch_messages.created_at) max_created_at'))
+        ->selectRaw('users.id, max(users.name) as name, MAX(users.avatar) as avatar, MAX(users.created_at) as created_at, MAX(ch_messages.created_at) as max_created_at')
         ->orderBy('max_created_at', 'desc')
         ->groupBy('users.id')
         ->paginate($request->per_page ?? $this->perPage);
@@ -262,7 +262,7 @@ class MessagesController extends Controller
     public function updateContactItem(Request $request)
     {
         // Get user data
-        $user = User::where('id', $request['user_id'])->first();
+        $user = Auth::user()->where('id', $request['user_id'])->first();
         if(!$user){
             return Response::json([
                 'message' => 'User not found!',
@@ -307,7 +307,7 @@ class MessagesController extends Controller
         $favorites = Favorite::where('user_id', Auth::user()->id);
         foreach ($favorites->get() as $favorite) {
             // get user data
-            $user = User::where('id', $favorite->favorite_id)->first();
+            $user = Auth::user()->where('id', $favorite->favorite_id)->first();
             $favoritesList .= view('Chatify::layouts.favorite', [
                 'user' => $user,
             ]);
@@ -331,7 +331,7 @@ class MessagesController extends Controller
     {
         $getRecords = null;
         $input = trim(filter_var($request['input']));
-        $records = User::where('id','!=',Auth::user()->id)
+        $records = Auth::user()->where('id','!=',Auth::user()->id)
                     ->where('name', 'LIKE', "%{$input}%")
                     ->paginate($request->per_page ?? $this->perPage);
         foreach ($records->items() as $record) {
@@ -417,15 +417,14 @@ class MessagesController extends Controller
         // dark mode
         if ($request['dark_mode']) {
             $request['dark_mode'] == "dark"
-                ? User::where('id', Auth::user()->id)->update(['dark_mode' => 1])  // Make Dark
-                : User::where('id', Auth::user()->id)->update(['dark_mode' => 0]); // Make Light
+                ? Auth::user()->update(['dark_mode' => 1])  // Make Dark
+                : Auth::user()->update(['dark_mode' => 0]); // Make Light
         }
 
         // If messenger color selected
         if ($request['messengerColor']) {
             $messenger_color = trim(filter_var($request['messengerColor']));
-            User::where('id', Auth::user()->id)
-                ->update(['messenger_color' => $messenger_color]);
+            Auth::user()->update(['messenger_color' => $messenger_color]);
         }
         // if there is a [file]
         if ($request->hasFile('avatar')) {
@@ -445,7 +444,7 @@ class MessagesController extends Controller
                     }
                     // upload
                     $avatar = Str::uuid() . "." . $file->extension();
-                    $update = User::where('id', Auth::user()->id)->update(['avatar' => $avatar]);
+                    $update = Auth::user()->update(['avatar' => $avatar]);
                     $file->storeAs(config('chatify.user_avatar.folder'), $avatar, config('chatify.storage_disk_name'));
                     $success = $update ? 1 : 0;
                 } else {
@@ -475,7 +474,7 @@ class MessagesController extends Controller
     public function setActiveStatus(Request $request)
     {
         $activeStatus = $request['status'] > 0 ? 1 : 0;
-        $status = User::where('id', Auth::user()->id)->update(['active_status' => $activeStatus]);
+        $status = Auth::user()->update(['active_status' => $activeStatus]);
         return Response::json([
             'status' => $status,
         ], 200);

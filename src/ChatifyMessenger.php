@@ -429,6 +429,10 @@ class ChatifyMessenger
      */
     public function getUserAvatarUrl($user_avatar_name)
     {
+        if (empty($user_avatar_name)) {
+            //If there is no avatar then use the default.
+            $user_avatar_name = config('chatify.user_avatar.default');
+        }
         return self::storage()->url(config('chatify.user_avatar.folder') . '/' . $user_avatar_name);
     }
 
