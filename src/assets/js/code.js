@@ -1360,7 +1360,8 @@ $(document).ready(function () {
   // message input on keyup [Enter to send, Enter+Shift for new line]
   $("#message-form .m-send").on("keyup", (e) => {
     // if enter key pressed.
-    if (e.which == 13 || e.keyCode == 13) {
+     var is_in_mobile = (e.keyCode == 13 &&  screen.width <= 480);
+    if ((e.which == 13 || e.keyCode == 13) && !is_in_mobile) {
       // if shift + enter key pressed, do nothing (new line).
       // if only enter key pressed, send message.
       if (!e.shiftKey) {
