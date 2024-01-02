@@ -446,14 +446,39 @@ body {
 .messenger-infoView-btns .delete-conversation {
   display: none;
 }
+.message-card-wrapper {
+  margin: 2px 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+
+  width: calc(100% - 30px);
+}
+.message-card-wrapper.mc-sender {
+  text-align: right;
+}
+.message-card-wrapper .message-user{
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.message-card-wrapper.mc-sender .message-user {
+  justify-content: end;
+  flex-direction: row-reverse;
+}
+.message-card-wrapper .message-user img{
+  width: 20px;
+  height: 20px;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 50%;
+}
 .message-card {
   display: flex;
   flex-direction: row;
   gap: 0.5rem;
   align-items: center;
-  width: 100%;
-  margin: 2px 15px;
-  width: calc(100% - 30px); /* 30px = 15px padding left + right */
   justify-content: flex-start;
 }
 .message-card .message-card-content {
@@ -1182,3 +1207,92 @@ div.loadingPlaceholder-date {
   border-radius: 4px;
   background: transparent;
 }
+
+/*
+*****************************************
+* Form Control
+*****************************************
+*/
+.form-control{
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.form-label{
+  text-align: left;
+  margin-bottom: 8px;
+  font-size: 12px;
+  display: block;
+}
+.form-input[type="text"] {
+  border: none;
+  padding: 8px 10px;
+  border-radius: 6px;
+  outline: none;
+  display: block;
+  width: 100%;
+}
+
+/*
+*****************************************
+* Modal Group Channel
+*****************************************
+*/
+.app-modal.group-modal .app-modal-card{
+  width: 100%;
+}
+.app-scroll.users-list{
+  max-height: 250px;
+  overflow-y: auto;
+}
+.app-modal.group-modal .message-hint{
+  font-size: 0.9em;
+}
+.user-list-item {
+  margin: 0;
+  width: 100%;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.user-list-item td {
+  padding: 10px;
+}
+.user-list-item tr > td:first-child {
+  padding-right: 0;
+  width: 55px;
+}
+.user-list-item td p {
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+.user-list-item td p span {
+  float: right;
+}
+.user-list-item td span {
+  color: #cacaca;
+  font-weight: 400;
+  font-size: 12px;
+}
+.user-list-item td b {
+  float: right;
+  color: #fff;
+  background: var(--primary-color);
+  padding: 0px 4px;
+  border-radius: 20px;
+  font-size: 13px;
+  width: auto;
+  height: auto;
+  text-align: center;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
