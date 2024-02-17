@@ -93,6 +93,11 @@ class ChatifyServiceProvider extends ServiceProvider
              // CSS
              __DIR__ . '/assets/sounds' => public_path('sounds/chatify'),
         ], 'chatify-assets');
+
+        // Routes (API and Web)
+        $this->publishes([
+            __DIR__ . '/routes' => base_path('routes/chatify')
+        ], 'chatify-routes');
     }
 
     /**
