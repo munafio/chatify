@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.6.3 (2024-03-17)
+
+### Added
+
+- Support for a custom routes.
+
 ## v1.6.2 (2023-07-27)
 
 ### Added
