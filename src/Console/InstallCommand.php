@@ -60,6 +60,7 @@ class InstallCommand extends Command
             'assets' => public_path('css/chatify'),
             'models' => app_path(($this->isV8 ? 'Models/' : '').'ChMessage.php'),
             'migrations' => database_path('migrations/2019_09_22_192348_create_messages_table.php'),
+            'routes' => base_path('routes/chatify'),
         ];
 
         foreach ($assetsToBePublished as $target => $path) {
