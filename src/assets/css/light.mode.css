@@ -164,3 +164,32 @@
         box-shadow: 0px 0px 20px rgba(18, 67, 105, 0.06);
     }
 }
+
+
+/*
+***********************************************
+* Form Control
+***********************************************
+*/
+.form-input[type="text"]{
+    background: var(--secondary-bg-color);
+    color: #333;
+}
+
+/*
+*****************************************
+* Modal Group Channel
+*****************************************
+*/
+.user-list-item:hover {
+    background: var(--secondary-bg-color);
+}
+.user-list-item td p {
+    color: #3c3c3c;
+}
+.user-list-item td span {
+    color: #929292;
+}
+.user-list-item:hover .activeStatus {
+    border-color: var(--secondary-bg-color);
+}

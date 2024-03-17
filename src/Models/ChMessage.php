@@ -8,4 +8,8 @@ use Chatify\Traits\UUID;
 class ChMessage extends Model
 {
     use UUID;
+
+    protected $casts = [
+        'seen' => 'array'
+    ];
 }

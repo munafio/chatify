@@ -58,12 +58,15 @@ class ChatifyServiceProvider extends ServiceProvider
 
         // Migrations
         $this->publishes([
-            __DIR__ . '/database/migrations/2022_01_10_99999_add_active_status_to_users.php' => database_path('migrations/' . date('Y_m_d') . '_999999_add_active_status_to_users.php'),
-            __DIR__ . '/database/migrations/2022_01_10_99999_add_avatar_to_users.php' => database_path('migrations/' . date('Y_m_d') . '_999999_add_avatar_to_users.php'),
-            __DIR__ . '/database/migrations/2022_01_10_99999_add_dark_mode_to_users.php' => database_path('migrations/' . date('Y_m_d') . '_999999_add_dark_mode_to_users.php'),
-            __DIR__ . '/database/migrations/2022_01_10_99999_add_messenger_color_to_users.php' => database_path('migrations/' . date('Y_m_d') . '_999999_add_messenger_color_to_users.php'),
-            __DIR__ . '/database/migrations/2022_01_10_99999_create_chatify_favorites_table.php' => database_path('migrations/' . date('Y_m_d') . '_999999_create_chatify_favorites_table.php'),
-            __DIR__ . '/database/migrations/2022_01_10_99999_create_chatify_messages_table.php' => database_path('migrations/' . date('Y_m_d') . '_999999_create_chatify_messages_table.php'),
+            __DIR__ . '/database/migrations/2022_01_10_99999_add_active_status_to_users.php' => database_path('migrations/' . date('Y_m_d') . '_000000_add_active_status_to_users.php'),
+            __DIR__ . '/database/migrations/2022_01_10_99999_add_avatar_to_users.php' => database_path('migrations/' . date('Y_m_d') . '_000000_add_avatar_to_users.php'),
+            __DIR__ . '/database/migrations/2022_01_10_99999_add_channel_id_to_users.php' => database_path('migrations/' . date('Y_m_d') . '_000000_add_channel_id_to_users.php'),
+            __DIR__ . '/database/migrations/2022_01_10_99999_add_dark_mode_to_users.php' => database_path('migrations/' . date('Y_m_d') . '_000000_add_dark_mode_to_users.php'),
+            __DIR__ . '/database/migrations/2022_01_10_99999_add_messenger_color_to_users.php' => database_path('migrations/' . date('Y_m_d') . '_000000_add_messenger_color_to_users.php'),
+            __DIR__ . '/database/migrations/2022_01_10_99999_create_chatify_channels_table.php' => database_path('migrations/' . date('Y_m_d') . '_000000_create_chatify_channels_table.php'),
+            __DIR__ . '/database/migrations/2022_01_10_99999_create_chatify_favorites_table.php' => database_path('migrations/' . date('Y_m_d') . '_000000_create_chatify_favorites_table.php'),
+            __DIR__ . '/database/migrations/2022_01_10_99999_create_chatify_messages_table.php' => database_path('migrations/' . date('Y_m_d') . '_000000_create_chatify_messages_table.php'),
+            __DIR__ . '/database/migrations/2022_01_10_99999_create_chatify_channel_user_table.php' => database_path('migrations/' . date('Y_m_d') . '_000001_create_chatify_channel_user_table.php'),
         ], 'chatify-migrations');
 
         // Models
