@@ -1324,7 +1324,7 @@ $(document).ready(function () {
     }
     const dataId = $(this).find("p[data-id]").attr("data-id");
     setMessengerId(dataId);
-    IDinfo(dataId);
+    // IDinfo(dataId);
   });
 
   // click action for favorite button
