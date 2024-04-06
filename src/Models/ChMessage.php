@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Chatify\Traits\UUID;
+use Chatify\MessageCollection;
+
 
 class ChMessage extends Model
 {
@@ -93,5 +95,17 @@ class ChMessage extends Model
     public function scopeUnread(Builder $query)
     {
         return $query->where('seen', 0);
+    }
+
+
+    /**
+     * Create a new database notification collection instance.
+     *
+     * @param  array  $models
+     * @return \Illuminate\Notifications\DatabaseNotificationCollection
+     */
+    public function newCollection(array $models = [])
+    {
+        return new MessageCollection($models);
     }
 }
