@@ -1,12 +1,4 @@
 <?php
-/**
- * -----------------------------------------------------------------
- * NOTE : There is two routes has a name (user & group),
- * any change in these two route's name may cause an issue
- * if not modified in all places that used in (e.g Chatify class,
- * Controllers, chatify javascript file...).
- * -----------------------------------------------------------------
- */
 
 use Illuminate\Support\Facades\Route;
 
@@ -46,7 +38,7 @@ Route::post('/chat/auth', 'MessagesController@pusherAuth')->name('pusher.auth');
 Route::post('/makeSeen', 'MessagesController@seen')->name('messages.seen');
 
 /**
- * Get contacts
+ * Get contacts / list of channels
  */
 Route::get('/getContacts', 'MessagesController@getContacts')->name('contacts.get');
 
@@ -55,6 +47,10 @@ Route::get('/getContacts', 'MessagesController@getContacts')->name('contacts.get
  */
 Route::post('/updateContacts', 'MessagesController@updateContactItem')->name('contacts.update');
 
+/**
+ * Get channel_id by user_id
+ */
+Route::post('/get-channel-id', 'MessagesController@getChannelId')->name('get-channel-id');
 
 /**
  * Star in favorite list
@@ -96,23 +92,24 @@ Route::post('/updateSettings', 'MessagesController@updateSettings')->name('avata
  */
 Route::post('/setActiveStatus', 'MessagesController@setActiveStatus')->name('activeStatus.set');
 
+/**
+ * Search users for group modal
+ */
+Route::get('/search-users', 'MessagesController@searchUsers')->name('group.search.users');
+
+/**
+ * Group Chat
+ */
+Route::name('group-chat.')->prefix('group-chat')->group(function () {
+    Route::post('/create', 'MessagesController@createGroupChat')->name('create');
+    Route::post('/delete', 'MessagesController@deleteGroupChat')->name('delete');
+    Route::post('/leave', 'MessagesController@leaveGroupChat')->name('delete');
+});
 
 
 
 
-
-/*
-* [Group] view by id
-*/
-Route::get('/group/{id}', 'MessagesController@index')->name('group');
-
-/*
-* user view by id.
-* Note : If you added routes after the [User] which is the below one,
-* it will considered as user id.
-*
-* e.g. - The commented routes below :
-*/
-// Route::get('/route', function(){ return 'Munaf'; }); // works as a route
-Route::get('/{id}', 'MessagesController@index')->name('user');
-// Route::get('/route', function(){ return 'Munaf'; }); // works as a user id
+/**
+ * Channel id
+ */
+Route::get('/{channel_id}', 'MessagesController@index')->name('channel_id');

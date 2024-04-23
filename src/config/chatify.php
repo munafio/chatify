@@ -65,6 +65,16 @@ return [
 
     /*
     |-------------------------------------
+    | Channel Avatar
+    |-------------------------------------
+    */
+    'channel_avatar' => [
+        'folder' => 'channels-avatar',
+        'default' => 'avatar.png',
+    ],
+
+    /*
+    |-------------------------------------
     | Gravatar
     |
     | imageset property options:

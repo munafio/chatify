@@ -1,3 +1,14 @@
+const messagesContainer = $(".messenger-messagingView .m-body"),
+    messengerTitleDefault = $(".messenger-headTitle").text(),
+    messageInputContainer = $(".messenger-sendCard"),
+    messageInput = $("#message-form .m-send"),
+    auth_id = $("meta[name=url]").attr("data-auth-user"),
+    my_channel_id = $("meta[name=url]").attr("data-auth-channel"),
+    url = $("meta[name=url]").attr("content"),
+    messengerTheme = $("meta[name=messenger-theme]").attr("content"),
+    defaultMessengerColor = $("meta[name=messenger-color]").attr("content"),
+    csrfToken = $('meta[name="csrf-token"]').attr("content");
+
 /**
  *-------------------------------------------------------------
  * Global variables
@@ -12,18 +23,8 @@ var messenger,
   dark_mode,
   messages_page = 1;
 
-const messagesContainer = $(".messenger-messagingView .m-body"),
-  messengerTitleDefault = $(".messenger-headTitle").text(),
-  messageInputContainer = $(".messenger-sendCard"),
-  messageInput = $("#message-form .m-send"),
-  auth_id = $("meta[name=url]").attr("data-user"),
-  url = $("meta[name=url]").attr("content"),
-  messengerTheme = $("meta[name=messenger-theme]").attr("content"),
-  defaultMessengerColor = $("meta[name=messenger-color]").attr("content"),
-  csrfToken = $('meta[name="csrf-token"]').attr("content");
-
-const getMessengerId = () => $("meta[name=id]").attr("content");
-const setMessengerId = (id) => $("meta[name=id]").attr("content", id);
+const currentChannelId = () => $("meta[name=channel_id]").attr("content");
+const setCurrentChannelId = (channel_id) => $("meta[name=channel_id]").attr("content", channel_id);
 
 /**
  *-------------------------------------------------------------
@@ -71,11 +72,11 @@ function routerPush(title, url) {
   $("meta[name=url]").attr("content", url);
   return window.history.pushState({}, title || document.title, url);
 }
-function updateSelectedContact(user_id) {
+function updateSelectedContact(channel_id) {
   $(document).find(".messenger-list-item").removeClass("m-list-active");
   $(document)
     .find(
-      ".messenger-list-item[data-contact=" + (user_id || getMessengerId()) + "]"
+      ".messenger-list-item[data-channel=" + (channel_id || currentChannelId()) + "]"
     )
     .addClass("m-list-active");
 }
@@ -335,7 +336,7 @@ function disableOnLoad(disable = true) {
     $(".upload-attachment").attr("disabled", "disabled");
   } else {
     // show star button
-    if (getMessengerId() != auth_id) {
+    if (currentChannelId() != my_channel_id) {
       $(".add-to-favorite").show();
     }
     // show send card
@@ -372,7 +373,7 @@ function errorMessageCard(id) {
  * Fetch id data (user/group) and update the view
  *-------------------------------------------------------------
  */
-function IDinfo(id) {
+function IDinfo(channel_id) {
   // clear temporary message id
   temporaryMsgId = 0;
   // clear typing now
@@ -383,37 +384,47 @@ function IDinfo(id) {
   disableOnLoad();
   if (messenger != 0) {
     // get shared photos
-    getSharedPhotos(id);
+    getSharedPhotos(channel_id);
     // Get info
     $.ajax({
       url: url + "/idInfo",
       method: "POST",
-      data: { _token: csrfToken, id },
+      data: { _token: csrfToken, channel_id },
       dataType: "JSON",
       success: (data) => {
         if (!data?.fetch) {
           NProgress.done();
           NProgress.remove();
+
+          data?.message && alert(data.message)
+
           return;
         }
-        // avatar photo
+
+        // messenger info
+        $(".messenger-infoView").html(data.infoHtml)
         $(".messenger-infoView")
-          .find(".avatar")
-          .css("background-image", 'url("' + data.user_avatar + '")');
+          .find(".avatar-channel")
+          .css("background-image", 'url("' + data.channel_avatar + '")');
         $(".header-avatar").css(
           "background-image",
-          'url("' + data.user_avatar + '")'
+          'url("' + data.channel_avatar + '")'
         );
+
         // Show shared and actions
         $(".messenger-infoView-btns .delete-conversation").show();
         $(".messenger-infoView-shared").show();
+
         // fetch messages
-        fetchMessages(id, true);
+        fetchMessages(channel_id, true);
+
         // focus on messaging input
         messageInput.focus();
+
         // update info in view
         $(".messenger-infoView .info-name").text(data.fetch.name);
         $(".m-header-messaging .user-name").text(data.fetch.name);
+
         // Star status
         data.favorite > 0
           ? $(".add-to-favorite").addClass("favorite")
@@ -449,7 +460,7 @@ function sendMessage() {
   const inputValue = $.trim(messageInput.val());
   if (inputValue.length > 0 || hasFile) {
     const formData = new FormData($("#message-form")[0]);
-    formData.append("id", getMessengerId());
+    formData.append("channel_id", currentChannelId());
     formData.append("temporaryMsgId", tempID);
     formData.append("_token", csrfToken);
     $.ajax({
@@ -492,7 +503,7 @@ function sendMessage() {
           console.error(data.error_msg);
         } else {
           // update contact item
-          updateContactItem(getMessengerId());
+          updateContactItem(currentChannelId());
           // temporary message card
           const tempMsgCardElement = messagesContainer.find(
             `.message-card[data-id=${data.tempID}]`
@@ -619,82 +630,91 @@ function cancelUpdatingAvatar() {
 
 // subscribe to the channel
 const channelName = "private-chatify";
-var channel = pusher.subscribe(`${channelName}.${auth_id}`);
 var clientSendChannel;
-var clientListenChannel;
 
 function initClientChannel() {
-  if (getMessengerId()) {
-    clientSendChannel = pusher.subscribe(`${channelName}.${getMessengerId()}`);
-    clientListenChannel = pusher.subscribe(`${channelName}.${auth_id}`);
+  if (currentChannelId()) {
+    clientSendChannel = pusher.subscribe(`${channelName}.${currentChannelId()}`);
   }
 }
 initClientChannel();
 
-// Listen to messages, and append if data received
-channel.bind("messaging", function (data) {
-  if (data.from_id == getMessengerId() && data.to_id == auth_id) {
-    $(".messages").find(".message-hint").remove();
-    messagesContainer.find(".messages").append(data.message);
-    scrollToBottom(messagesContainer);
-    makeSeen(true);
-    // remove unseen counter for the user from the contacts list
-    $(".messenger-list-item[data-contact=" + getMessengerId() + "]")
-      .find("tr>td>b")
-      .remove();
-  }
-
-  playNotificationSound(
-    "new_message",
-    !(data.from_id == getMessengerId() && data.to_id == auth_id)
-  );
-});
-
-// listen to typing indicator
-clientListenChannel.bind("client-typing", function (data) {
-  if (data.from_id == getMessengerId() && data.to_id == auth_id) {
-    data.typing == true
-      ? messagesContainer.find(".typing-indicator").show()
-      : messagesContainer.find(".typing-indicator").hide();
-  }
-  // scroll to bottom
-  scrollToBottom(messagesContainer);
-});
-
-// listen to seen event
-clientListenChannel.bind("client-seen", function (data) {
-  if (data.from_id == getMessengerId() && data.to_id == auth_id) {
-    if (data.seen == true) {
-      $(".message-time")
-        .find(".fa-check")
-        .before('<span class="fas fa-check-double seen"></span> ');
-      $(".message-time").find(".fa-check").remove();
+function listenAllContactChannels(){
+  // listen to all existing contact channels
+  const list = document.querySelectorAll('.listOfContacts .contact-item')
+  list.forEach(item => {
+    const channelID = item.getAttribute('data-channel')
+    const channel = pusher.subscribe(`${channelName}.${channelID}`);
+    _listenChannelEvent(channel)
+  })
+}
+function _listenChannelEvent(channel){
+  // Listen to messages, and append if data received
+  channel.bind("messaging", function (data) {
+    if (data.to_channel_id == currentChannelId() && data.from_id != auth_id) {
+      $(".messages").find(".message-hint").remove();
+      messagesContainer.find(".messages").append(data.message);
+      scrollToBottom(messagesContainer);
+      makeSeen(true);
+      // remove unseen counter for the user from the contacts list
+      $(".messenger-list-item[data-channel=" + currentChannelId() + "]")
+          .find("tr>td>b")
+          .remove();
     }
-  }
-});
 
-// listen to contact item updates event
-clientListenChannel.bind("client-contactItem", function (data) {
-  if (data.to == auth_id) {
+    playNotificationSound("new_message", !(data.to_channel_id == currentChannelId()));
+  });
+
+  // listen to typing indicator
+  channel.bind("client-typing", function (data) {
+    if (data.to_channel_id == currentChannelId()) {
+      data.typing == true
+          ? messagesContainer.find(".typing-indicator").show()
+          : messagesContainer.find(".typing-indicator").hide();
+    }
+    // scroll to bottom
+    scrollToBottom(messagesContainer);
+  });
+
+  // listen to seen event
+  channel.bind("client-seen", function (data) {
+    if (data.to_channel_id == currentChannelId()) {
+      if (data.seen == true) {
+        $(".message-time")
+            .find(".fa-check")
+            .before('<span class="fas fa-check-double seen"></span> ');
+        $(".message-time").find(".fa-check").remove();
+      }
+    }
+  });
+
+  // listen to contact item updates event
+  channel.bind("client-contactItem", function (data) {
+    const channel_id = data.to
+    const from_user_id = data.from
+
     if (data.update) {
-      updateContactItem(data.from);
+      updateContactItem(channel_id);
     } else {
       console.error("Can not update contact item!");
     }
-  }
-});
+  });
 
-// listen on message delete event
-clientListenChannel.bind("client-messageDelete", function (data) {
-  $("body").find(`.message-card[data-id=${data.id}]`).remove();
-});
-// listen on delete conversation event
-clientListenChannel.bind("client-deleteConversation", function (data) {
-  if (data.from == getMessengerId() && data.to == auth_id) {
-    $("body").find(`.messages`).html("");
-    $(".messages").find(".message-hint").show();
-  }
-});
+  // listen on message delete event
+  channel.bind("client-messageDelete", function (data) {
+    $("body").find(`.message-card[data-id=${data.id}]`).remove();
+  });
+
+  // listen on delete conversation event
+  channel.bind("client-deleteConversation", function (data) {
+    if (data.to_channel_id == currentChannelId()) {
+      $("body").find(`.messages`).html("");
+      $(".messages").find(".message-hint").show();
+    }
+  });
+}
+
+
 // -------------------------------------
 // presence channel [User Active Status]
 var activeStatusChannel = pusher.subscribe("presence-activeStatus");
@@ -702,10 +722,10 @@ var activeStatusChannel = pusher.subscribe("presence-activeStatus");
 // Joined
 activeStatusChannel.bind("pusher:member_added", function (member) {
   setActiveStatus(1);
-  $(".messenger-list-item[data-contact=" + member.id + "]")
+  $(".messenger-list-item[data-user=" + member.id + "]")
     .find(".activeStatus")
     .remove();
-  $(".messenger-list-item[data-contact=" + member.id + "]")
+  $(".messenger-list-item[data-user=" + member.id + "]")
     .find(".avatar")
     .before(activeStatusCircle());
 });
@@ -713,7 +733,7 @@ activeStatusChannel.bind("pusher:member_added", function (member) {
 // Leaved
 activeStatusChannel.bind("pusher:member_removed", function (member) {
   setActiveStatus(0);
-  $(".messenger-list-item[data-contact=" + member.id + "]")
+  $(".messenger-list-item[data-user=" + member.id + "]")
     .find(".activeStatus")
     .remove();
 });
@@ -734,7 +754,7 @@ document.addEventListener("visibilitychange", handleVisibilityChange, false);
 function isTyping(status) {
   return clientSendChannel.trigger("client-typing", {
     from_id: auth_id, // Me
-    to_id: getMessengerId(), // Messenger
+    to_channel_id: currentChannelId(), // Messenger
     typing: status,
   });
 }
@@ -749,19 +769,19 @@ function makeSeen(status) {
     return;
   }
   // remove unseen counter for the user from the contacts list
-  $(".messenger-list-item[data-contact=" + getMessengerId() + "]")
+  $(".messenger-list-item[data-channel=" + currentChannelId() + "]")
     .find("tr>td>b")
     .remove();
   // seen
   $.ajax({
     url: url + "/makeSeen",
     method: "POST",
-    data: { _token: csrfToken, id: getMessengerId() },
+    data: { _token: csrfToken, channel_id: currentChannelId() },
     dataType: "JSON",
   });
   return clientSendChannel.trigger("client-seen", {
     from_id: auth_id, // Me
-    to_id: getMessengerId(), // Messenger
+    to_channel_id: currentChannelId(), // Messenger
     seen: status,
   });
 }
@@ -774,7 +794,7 @@ function makeSeen(status) {
 function sendContactItemUpdates(status) {
   return clientSendChannel.trigger("client-contactItem", {
     from: auth_id, // Me
-    to: getMessengerId(), // Messenger
+    to: currentChannelId(), // Channel
     update: status,
   });
 }
@@ -797,7 +817,7 @@ function sendMessageDeleteEvent(messageId) {
 function sendDeleteConversationEvent() {
   return clientSendChannel.trigger("client-deleteConversation", {
     from: auth_id,
-    to: getMessengerId(),
+    to: currentChannelId(),
   });
 }
 
@@ -878,6 +898,7 @@ function getContacts() {
         } else {
           $(".listOfContacts").append(data.contacts);
         }
+        listenAllContactChannels()
         updateSelectedContact();
         // update data-action required with [responsive design]
         cssMediaQueries();
@@ -898,38 +919,51 @@ function getContacts() {
  * Update contact item
  *-------------------------------------------------------------
  */
-function updateContactItem(user_id) {
-  if (user_id != auth_id) {
-    $.ajax({
-      url: url + "/updateContacts",
-      method: "POST",
-      data: {
-        _token: csrfToken,
-        user_id,
-      },
-      dataType: "JSON",
-      success: (data) => {
-        $(".listOfContacts")
-          .find(".messenger-list-item[data-contact=" + user_id + "]")
-          .remove();
-        if (data.contactItem) $(".listOfContacts").prepend(data.contactItem);
-        if (user_id == getMessengerId()) updateSelectedContact(user_id);
-        // show/hide message hint (empty state message)
-        const totalContacts =
-          $(".listOfContacts").find(".messenger-list-item")?.length || 0;
-        if (totalContacts > 0) {
-          $(".listOfContacts").find(".message-hint").hide();
-        } else {
-          $(".listOfContacts").find(".message-hint").show();
-        }
-        // update data-action required with [responsive design]
-        cssMediaQueries();
-      },
-      error: (error) => {
-        console.error(error);
-      },
-    });
-  }
+function updateContactItem(channel_id) {
+  $.ajax({
+    url: url + "/updateContacts",
+    method: "POST",
+    data: {
+      _token: csrfToken,
+      channel_id,
+    },
+    dataType: "JSON",
+    success: (data) => {
+      $(".listOfContacts")
+        .find(".contact-item[data-channel=" + channel_id + "]")
+        .remove();
+      if (data.contactItem) $(".listOfContacts").prepend(data.contactItem);
+      if (channel_id == currentChannelId()) updateSelectedContact(channel_id);
+      // show/hide message hint (empty state message)
+      const totalContacts =
+        $(".listOfContacts").find(".contact-item")?.length || 0;
+      if (totalContacts > 0) {
+        $(".listOfContacts").find(".message-hint").hide();
+      } else {
+        $(".listOfContacts").find(".message-hint").show();
+      }
+      // update data-action required with [responsive design]
+      cssMediaQueries();
+    },
+    error: (error) => {
+      console.error(error);
+    },
+  });
+}
+
+/**
+ *-------------------------------------------------------------
+ * Get channel_id by user_id
+ *-------------------------------------------------------------
+ */
+
+function getChannelId(user_id) {
+  return $.ajax({
+    url: url + "/get-channel-id",
+    method: "POST",
+    data: { _token: csrfToken, user_id: user_id },
+    dataType: "JSON"
+  });
 }
 
 /**
@@ -938,12 +972,12 @@ function updateContactItem(user_id) {
  *-------------------------------------------------------------
  */
 
-function star(user_id) {
-  if (getMessengerId() != auth_id) {
+function star(channel_id) {
+  if (currentChannelId() != auth_id) {
     $.ajax({
       url: url + "/star",
       method: "POST",
-      data: { _token: csrfToken, user_id: user_id },
+      data: { _token: csrfToken, channel_id: channel_id },
       dataType: "JSON",
       success: (data) => {
         data.status > 0
@@ -990,11 +1024,11 @@ function getFavoritesList() {
  * Get shared photos
  *-------------------------------------------------------------
  */
-function getSharedPhotos(user_id) {
+function getSharedPhotos(channel_id) {
   $.ajax({
     url: url + "/shared",
     method: "POST",
-    data: { _token: csrfToken, user_id: user_id },
+    data: { _token: csrfToken, channel_id: channel_id },
     dataType: "JSON",
     success: (data) => {
       $(".shared-photos-list").html(data.shared);
@@ -1033,7 +1067,7 @@ function messengerSearch(input) {
   searchTempVal = input;
   if (!searchLoading && !noMoreDataSearch) {
     if (searchPage < 2) {
-      $(".search-records").html("");
+      $(".messenger-tab .search-records").html("");
     }
     setSearchLoading(true);
     $.ajax({
@@ -1044,9 +1078,9 @@ function messengerSearch(input) {
       success: (data) => {
         setSearchLoading(false);
         if (searchPage < 2) {
-          $(".search-records").html(data.records);
+          $(".messenger-tab .search-records").html(data.records);
         } else {
-          $(".search-records").append(data.records);
+          $(".messenger-tab .search-records").append(data.records);
         }
         // update data-action required with [responsive design]
         cssMediaQueries();
@@ -1064,14 +1098,118 @@ function messengerSearch(input) {
 
 /**
  *-------------------------------------------------------------
+ * Delete Group Chat
+ *-------------------------------------------------------------
+ */
+function deleteGroupChat(channel_id) {
+  $.ajax({
+    url: url + "/group-chat/delete",
+    method: "POST",
+    data: { _token: csrfToken, channel_id: channel_id, user_id: auth_id },
+    dataType: "JSON",
+    beforeSend: () => {
+      // hide delete modal
+      app_modal({
+        show: false,
+        name: "delete-group",
+      });
+      // Show waiting alert modal
+      app_modal({
+        show: true,
+        name: "alert",
+        buttons: false,
+        body: loadingSVG("32px", null, "margin:auto"),
+      });
+    },
+    success: (data) => {
+      // Hide waiting alert modal
+      app_modal({
+        show: false,
+        name: "alert",
+        buttons: true,
+        body: "",
+      });
+
+      $(".listOfContacts")
+          .find(".contact-item[data-channel=" + channel_id + "]")
+          .remove();
+
+      // load channel
+      routerPush(document.title, `${url}/${my_channel_id}`);
+      setCurrentChannelId(my_channel_id);
+      updateSelectedContact(my_channel_id);
+
+      // load data from database
+      IDinfo(my_channel_id);
+    },
+    error: () => {
+      console.error("Server error, check your response");
+    },
+  });
+}
+
+/**
+ *-------------------------------------------------------------
+ * Leave Group Chat
+ *-------------------------------------------------------------
+ */
+function leaveGroupChat(channel_id) {
+  $.ajax({
+    url: url + "/group-chat/leave",
+    method: "POST",
+    data: { _token: csrfToken, channel_id: channel_id, user_id: auth_id },
+    dataType: "JSON",
+    beforeSend: () => {
+      // hide delete modal
+      app_modal({
+        show: false,
+        name: "leave-group",
+      });
+      // Show waiting alert modal
+      app_modal({
+        show: true,
+        name: "alert",
+        buttons: false,
+        body: loadingSVG("32px", null, "margin:auto"),
+      });
+    },
+    success: (data) => {
+      // Hide waiting alert modal
+      app_modal({
+        show: false,
+        name: "alert",
+        buttons: true,
+        body: "",
+      });
+
+      $(".listOfContacts")
+          .find(".contact-item[data-channel=" + channel_id + "]")
+          .remove();
+
+      // load channel
+      routerPush(document.title, `${url}/${my_channel_id}`);
+      setCurrentChannelId(my_channel_id);
+      updateSelectedContact(my_channel_id);
+
+      // load data from database
+      IDinfo(my_channel_id);
+    },
+    error: () => {
+      console.error("Server error, check your response");
+    },
+  });
+}
+
+/**
+ *-------------------------------------------------------------
  * Delete Conversation
  *-------------------------------------------------------------
  */
-function deleteConversation(id) {
+function deleteConversation(channel_id) {
   $.ajax({
     url: url + "/deleteConversation",
     method: "POST",
-    data: { _token: csrfToken, id: id },
+    data: { _token: csrfToken, channel_id: channel_id },
     dataType: "JSON",
     beforeSend: () => {
       // hide delete modal
@@ -1090,10 +1228,10 @@ function deleteConversation(id) {
     success: (data) => {
       // delete contact from the list
       $(".listOfContacts")
-        .find(".messenger-list-item[data-contact=" + id + "]")
+        .find(".contact-item[data-channel=" + channel_id + "]")
         .remove();
       // refresh info
-      IDinfo(id);
+      IDinfo(channel_id);
 
       if (!data.deleted)
         return alert("Error occurred, messages can not be deleted!");
@@ -1247,6 +1385,228 @@ function setActiveStatus(status) {
 
 /**
  *-------------------------------------------------------------
+ * Group Chat Events
+ *-------------------------------------------------------------
+ */
+function groupChatAddingModalInit(){
+  const modalGroupChannel = $(".app-modal[data-name=addGroup]")
+
+  let searchPage = 1;
+  let noMoreDataSearch = false;
+  let searchLoading = false;
+  let searchTempVal = "";
+  const addedUserIds = []
+
+  const userSearchEl = modalGroupChannel.find(".user-search")
+  const searchRecordsEl = modalGroupChannel.find(".search-records")
+
+  // Group button action to show group modal
+  $("body").on("click", ".group-btn", function (e) {
+    e.preventDefault();
+    app_modal({
+      show: true,
+      name: "addGroup",
+    });
+  });
+
+  // Group modal [cancel button]
+  modalGroupChannel.find(".app-modal-footer .cancel")
+    .on("click", function () {
+      app_modal({
+        show: false,
+        name: "addGroup",
+      });
+    });
+
+
+  /*
+  -----------------------------
+  -------- Search User --------
+  -----------------------------
+  */
+  function setSearchLoading(loading = false) {
+    if (!loading) {
+      searchRecordsEl.find(".loading-search").remove();
+    } else {
+      searchRecordsEl.append(
+        `<div class="loading-search">${listItemLoading(4)}</div>`
+      );
+    }
+    searchLoading = loading;
+  }
+  function handleUserSearch(input) {
+    if (input != searchTempVal) {
+      searchPage = 1;
+      noMoreDataSearch = false;
+      searchLoading = false;
+    }
+    searchTempVal = input;
+    if (!searchLoading && !noMoreDataSearch) {
+      if (searchPage < 2) {
+        searchRecordsEl.html("");
+      }
+      setSearchLoading(true);
+      $.ajax({
+        url: url + "/search-users",
+        method: "GET",
+        data: { _token: csrfToken, input: input, page: searchPage },
+        dataType: "JSON",
+        success: (data) => {
+          setSearchLoading(false);
+
+          let html = '';
+          if(typeof data.records == 'string'){
+            html = data.records
+          } else {
+            data.records.filter(({user, view}) => !addedUserIds.includes(user.id)).forEach(({user, view}) => {
+              html += view
+            })
+          }
+
+          if (searchPage < 2) {
+            searchRecordsEl.html(html);
+          } else {
+            searchRecordsEl.append(html);
+          }
+          // update data-action required with [responsive design]
+          cssMediaQueries();
+          // Pagination lock & messages page
+          noMoreDataSearch = searchPage >= data?.last_page;
+          if (!noMoreDataSearch) searchPage += 1;
+        },
+        error: (error) => {
+          setSearchLoading(false);
+          console.error(error);
+        },
+      });
+    }
+  }
+
+  const debouncedSearch = debounce(function () {
+    const value = userSearchEl.val();
+    handleUserSearch(value);
+  }, 500);
+  userSearchEl.on("keyup", function (e) {
+    const value = $(this).val();
+    if ($.trim(value).length > 0) {
+      userSearchEl.trigger("focus");
+      debouncedSearch();
+    }
+  });
+
+
+  /*
+  ------------------------------------------------
+  ------------ Search Result & Submit ------------
+  ------------------------------------------------
+  */
+
+  /* -------- Add User to group -------- */
+  $("body").on("click", ".search-records .user-list-item", function () {
+    const userID = $(this).attr("data-user");
+    const addedUserView = modalGroupChannel.find('.added-users')
+
+    addedUserView.prepend($(this))
+    addedUserIds.push(Number(userID))
+  });
+
+  /* -------- Remove User in group -------- */
+  $("body").on("click", ".added-users .user-list-item", function () {
+    const userID = $(this).attr("data-user");
+
+    addedUserIds.splice(addedUserIds.indexOf(Number(userID)), 1)
+    $(this).remove()
+  });
+
+  /* -------- Create Group Channel -------- */
+  $("#addGroupForm").on("submit", (e) => {
+    e.preventDefault();
+    createGroupChat();
+  });
+  function createGroupChat() {
+    const addGroupForm = $("#addGroupForm");
+    const groupNameVal = $.trim(addGroupForm.find('#group_name').val());
+    const avatar = addGroupForm.find('.upload-avatar').prop('files')
+
+    const formData = new FormData();
+    formData.append("avatar", avatar ? avatar[0] : null);
+    formData.append("group_name", groupNameVal);
+    formData.append("user_ids", addedUserIds);
+    formData.append("_token", csrfToken);
+
+    $.ajax({
+      url: addGroupForm.attr("action"),
+      method: "POST",
+      data: formData,
+      dataType: "JSON",
+      processData: false,
+      contentType: false,
+      beforeSend: () => {
+        // close settings modal
+        app_modal({
+          show: false,
+          name: "addGroup",
+        });
+        // Show waiting alert modal
+        app_modal({
+          show: true,
+          name: "alert",
+          buttons: false,
+          body: loadingSVG("32px", null, "margin:auto"),
+        });
+      },
+      success: (data) => {
+        if (data.error) {
+          // Show error message in alert modal
+          app_modal({
+            show: true,
+            name: "alert",
+            buttons: true,
+            body: data.msg,
+          });
+        } else {
+          // Hide alert modal
+          app_modal({
+            show: false,
+            name: "alert",
+            buttons: true,
+            body: "",
+          });
+
+          const channel_id = data.channel.id
+
+          // pusher subscribe new channel
+          const channel_pusher = pusher.subscribe(`${channelName}.${channel_id}`);
+          _listenChannelEvent(channel_pusher)
+
+          // update route
+          routerPush(document.title, `${url}/${channel_id}`);
+          setCurrentChannelId(channel_id);
+          updateSelectedContact(channel_id);
+
+          // load data from database
+          IDinfo(channel_id);
+
+          setTimeout(()=>{
+            updateContactItem(channel_id);
+          }, 500)
+
+          // reset form
+          addGroupForm.trigger("reset");
+          addedUserIds.length = 0
+          modalGroupChannel.find('.added-users')?.html("")
+          modalGroupChannel.find('.search-records')?.html("")
+        }
+      },
+      error: () => {
+        console.error("Server error, check your response");
+      },
+    });
+  }
+}
+
+/**
+ *-------------------------------------------------------------
  * On DOM ready
  *-------------------------------------------------------------
  */
@@ -1256,6 +1616,9 @@ $(document).ready(function () {
 
   // get contacts list
   getFavoritesList();
+
+  // group chat modal event
+  groupChatAddingModalInit();
 
   // Clear typing timeout
   clearTimeout(typingTimeout);
@@ -1270,19 +1633,13 @@ $(document).ready(function () {
   pusher.connection.bind("state_change", function (states) {
     let selector = $(".internet-connection");
     checkInternet(states.current, selector);
-    // listening for pusher:subscription_succeeded
-    channel.bind("pusher:subscription_succeeded", function () {
+    // listening for pusher:subscription_succeeded - first load
+    clientSendChannel.bind("pusher:subscription_succeeded", function () {
       // On connection state change [Updating] and get [info & msgs]
-      if (getMessengerId() != 0) {
-        if (
-          $(".messenger-list-item")
-            .find("tr[data-action]")
-            .attr("data-action") == "1"
-        ) {
-          $(".messenger-listView").hide();
-        }
-        IDinfo(getMessengerId());
+      if ($(".messenger-list-item").find("tr[data-action]").attr("data-action") == "1") {
+        $(".messenger-listView").hide();
       }
+      currentChannelId() && currentChannelId().length > 2 && IDinfo(currentChannelId());
     });
   });
 
@@ -1295,43 +1652,74 @@ $(document).ready(function () {
     $(".messenger-tab[data-view=" + dataView + "]").show();
   });
 
-  // set item active on click
-  $("body").on("click", ".messenger-list-item", function () {
+  // click on contact listOfContacts
+  $("body").on("click", ".messenger-list-item.contact-item", async function () {
     $(".messenger-list-item").removeClass("m-list-active");
     $(this).addClass("m-list-active");
-    const userID = $(this).attr("data-contact");
-    routerPush(document.title, `${url}/${userID}`);
-    updateSelectedContact(userID);
+
+    const channel_id = $(this).attr("data-channel");
+
+    routerPush(document.title, `${url}/${channel_id}`);
+    setCurrentChannelId(channel_id);
+    updateSelectedContact(channel_id);
+
+    // load data from database
+    IDinfo(channel_id);
   });
 
-  // show info side button
-  $(".messenger-infoView nav a , .show-infoSide").on("click", function () {
-    $(".messenger-infoView").toggle();
-  });
+  // click on search results
+  $("body").on("click", ".messenger-list-item.search-item", async function () {
+    $(".messenger-list-item.search-item").removeClass("m-list-active");
+    $(this).addClass("m-list-active");
 
-  // make favorites card dragable on click to slide.
-  hScroller(".messenger-favorites");
+    const userID = $(this).attr("data-user");
+
+    getChannelId(userID).then(res => {
+      const {channel_id, type} = res
+
+      // pusher subscribe new channel
+      if(type && type === 'new_channel'){
+        const channel = pusher.subscribe(`${channelName}.${channel_id}`);
+        _listenChannelEvent(channel)
+      }
+
+      // update route
+      routerPush(document.title, `${url}/${channel_id}`);
+      setCurrentChannelId(channel_id);
+      updateSelectedContact(channel_id);
+
+      // load data from database
+      IDinfo(channel_id);
+    }).catch(e => {
+      console.log(e)
+    })
+  });
 
   // click action for list item [user/group]
   $("body").on("click", ".messenger-list-item", function () {
     if ($(this).find("tr[data-action]").attr("data-action") == "1") {
       $(".messenger-listView").hide();
     }
-    const dataId = $(this).find("p[data-id]").attr("data-id");
-    setMessengerId(dataId);
-    IDinfo(dataId);
   });
+
+  // show info side button
+  $("body").on("click", ".messenger-infoView nav a , .show-infoSide", function () {
+    $(".messenger-infoView").toggle();
+  });
+
+  // make favorites card draggable on click to slide.
+  hScroller(".messenger-favorites");
 
   // click action for favorite button
   $("body").on("click", ".favorite-list-item", function () {
     if ($(this).find("div").attr("data-action") == "1") {
       $(".messenger-listView").hide();
     }
-    const uid = $(this).find("div.avatar").attr("data-id");
-    setMessengerId(uid);
-    IDinfo(uid);
-    updateSelectedContact(uid);
-    routerPush(document.title, `${url}/${uid}`);
+    const channel_id = $(this).find("div.avatar").attr("data-channel");
+    setCurrentChannelId(channel_id);
+    IDinfo(channel_id);
+    updateSelectedContact(channel_id);
+    routerPush(document.title, `${url}/${channel_id}`);
   });
 
   // list view buttons
@@ -1345,7 +1733,7 @@ $(document).ready(function () {
 
   // click action for [add to favorite] button.
   $(".add-to-favorite").on("click", function () {
-    star(getMessengerId());
+    star(currentChannelId());
   });
 
   // calling Css Media Queries
@@ -1472,8 +1860,20 @@ $(document).ready(function () {
     }
   });
 
+  // Delete Group button
+  $("body").on("click", ".messenger-infoView-btns .delete-group", function () {
+    app_modal({
+      name: "delete-group",
+    });
+  });
+  // Leave Group button
+  $("body").on("click", ".messenger-infoView-btns .leave-group", function () {
+    app_modal({
+      name: "leave-group",
+    });
+  });
   // Delete Conversation button
-  $(".messenger-infoView-btns .delete-conversation").on("click", function () {
+  $("body").on("click", ".messenger-infoView-btns .delete-conversation", function () {
     app_modal({
       name: "delete",
     });
@@ -1494,7 +1894,7 @@ $(document).ready(function () {
         .find(".app-modal-card")
         .attr("data-modal");
       if (id == 0) {
-        deleteConversation(getMessengerId());
+        deleteConversation(currentChannelId());
       } else {
         deleteMessage(id);
       }
@@ -1503,6 +1903,47 @@ $(document).ready(function () {
         name: "delete",
       });
     });
+  // Delete group modal [on button click]
+  $(".app-modal[data-name=delete-group]")
+      .find(".app-modal-footer .delete")
+      .on("click", function () {
+        deleteGroupChat(currentChannelId())
+        app_modal({
+          show: false,
+          name: "delete-group",
+        });
+      });
+  // Leave group modal [on button click]
+  $(".app-modal[data-name=leave-group]")
+      .find(".app-modal-footer .delete")
+      .on("click", function () {
+        leaveGroupChat(currentChannelId())
+
+        app_modal({
+          show: false,
+          name: "leave-group",
+        });
+      });
+
+  // Delete group modal [on cancel click]
+  $(".app-modal[data-name=delete-group]")
+      .find(".app-modal-footer .cancel")
+      .on("click", function () {
+        app_modal({
+          show: false,
+          name: "delete-group",
+        });
+      });
+  // Leave group modal [on cancel click]
+  $(".app-modal[data-name=leave-group]")
+      .find(".app-modal-footer .cancel")
+      .on("click", function () {
+        app_modal({
+          show: false,
+          name: "leave-group",
+        });
+      });
+
   // delete modal [cancel button]
   $(".app-modal[data-name=delete]")
     .find(".app-modal-footer .cancel")
@@ -1593,7 +2034,7 @@ $(document).ready(function () {
   actionOnScroll(
     ".m-body.messages-container",
     function () {
-      fetchMessages(getMessengerId());
+      fetchMessages(currentChannelId());
     },
     true
   );
@@ -1612,10 +2053,10 @@ $(document).ready(function () {
  * Observer on DOM changes
  *-------------------------------------------------------------
  */
-let previousMessengerId = getMessengerId();
+let previousMessengerId = currentChannelId();
 const observer = new MutationObserver(function (mutations) {
-  if (getMessengerId() !== previousMessengerId) {
-    previousMessengerId = getMessengerId();
+  if (currentChannelId() !== previousMessengerId) {
+    previousMessengerId = currentChannelId();
     initClientChannel();
   }
 });
