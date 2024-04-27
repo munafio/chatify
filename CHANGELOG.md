@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.6.4 (2024-04-27)
+
+### Fixed
+- [fix bug] updateSelectedContact and IDinfo load if user_id != auth_id #339
+
 ## v1.6.3 (2024-03-17)
 
 ### Added
