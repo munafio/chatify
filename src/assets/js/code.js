@@ -72,12 +72,17 @@ function routerPush(title, url) {
   return window.history.pushState({}, title || document.title, url);
 }
 function updateSelectedContact(user_id) {
-  $(document).find(".messenger-list-item").removeClass("m-list-active");
-  $(document)
-    .find(
-      ".messenger-list-item[data-contact=" + (user_id || getMessengerId()) + "]"
-    )
-    .addClass("m-list-active");
+  user_id = user_id || getMessengerId();
+$(document).find(".messenger-list-item").removeClass("m-list-active");
+$(document)
+  .find(
+    ".messenger-list-item[data-contact=" + (user_id) + "]"
+  )
+  .addClass("m-list-active");
+
+  if (user_id != 0) {
+      IDinfo(user_id);
+  }
 }
 /**
  *-------------------------------------------------------------
@@ -1319,7 +1324,7 @@ $(document).ready(function () {
     }
     const dataId = $(this).find("p[data-id]").attr("data-id");
     setMessengerId(dataId);
-    IDinfo(dataId);
+    // IDinfo(dataId);
   });
 
   // click action for favorite button
