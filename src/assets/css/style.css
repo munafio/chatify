@@ -841,11 +841,13 @@ body {
   width: auto;
   max-width: 400px;
   margin: auto;
-  padding: 20px 40px;
   border-radius: 5px;
   text-align: center;
   box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.27);
   transform: scale(0);
+}
+.app-modal-form {
+  padding: 20px 40px;
 }
 .app-modal-header {
   font-weight: 500;
