@@ -1,6 +1,6 @@
 {
-  "name": "munafio/chatify",
-  "description": "A package for Laravel PHP Framework to add a complete real-time chat system.",
+  "name": "thant/chatify",
+  "description": "A package for Laravel PHP Framework to add a complete real-time chat system with voice message add-on feature.",
   "type": "library",
   "keywords": [
     "laravel",
@@ -16,11 +16,11 @@
   "license": "MIT",
   "authors": [
     {
-      "name": "Munaf A. Mahdi",
-      "email": "munafaqeelmahdi@gmail.com"
+      "name": "Thant Htet Aung",
+      "email": "galactuscosmic101@gmail.com"
     }
   ],
-  "homepage": "https://github.com/munafio/chatify",
+  "homepage": "https://github.com/ThantHtetAung101/chatify-with-voice-message",
   "minimum-stability": "dev",
   "prefer-stable": true,
   "require": {
