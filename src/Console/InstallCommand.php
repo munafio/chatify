@@ -73,10 +73,24 @@ class InstallCommand extends Command
         $this->line('Creating storage symlink...');
         Artisan::call('storage:link');
         $this->info('[✓] Storage linked.');
+        $this->line('----------');
 
+        $packageJsonPath = base_path('package.json');
+        $packageJson = json_decode(File::get($packageJsonPath), true);
+
+        $packageJson['dependencies']['extendable-media-recorder'] = "^9.2.4";
+        $packageJson['dependencies']['extendable-media-recorder-wav-encoder'] = "^7.0.111";
+        $packageJson['dependencies']['wav-blob-util'] = "^1.0.21";
+        $packageJson['dependencies']['wavesurfer.js'] = "^7.8.0";
+
+        // Save the updated package.json
+        File::put($packageJsonPath, json_encode($packageJson, JSON_PRETTY_PRINT));
+
+        $this->info('[✓] Dependencies added to package.json successfully.');
+
+        $this->line('----------');
         if ($this->isV9) {
-            $viteConfigPath = base_path('vite.config.js');
-
+            $configPath = base_path('vite.config.js');
             $newContent = <<<EOT
                 import { defineConfig } from 'vite';
                 import laravel from 'laravel-vite-plugin';
@@ -86,21 +100,43 @@ class InstallCommand extends Command
                         laravel({
                             input: ['resources/css/app.css',
                                 'resources/js/app.js',
-                                'public/assets/js/chatify/audioRecorder.js',
-                                'public/assets/js/chatify/voiceMessage.js',],
+                                'public/js/chatify/audioRecorder.js',
+                                'public/js/chatify/voiceMessage.js',],
                             refresh: true,
                         }),
                     ],
                 });
             EOT;
+        } else {
+            $configPath = base_path('webpack.mix.js');
+            $newContent = <<<EOT
+                const mix = require('laravel-mix');
 
-            if (file_exists($viteConfigPath)) {
-                file_put_contents($viteConfigPath, $newContent);
-                echo "vite.config.js has been overwritten successfully.\n";
-            } else {
-                echo "vite.config.js not found.\n";
-            }
+                /*
+                |--------------------------------------------------------------------------
+                | Mix Asset Management
+                |--------------------------------------------------------------------------
+                |
+                | Mix provides a clean, fluent API for defining some Webpack build steps
+                | for your Laravel application. By default, we are compiling the Sass
+                | file for the application as well as bundling up all the JS files.
+                |
+                */
+
+                mix.js('resources/js/app.js', 'public/js')
+                    .js('public/js/chatify/audioRecorder.js', 'public/js')
+                    .js('public/js/chatify/voiceMessage.js', 'public/js')
+                    .postCss("resources/css/app.css", "public/css", [
+                        require("tailwindcss"),
+                    ])
+                    .sourceMaps();
+            EOT;
         }
+        if (file_exists($configPath)) {
+            file_put_contents($configPath, $newContent);
+            $this->info('[✓] js complie file has been overwritten successfully');
+        }
+
         $this->line('----------');
         $this->info('[✓] Chatify installed successfully');
     }

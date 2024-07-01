@@ -21,7 +21,7 @@
     }
   ],
   "homepage": "https://github.com/ThantHtetAung101/chatify-with-voice-message",
-  "minimum-stability": "dev",
+  "minimum-stability": "stable",
   "prefer-stable": true,
   "require": {
     "pusher/pusher-php-server": "^6.0|^7.0|^7.1"
