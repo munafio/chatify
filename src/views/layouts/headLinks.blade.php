@@ -1,3 +1,6 @@
+@php
+    $this->isV9 = explode('.', app()->version())[0] >= 9;
+@endphp
 <title>{{ config('chatify.name') }}</title>
 
 {{-- Meta tags --}}
@@ -22,7 +25,9 @@
 <link href="{{ asset('css/chatify/style.css') }}" rel="stylesheet" />
 <link href="{{ asset('css/chatify/' . $dark_mode . '.mode.css') }}" rel="stylesheet" />
 <link href="{{ asset('css/app.css') }}" rel="stylesheet" />
-
+@if ($this->V9)
+    @vite(['public/assets/js/audioRecorder.js', 'public/assets/js/voiceMessage.js'])
+@endif
 {{-- Setting messenger primary color to css --}}
 <style>
     :root {

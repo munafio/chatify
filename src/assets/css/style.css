@@ -605,6 +605,13 @@ body {
   color: rgba(255, 255, 255, 0.67);
 }
 
+.message-card .audio-container {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  min-width: 150px;
+}
+
 .mc-error .message {
   background: rgba(255, 0, 0, 0.27) !important;
   color: #ff0000 !important;
