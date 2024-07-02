@@ -32,13 +32,13 @@ const setMessengerId = (id) => $("meta[name=id]").attr("content", id);
  */
 Pusher.logToConsole = chatify.pusher.debug;
 const pusher = new Pusher(chatify.pusher.key, {
-    encrypted: chatify.pusher.options.encrypted,
-    cluster: chatify.pusher.options.cluster,
-    wsHost: chatify.pusher.options.host,
-    wsPort: chatify.pusher.options.port,
-    wssPort: chatify.pusher.options.port,
-    forceTLS: chatify.pusher.options.useTLS,
-    authEndpoint: chatify.pusherAuthEndpoint,
+  encrypted: chatify.pusher.options.encrypted,
+  cluster: chatify.pusher.options.cluster,
+  wsHost: chatify.pusher.options.host,
+  wsPort: chatify.pusher.options.port,
+  wssPort: chatify.pusher.options.port,
+  forceTLS: chatify.pusher.options.useTLS,
+  authEndpoint: chatify.pusherAuthEndpoint,
   auth: {
     headers: {
       "X-CSRF-TOKEN": csrfToken,
@@ -72,17 +72,12 @@ function routerPush(title, url) {
   return window.history.pushState({}, title || document.title, url);
 }
 function updateSelectedContact(user_id) {
-  user_id = user_id || getMessengerId();
-$(document).find(".messenger-list-item").removeClass("m-list-active");
-$(document)
-  .find(
-    ".messenger-list-item[data-contact=" + (user_id) + "]"
-  )
-  .addClass("m-list-active");
-
-  if (user_id != 0) {
-      IDinfo(user_id);
-  }
+  $(document).find(".messenger-list-item").removeClass("m-list-active");
+  $(document)
+    .find(
+      ".messenger-list-item[data-contact=" + (user_id || getMessengerId()) + "]"
+    )
+    .addClass("m-list-active");
 }
 /**
  *-------------------------------------------------------------
@@ -447,15 +442,20 @@ function IDinfo(id) {
  * Send message function
  *-------------------------------------------------------------
  */
+var audioMessage = null
 function sendMessage() {
   temporaryMsgId += 1;
   let tempID = `temp_${temporaryMsgId}`;
   let hasFile = !!$(".upload-attachment").val();
   const inputValue = $.trim(messageInput.val());
-  if (inputValue.length > 0 || hasFile) {
+  if (inputValue.length > 0 || hasFile || audioMessage) {
     const formData = new FormData($("#message-form")[0]);
     formData.append("id", getMessengerId());
     formData.append("temporaryMsgId", tempID);
+    if (audioMessage) {
+      formData.append('audio_data', audioMessage, 'file');
+      formData.append('type', 'audio');
+    }
     formData.append("_token", csrfToken);
     $.ajax({
       url: $("#message-form").attr("action"),
@@ -641,12 +641,16 @@ channel.bind("messaging", function (data) {
   if (data.from_id == getMessengerId() && data.to_id == auth_id) {
     $(".messages").find(".message-hint").remove();
     messagesContainer.find(".messages").append(data.message);
-    scrollToBottom(messagesContainer);
     makeSeen(true);
     // remove unseen counter for the user from the contacts list
     $(".messenger-list-item[data-contact=" + getMessengerId() + "]")
       .find("tr>td>b")
       .remove();
+
+    // update contact item
+    updateContactItem(getMessengerId());
+    scrollToBottom(messagesContainer);
+    sendContactItemUpdates(true);
   }
 
   playNotificationSound(
@@ -1324,7 +1328,7 @@ $(document).ready(function () {
     }
     const dataId = $(this).find("p[data-id]").attr("data-id");
     setMessengerId(dataId);
-    // IDinfo(dataId);
+    IDinfo(dataId);
   });
 
   // click action for favorite button
