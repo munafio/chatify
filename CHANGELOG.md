@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.6.5 ()
+
+### Fixed
+- Fix settings' modal UI #351
+
 ## v1.6.4 (2024-04-27)
 
 ### Fixed
