@@ -100,13 +100,19 @@ class ChatifyMessenger
      */
     public function pusherAuth($requestUser, $authUser, $channelName, $socket_id)
     {
-        // Auth data
-        $authData = json_encode([
-            'user_id' => $authUser->id,
-            'user_info' => [
-                'name' => $authUser->name
-            ]
-        ]);
+        $authData = null;
+
+        // Set auth data only if it is presence channel
+        if (strncmp($channelName, 'presence-', 9) == 0) {
+            // Auth data
+            $authData = json_encode([
+                'user_id' => $authUser->id,
+                'user_info' => [
+                    'name' => $authUser->name
+                ]
+            ]);
+        }
+
         // check if user authenticated
         if (Auth::check()) {
             if($requestUser->id == $authUser->id){
