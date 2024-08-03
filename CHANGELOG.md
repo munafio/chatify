@@ -5,7 +5,8 @@ All notable changes to this project will be documented in this file.
 ## v1.6.5 ()
 
 ### Fixed
-- Fix settings' modal UI #351
+- Settings modal UI #351
+- Limit the data retrieved for the user #359
 
 ## v1.6.4 (2024-04-27)
 
