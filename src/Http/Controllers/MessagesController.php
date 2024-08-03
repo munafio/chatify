@@ -60,10 +60,11 @@ class MessagesController extends Controller
     public function idFetchData(Request $request)
     {
         $favorite = Chatify::inFavorite($request['id']);
-        $fetch = User::where('id', $request['id'])->first();
+        $fetch = User::where('id', $request['id'])->select('id', 'name', 'email')->first();
         if($fetch){
             $userAvatar = Chatify::getUserWithAvatar($fetch)->avatar;
         }
+        unset($fetch['email']);
         return Response::json([
             'favorite' => $favorite,
             'fetch' => $fetch ?? null,
