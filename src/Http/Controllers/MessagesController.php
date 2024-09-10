@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request as FacadesRequest;
 use Illuminate\Support\Str;
+
 class MessagesController extends Controller
 {
     protected $perPage = 30;
@@ -89,74 +90,171 @@ class MessagesController extends Controller
     }
 
     /**
-     * Send a message to database
+     * Send a message to database.
      *
      * @param Request $request
      * @return JsonResponse
      */
     public function send(Request $request)
     {
-        // default variables
-        $error = (object)[
+        $error = (object) [
             'status' => 0,
-            'message' => null
+            'message' => null,
         ];
+
         $attachment = null;
         $attachment_title = null;
+        $messageData = null;
+        $isVoiceMessage = $request->hasFile('audio');
 
-        // if there is attachment [file]
-        if ($request->hasFile('file')) {
-            // allowed extensions
-            $allowed_images = Chatify::getAllowedImages();
-            $allowed_files  = Chatify::getAllowedFiles();
-            $allowed        = array_merge($allowed_images, $allowed_files);
-
-            $file = $request->file('file');
-            // check file size
-            if ($file->getSize() < Chatify::getMaxUploadSize()) {
-                if (in_array(strtolower($file->extension()), $allowed)) {
-                    // get attachment name
-                    $attachment_title = $file->getClientOriginalName();
-                    // upload attachment and store the new name
-                    $attachment = Str::uuid() . "." . $file->extension();
-                    $file->storeAs(config('chatify.attachments.folder'), $attachment, config('chatify.storage_disk_name'));
-                } else {
-                    $error->status = 1;
-                    $error->message = "File extension not allowed!";
-                }
-            } else {
-                $error->status = 1;
-                $error->message = "File size you are trying to upload is too large!";
-            }
+        if ($isVoiceMessage) {
+            $this->handleVoiceMessage($request, $error, $attachment, $attachment_title);
+        } else {
+            $this->handleTextOrFileMessage($request, $error, $attachment, $attachment_title);
         }
 
         if (!$error->status) {
-            $message = Chatify::newMessage([
-                'from_id' => Auth::user()->id,
-                'to_id' => $request['id'],
-                'body' => htmlentities(trim($request['message']), ENT_QUOTES, 'UTF-8'),
-                'attachment' => ($attachment) ? json_encode((object)[
-                    'new_name' => $attachment,
-                    'old_name' => htmlentities(trim($attachment_title), ENT_QUOTES, 'UTF-8'),
-                ]) : null,
-            ]);
+            $message = $this->createMessage($request, $isVoiceMessage, $attachment, $attachment_title);
             $messageData = Chatify::parseMessage($message);
-            if (Auth::user()->id != $request['id']) {
-                Chatify::push("private-chatify.".$request['id'], 'messaging', [
-                    'from_id' => Auth::user()->id,
-                    'to_id' => $request['id'],
-                    'message' => Chatify::messageCard($messageData, true)
-                ]);
-            }
+            $this->pushNotification($request, $messageData);
         }
 
-        // send the response
         return Response::json([
             'status' => '200',
             'error' => $error,
-            'message' => Chatify::messageCard(@$messageData),
+            'message' => Chatify::messageCard($messageData),
             'tempID' => $request['temporaryMsgId'],
         ]);
+    }
+
+    /**
+     * Handle a recorded voice message upload.
+     *
+     * @param Request $request
+     * @param object $error
+     * @param string|null $attachment
+     * @param string|null $attachment_title
+     * @return void
+     */
+    private function handleVoiceMessage(Request $request, &$error, &$attachment, &$attachment_title)
+    {
+        if (!$request->hasFile('audio')) {
+            return;
+        }
+
+        $this->storeUploadedAttachment(
+            $request->file('audio'),
+            Chatify::getAllowedVoiceMessages(),
+            $error,
+            $attachment,
+            $attachment_title
+        );
+    }
+
+    /**
+     * Handle a regular text message with an optional file attachment.
+     *
+     * @param Request $request
+     * @param object $error
+     * @param string|null $attachment
+     * @param string|null $attachment_title
+     * @return void
+     */
+    private function handleTextOrFileMessage(Request $request, &$error, &$attachment, &$attachment_title)
+    {
+        if (!$request->hasFile('file')) {
+            return;
+        }
+
+        $this->storeUploadedAttachment(
+            $request->file('file'),
+            array_merge(Chatify::getAllowedImages(), Chatify::getAllowedFiles()),
+            $error,
+            $attachment,
+            $attachment_title
+        );
+    }
+
+    /**
+     * Validate and store a message attachment.
+     *
+     * @param mixed $file
+     * @param array $allowedExtensions
+     * @param object $error
+     * @param string|null $attachment
+     * @param string|null $attachment_title
+     * @return void
+     */
+    private function storeUploadedAttachment($file, $allowedExtensions, &$error, &$attachment, &$attachment_title)
+    {
+        if ($file->getSize() > Chatify::getMaxUploadSize()) {
+            $this->setError($error, "File size you are trying to upload is too large!");
+            return;
+        }
+
+        $extension = strtolower($file->getClientOriginalExtension());
+
+        if (!in_array($extension, $allowedExtensions)) {
+            $this->setError($error, "File extension not allowed!");
+            return;
+        }
+
+        $attachment = Str::uuid() . "." . $extension;
+        $attachment_title = $file->getClientOriginalName();
+        $file->storeAs(config('chatify.attachments.folder'), $attachment, config('chatify.storage_disk_name'));
+    }
+
+    /**
+     * Set a send-message error.
+     *
+     * @param object $error
+     * @param string $message
+     * @return void
+     */
+    private function setError(&$error, $message)
+    {
+        $error->status = 1;
+        $error->message = $message;
+    }
+
+    /**
+     * Create the chat message record.
+     *
+     * @param Request $request
+     * @param bool $isVoiceMessage
+     * @param string|null $attachment
+     * @param string|null $attachment_title
+     * @return mixed
+     */
+    private function createMessage(Request $request, $isVoiceMessage, $attachment, $attachment_title)
+    {
+        return Chatify::newMessage([
+            'from_id' => Auth::user()->id,
+            'to_id' => $request->input('id'),
+            'body' => $isVoiceMessage ? '' : htmlentities(trim($request['message']), ENT_QUOTES, 'UTF-8'),
+            'attachment' => ($attachment) ? json_encode((object) [
+                'new_name' => $attachment,
+                'old_name' => htmlentities(trim($attachment_title), ENT_QUOTES, 'UTF-8'),
+            ]) : null,
+        ]);
+    }
+
+    /**
+     * Push a message notification to the receiver.
+     *
+     * @param Request $request
+     * @param array $messageData
+     * @return void
+     */
+    private function pushNotification(Request $request, $messageData)
+    {
+        if (Auth::user()->id != $request->input('id')) {
+            Chatify::push("private-chatify." . $request->input('id'), 'messaging', [
+                'from_id' => Auth::user()->id,
+                'to_id' => $request->input('id'),
+                'message' => Chatify::messageCard($messageData, true),
+            ]);
+        }
     }
 
     /**

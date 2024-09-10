@@ -15,6 +15,7 @@
 <script src="{{ asset('js/chatify/autosize.js') }}"></script>
 <script src="{{ asset('js/app.js') }}"></script>
 <script src='https://unpkg.com/nprogress@0.2.0/nprogress.js'></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/6.6.3/wavesurfer.min.js"></script>
 
 {{-- styles --}}
 <link rel='stylesheet' href='https://unpkg.com/nprogress@0.2.0/nprogress.css'/>

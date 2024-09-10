@@ -7,11 +7,13 @@
         sounds: {!! json_encode(config('chatify.sounds')) !!},
         allowedImages: {!! json_encode(config('chatify.attachments.allowed_images')) !!},
         allowedFiles: {!! json_encode(config('chatify.attachments.allowed_files')) !!},
+        allowedVoiceMessages: {!! json_encode(config('chatify.attachments.allowed_voice_messages')) !!},
         maxUploadSize: {{ Chatify::getMaxUploadSize() }},
         pusher: {!! json_encode(config('chatify.pusher')) !!},
         pusherAuthEndpoint: '{{route("pusher.auth")}}'
     };
-    window.chatify.allAllowedExtensions = chatify.allowedImages.concat(chatify.allowedFiles);
+    window.chatify.allAllowedExtensions = chatify.allowedImages.concat(chatify.allowedFiles).concat(chatify.allowedVoiceMessages);
 </script>
+<script src="{{ asset('js/chatify/voiceMessage.js') }}" defer></script>
 <script src="{{ asset('js/chatify/utils.js') }}"></script>
 <script src="{{ asset('js/chatify/code.js') }}"></script>
