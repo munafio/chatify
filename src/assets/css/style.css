@@ -1184,3 +1184,144 @@ div.loadingPlaceholder-date {
   border-radius: 4px;
   background: transparent;
 }
+
+
+/*
+*****************************************
+* microphone
+*****************************************
+*/
+.microphone-button {
+  position: relative;
+  border: 2px solid var(--primary-color);
+  background-color: var(--primary-color); 
+  border-radius: 50%;
+  padding: 15px;
+  cursor: pointer;
+  outline: none;
+  transition: transform 0.2s ease;
+}
+.microphone-icon {
+  position: relative;
+  font-size: 24px;
+  color: white;
+}
+
+/*
+*****************************************
+* waveSurfer
+*****************************************
+*/
+
+
+.audio-wrap {
+  display: flex;
+  align-items: center;
+  border-radius: 20px;
+  justify-content: space-between;
+}
+
+.controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 25%;
+  margin-bottom: 15px;
+  padding :15px;
+  width: 13em;
+  height: 3em;
+  border-radius: 25px;
+  box-shadow: 0px 6px 11px rgba(18, 67, 105, 0.03);
+
+
+}
+.controls .btn-toggle-play {
+  background-color: transparent;
+  border: none;
+  width: 10%;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.controls .btn-toggle-play i {
+  font-size: 20px;
+}
+
+.waveform {
+  width: 80%;
+  overflow: hidden;
+
+  
+}
+
+.controls .duration {
+  font-size: 15px;
+  font-weight: 500;
+  margin-left: 15px;
+  width:10%;
+}
+/* 
+ * Recording Slide Progress
+*/
+.recording-ui {
+  width: 100%;
+  padding: 10px 0;
+}
+
+.recording-slider-wrapper {
+  background-color: var(--primary-color);
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.recording-slider-content {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+.recording-progress-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background-color: rgba(241, 243, 245, 0.2);
+  transition: width 0.1s linear;
+  z-index: 1;
+}
+
+.stop-button,
+.trash-button,
+.send-record-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 10px;
+  z-index: 2;
+}
+
+
+.fa-trash , .fa-paper-plane {
+  color: var(--primary-color) !important;
+}
+.fa-stop, .fa-play, .fa-pause{
+color: white !important;
+font-size: 15px !important;
+}
+
+.recording-time {
+  font-size: 14px;
+  color: #f4f6f8 !important; 
+  margin: 0 10px;
+  min-width: 40px;
+  z-index: 2;
+}
