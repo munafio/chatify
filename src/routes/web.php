@@ -55,7 +55,6 @@ Route::get('/getContacts', 'MessagesController@getContacts')->name('contacts.get
  */
 Route::post('/updateContacts', 'MessagesController@updateContactItem')->name('contacts.update');
 
-
 /**
  * Star in favorite list
  */
@@ -95,11 +94,6 @@ Route::post('/updateSettings', 'MessagesController@updateSettings')->name('avata
  * Set active status
  */
 Route::post('/setActiveStatus', 'MessagesController@setActiveStatus')->name('activeStatus.set');
-
-
-
-
-
 
 /*
 * [Group] view by id

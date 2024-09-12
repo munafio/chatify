@@ -14,12 +14,12 @@ trait UUID
         });
     }
 
-    public function getIncrementing ()
+    public function getIncrementing()
     {
         return false;
     }
 
-    public function getKeyType ()
+    public function getKeyType()
     {
         return 'string';
     }
