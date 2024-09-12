@@ -27,7 +27,7 @@ class PublishCommand extends Command
      */
     public function handle()
     {
-        if($this->option('force')){
+        if ($this->option('force')) {
             $this->call('vendor:publish', [
                 '--tag' => 'chatify-config',
                 '--force' => true,

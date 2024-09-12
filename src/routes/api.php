@@ -71,5 +71,3 @@ Route::post('/updateSettings', 'MessagesController@updateSettings')->name('api.a
  * Set active status
  */
 Route::post('/setActiveStatus', 'MessagesController@setActiveStatus')->name('api.activeStatus.set');
-
-

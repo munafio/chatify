@@ -36,20 +36,20 @@ class InstallCommand extends Command
      */
     public function handle()
     {
-        $this->isV8 = explode('.',app()->version())[0] >= 8;
+        $this->isV8 = explode('.', app()->version())[0] >= 8;
 
         $this->info('Installing Chatify...');
 
         $this->line('----------');
         $this->line('Configurations...');
-        $this->modifyModelsPath('/../Http/Controllers/MessagesController.php','User');
-        $this->modifyModelsPath('/../Http/Controllers/MessagesController.php','ChFavorite');
-        $this->modifyModelsPath('/../Http/Controllers/MessagesController.php','ChMessage');
-        $this->modifyModelsPath('/../Http/Controllers/Api/MessagesController.php','User');
-        $this->modifyModelsPath('/../Http/Controllers/Api/MessagesController.php','ChFavorite');
-        $this->modifyModelsPath('/../Http/Controllers/Api/MessagesController.php','ChMessage');
-        $this->modifyModelsPath('/../ChatifyMessenger.php','ChFavorite');
-        $this->modifyModelsPath('/../ChatifyMessenger.php','ChMessage');
+        $this->modifyModelsPath('/../Http/Controllers/MessagesController.php', 'User');
+        $this->modifyModelsPath('/../Http/Controllers/MessagesController.php', 'ChFavorite');
+        $this->modifyModelsPath('/../Http/Controllers/MessagesController.php', 'ChMessage');
+        $this->modifyModelsPath('/../Http/Controllers/Api/MessagesController.php', 'User');
+        $this->modifyModelsPath('/../Http/Controllers/Api/MessagesController.php', 'ChFavorite');
+        $this->modifyModelsPath('/../Http/Controllers/Api/MessagesController.php', 'ChMessage');
+        $this->modifyModelsPath('/../ChatifyMessenger.php', 'ChFavorite');
+        $this->modifyModelsPath('/../ChatifyMessenger.php', 'ChMessage');
         $this->modifyModelsPath('/../Models/ChFavorite.php');
         $this->modifyModelsPath('/../Models/ChMessage.php');
         $this->info('[✓] done');
@@ -80,16 +80,17 @@ class InstallCommand extends Command
     /**
      * Modify models imports/namespace path according to Laravel version.
      *
-     * @param string $targetFilePath
-     * @param string $model
+     * @param  string  $targetFilePath
+     * @param  string  $model
      * @return void
      */
-    private function modifyModelsPath($targetFilePath, $model = null){
+    private function modifyModelsPath($targetFilePath, $model = null)
+    {
         $path = realpath(__DIR__.$targetFilePath);
         $contents = File::get($path);
-        $model = !empty($model) ? '\\'.$model : ';';
+        $model = ! empty($model) ? '\\'.$model : ';';
         $contents = str_replace(
-            (!$this->isV8 ? 'App\Models' : 'App').$model,
+            (! $this->isV8 ? 'App\Models' : 'App').$model,
             ($this->isV8 ? 'App\Models' : 'App').$model,
             $contents
         );
@@ -99,46 +100,34 @@ class InstallCommand extends Command
     /**
      * Check, publish, or overwrite the assets.
      *
-     * @param string $target
-     * @param string $path
+     * @param  string  $target
+     * @param  string  $path
      * @return void
      */
     private function process($target, $path)
     {
         $this->line('Publishing '.$target.'...');
-        if (!File::exists($path)) {
+        if (! File::exists($path)) {
             $this->publish($target);
             $this->info('[✓] '.$target.' published.');
+
             return;
         }
         if ($this->shouldOverwrite($target)) {
             $this->line('Overwriting '.$target.'...');
-            $this->publish($target,true);
+            $this->publish($target, true);
             $this->info('[✓] '.$target.' published.');
+
             return;
         }
         $this->line('[-] Ignored, The existing '.$target.' was not overwritten');
     }
 
     /**
-     * Ask to overwrite.
-     *
-     * @param string $target
-     * @return void
-     */
-    private function shouldOverwrite($target)
-    {
-        return $this->confirm(
-            $target.' already exists. Do you want to overwrite it?',
-            false
-        );
-    }
-
-    /**
      * Call the publish command.
      *
-     * @param string $tag
-     * @param bool $forcePublish
+     * @param  string  $tag
+     * @param  bool  $forcePublish
      * @return void
      */
     private function publish($tag, $forcePublish = false)
@@ -147,5 +136,19 @@ class InstallCommand extends Command
             '--tag' => 'chatify-'.$tag,
             '--force' => $forcePublish,
         ]);
+    }
+
+    /**
+     * Ask to overwrite.
+     *
+     * @param  string  $target
+     * @return void
+     */
+    private function shouldOverwrite($target)
+    {
+        return $this->confirm(
+            $target.' already exists. Do you want to overwrite it?',
+            false
+        );
     }
 }

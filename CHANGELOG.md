@@ -5,12 +5,14 @@ All notable changes to this project will be documented in this file.
 ## v1.6.5 ()
 
 ### Fixed
+
 - Settings modal UI #351
 - Limit the data retrieved for the user #359
 
 ## v1.6.4 (2024-04-27)
 
 ### Fixed
+
 - [fix bug] updateSelectedContact and IDinfo load if user_id != auth_id #339
 
 ## v1.6.3 (2024-03-17)
@@ -96,7 +98,8 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 
-- Sync the `sending a message form`'s allowed files/images with the `config` file (Update sendForm.blade.php [#190](https://github.com/munafio/chatify/pull/190))
+- Sync the `sending a message form`'s allowed files/images with the `config` file (Update
+  sendForm.blade.php [#190](https://github.com/munafio/chatify/pull/190))
 
 ## v1.5.0 (2022-06-08)
 
@@ -118,7 +121,8 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-- File upload (user avatar & attachments) `allowed files` and `max size` now can be changed from one place which is (config/chatify.php).
+- File upload (user avatar & attachments) `allowed files` and `max size` now can be changed from one place which is (
+  config/chatify.php).
 
 ### Fixed
 

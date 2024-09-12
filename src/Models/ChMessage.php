@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Chatify\Traits\UUID;
 use Chatify\MessageCollection;
-
+use Chatify\Traits\UUID;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Notifications\DatabaseNotificationCollection;
 
 class ChMessage extends Model
 {
@@ -14,7 +16,7 @@ class ChMessage extends Model
     /**
      * Get the user who sent the message.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function from()
     {
@@ -24,7 +26,7 @@ class ChMessage extends Model
     /**
      * Get the user who received the message.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function to()
     {
@@ -78,8 +80,7 @@ class ChMessage extends Model
     /**
      * Scope a query to only include read notifications.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return Builder
      */
     public function scopeRead(Builder $query)
     {
@@ -89,20 +90,17 @@ class ChMessage extends Model
     /**
      * Scope a query to only include unread notifications.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return Builder
      */
     public function scopeUnread(Builder $query)
     {
         return $query->where('seen', 0);
     }
 
-
     /**
      * Create a new database notification collection instance.
      *
-     * @param  array  $models
-     * @return \Illuminate\Notifications\DatabaseNotificationCollection
+     * @return DatabaseNotificationCollection
      */
     public function newCollection(array $models = [])
     {

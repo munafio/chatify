@@ -3,119 +3,153 @@
 .app-scroll-thin::-webkit-scrollbar-thumb {
   background: var(--dark-scrollbar-thumb-color);
 }
+
 .app-scroll-thin::-webkit-scrollbar {
   background: var(--dark-secondary-bg-color);
 }
+
 .app-scroll::-webkit-scrollbar:hover,
 .app-scroll-thin::-webkit-scrollbar:hover {
   background: var(--dark-secondary-bg-color);
 }
+
 .messenger {
   background: var(--dark-primary-bg-color);
 }
+
 .messenger-search[type="text"] {
   background: var(--dark-secondary-bg-color);
   color: #fff;
 }
+
 .messenger-search[type="text"]::placeholder {
   color: #fff;
 }
+
 .messenger-listView {
   background: var(--dark-primary-bg-color);
   border: 1px solid var(--dark-border-color);
 }
+
 .messenger-listView-tabs {
   border-bottom: 1px solid var(--dark-border-color);
 }
+
 .messenger-listView-tabs a:hover,
 .messenger-listView-tabs a:focus {
   background-color: var(--dark-secondary-bg-color);
 }
+
 .messenger-favorites div.avatar {
   border: 2px solid var(--dark-primary-bg-color);
 }
+
 .messenger-list-item:hover {
   background: var(--dark-secondary-bg-color);
 }
+
 .messenger-messagingView {
   border-top: 1px solid var(--dark-secondary-bg-color);
   border-bottom: 1px solid var(--dark-secondary-bg-color);
   background: var(--dark-messagingView-bg-color);
 }
+
 .m-header-messaging {
   background: var(--dark-primary-bg-color);
 }
+
 .messenger-infoView {
   background: var(--dark-primary-bg-color);
   border: 1px solid var(--dark-border-color);
 }
+
 .messenger-infoView > p {
   color: #fff;
 }
+
 .divider {
   border-top: 1px solid var(--dark-border-color);
 }
+
 .messenger-sendCard {
   background: var(--dark-primary-bg-color);
   border-top: 1px solid var(--dark-border-color);
 }
+
 .attachment-preview > p {
   color: #fff;
 }
+
 .m-send {
   color: #fff;
 }
+
 .m-send::placeholder {
   color: #fff;
 }
+
 .message-card .message {
   background: var(--dark-message-card-color);
   color: #fff;
 }
+
 .m-li-divider {
   border-bottom: 1px solid var(--dark-border-color);
 }
+
 .m-header a,
 .m-header a:hover,
 .m-header a:focus {
   text-decoration: none;
   color: #fff;
 }
+
 .messenger-list-item td p {
   color: #fff;
 }
+
 .activeStatus {
   border: 2px solid var(--dark-border-color);
 }
+
 .messenger-list-item:hover .activeStatus {
   border-color: var(--dark-secondary-bg-color);
 }
+
 .messenger-favorites > div p {
   color: #ffffff;
 }
+
 .avatar {
   background-color: var(--dark-secondary-bg-color);
   border-color: var(--dark-border-color);
 }
+
 .messenger-sendCard svg {
   color: var(--dark-send-input-icons-color);
 }
+
 .messenger-title {
   color: #dbdbdb;
 }
+
 .messenger-title > span {
   background-color: var(--dark-primary-bg-color);
 }
+
 .messenger-title::before {
   background-color: var(--dark-border-color);
 }
+
 .message-hint span {
   background: var(--dark-message-hint-bg-color);
   color: var(--dark-message-hint-color);
 }
+
 .messenger-infoView > nav > p {
   color: #fff;
 }
+
 /*
 ***********************************************
 * Placeholder loading
@@ -142,9 +176,11 @@
 .app-modal-card {
   background: var(--dark-modal-bg-color);
 }
+
 .app-modal-header {
   color: #fff;
 }
+
 .app-modal-body {
   color: #fff;
 }
