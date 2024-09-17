@@ -79,11 +79,10 @@ function updateSelectedContact(user_id) {
     ".messenger-list-item[data-contact=" + (user_id) + "]"
    )
    .addClass("m-list-active");
-
    if (user_id != 0) {
     IDinfo(user_id);
 }
-  }
+}
 /**
 *-------------------------------------------------------------
 * Global Templates
@@ -466,10 +465,10 @@ function sendMessage(isVoiceMessage = false, audioBlob = null, duration = null, 
      return false;
    }
 
-   formData = new FormData($("#message-form")[0]);
-   formData.append("id", receiverId);
-   formData.append("temporaryMsgId", tempID);
-   formData.append("_token", csrfToken);
+    formData = new FormData($("#message-form")[0]);
+    formData.append("id", receiverId);
+    formData.append("temporaryMsgId", tempID);
+    formData.append("_token", csrfToken);
 
  }
 
@@ -510,7 +509,6 @@ function sendMessage(isVoiceMessage = false, audioBlob = null, duration = null, 
        const tempMsgCardElement = messagesContainer.find(
          `.message-card[data-id=${data.tempID}]`
        );
-
        const message = duration
          ? data.message.replace(/(<span class="duration">)\d{1,2}:\d{2}(<\/span>)/, `$1${duration}$2`)
          : data.message;
@@ -539,6 +537,8 @@ function sendMessage(isVoiceMessage = false, audioBlob = null, duration = null, 
 
  return false;
 }
+
+
 /**
 *-------------------------------------------------------------
 * Fetch messages from database
@@ -590,11 +590,13 @@ function fetchMessages(id, newFetch = false) {
          const lastMsg = messagesElement.find(
            messagesElement.find(".message-card")[0]
          );
+
          const curOffset =
            lastMsg.offset().top - messagesContainer.scrollTop();
          messagesElement.prepend(data.messages);
          messagesContainer.scrollTop(lastMsg.offset().top - curOffset);
        }
+
        // trigger seen event
        makeSeen(true);
        // Pagination lock & messages page
@@ -660,6 +662,16 @@ channel.bind("messaging", function (data) {
  if (data.from_id == getMessengerId() && data.to_id == auth_id) {
    $(".messages").find(".message-hint").remove();
    messagesContainer.find(".messages").append(data.message);
+
+   if (data.message.includes("data-audio-url")) {
+     const actualMessageIdMatch = data.message.match(/data-id="([a-z0-9\-]+)"/);
+     const actualMessageId = actualMessageIdMatch ? actualMessageIdMatch[1] : null;
+
+     if (actualMessageId) {
+       initializeAudioPlayer(actualMessageId);
+     }
+   }
+
    scrollToBottom(messagesContainer);
    makeSeen(true);
    // remove unseen counter for the user from the contacts list
@@ -1359,7 +1371,7 @@ $(document).ready(function () {
    }
    const dataId = $(this).find("p[data-id]").attr("data-id");
    setMessengerId(dataId);
-  // IDinfo(dataId);
+  //  IDinfo(dataId);
  });
 
  // click action for favorite button

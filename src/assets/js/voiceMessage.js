@@ -301,12 +301,14 @@
       waveColor: "rgb(218, 210, 210)",
       progressColor: "grey",
       cursorColor: "transparent",
-      barWidth: 2,
+      barWidth: 2.5,
       barRadius: 3,
-      height: 36,
+      height: 28,
       responsive: true,
       barGap: 3,
       hideScrollbar: true,
+      drawingContextAttributes: { desynchronized: true },
+      barMinHeight: 5,
     });
 
     waveform.classList.add("initialized");
@@ -361,4 +363,5 @@
   window.initializeAudioPlayer = initializeAudioPlayer;
   window.renderWavesurfers = renderWavesurfers;
   window.rederWavesurfers = renderWavesurfers;
+  window.renderWaveSurfers = renderWavesurfers;
 })();

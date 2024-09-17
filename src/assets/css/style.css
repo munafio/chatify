@@ -1258,6 +1258,7 @@ div.loadingPlaceholder-date {
 .waveform {
   width: 80%;
   overflow: hidden;
+  margin-left: 12px;
   position: relative;
   z-index: 0;
   cursor: pointer;
@@ -1299,6 +1300,7 @@ div.loadingPlaceholder-date {
   display: flex;
   align-items: center;
   width: 100%;
+  height: 100%;
   position: relative;
   z-index: 2;
 }
