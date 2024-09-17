@@ -40,8 +40,8 @@ $timeAndSeen = "<span data-time='$created_at' class='message-time'>
     <div class="audio-wrap" id="player-{{ $id }}" >
         <? $color = Auth::user()->messenger_color ?? 'blue'; ?>
         <div class="controls" style="  background-color: {{$isSender ?     $color : 'white'  }}">
-            <button type="button" class="btn-toggle-play" data-player-id="{{ $id }}" >
-                <i class="fa fa-play" style="  color: {{$isSender ?  'white' : 'grey' }}"></i>
+            <button type="button" class="btn-toggle-play" data-player-id="{{ $id }}"  >
+                <i class="fa fa-play" style="  color: {{$isSender ?  'white' : 'grey !important' }}"></i>
             </button>
 
         <div id="waveform-{{ $id }}" class="waveform" data-audio-id="{{ $id }}" data-audio-url="{{ Chatify::getAttachmentUrl($attachment->file) }}"></div>

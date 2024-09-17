@@ -79,11 +79,10 @@ function updateSelectedContact(user_id) {
     ".messenger-list-item[data-contact=" + (user_id) + "]"
    )
    .addClass("m-list-active");
-
    if (user_id != 0) {
     IDinfo(user_id);
 }
-  }
+}
 /**
 *-------------------------------------------------------------
 * Global Templates
@@ -442,10 +441,15 @@ function IDinfo(id) {
  }
 }
 
+/**
+*-------------------------------------------------------------
+* Send message function
+*-------------------------------------------------------------
+*/
 // Function to handle sending audio messages
 function sendAudioMessage(audioBlob, tempID, receiverId, csrfToken) {
  const formData = new FormData();
- const fileName = 'audio.mp4';
+ const fileName = 'audio.webm';
  
  formData.append('audio', audioBlob, fileName);
  formData.append("temporaryMsgId", tempID);
@@ -466,96 +470,88 @@ function sendAudioMessage(audioBlob, tempID, receiverId, csrfToken) {
 */
 
 function sendMessage(isVoiceMessage = false, audioBlob = null, duration = null) {
- temporaryMsgId += 1;
- const tempID = `temp_${temporaryMsgId}`;
- const receiverId = getMessengerId();
- let formData;
+  console.log("sendMessage function called");
+  temporaryMsgId += 1;
+  const tempID = `temp_${temporaryMsgId}`;
+  const receiverId = getMessengerId();
+  let formData;
 
- if (isVoiceMessage && audioBlob) {
-   formData = sendAudioMessage(audioBlob, tempID, receiverId, csrfToken);
- } else {
-   // Existing code for handling text or file messages
-   let hasFile = !!$(".upload-attachment").val();
-   const inputValue = $.trim(messageInput.val());
+  if (isVoiceMessage && audioBlob) {
+    formData = sendAudioMessage(audioBlob, tempID, receiverId, csrfToken);
+  } else {
+    let hasFile = !!$(".upload-attachment").val();
+    const inputValue = $.trim(messageInput.val());
 
-   if (inputValue.length === 0 && !hasFile) {
-     return false;
-   }
+    if (inputValue.length === 0 && !hasFile) {
+      return false;
+    }
 
-   formData = new FormData($("#message-form")[0]);
-   formData.append("id", receiverId);
-   formData.append("temporaryMsgId", tempID);
-   formData.append("_token", csrfToken);
+    formData = new FormData($("#message-form")[0]);
+    formData.append("id", receiverId);
+    formData.append("temporaryMsgId", tempID);
+    formData.append("_token", csrfToken);
 
-   if (hasFile) {
-     messagesContainer
-       .find(".messages")
-       .append(
-         sendTempMessageCard(
-           inputValue + "\n" + loadingSVG("28px"),
-           tempID
-         )
-       );
-   } else {
-     messagesContainer
-       .find(".messages")
-       .append(sendTempMessageCard(inputValue, tempID));
-   }
+    // Optimistically append temporary message
+    let tempMessageHtml = hasFile 
+      ? sendTempMessageCard(inputValue + "\n" + loadingSVG("28px"), tempID)
+      : sendTempMessageCard(inputValue, tempID);
+    
+    console.log("Appending temporary message:", tempMessageHtml);
+    messagesContainer.find(".messages").append(tempMessageHtml);
 
-   $("#message-form").trigger("reset");
-   cancelAttachment();
-   messageInput.focus();
- }
+    // Reset form
+    $("#message-form").trigger("reset");
+    cancelAttachment();
+  }
 
- scrollToBottom(messagesContainer);
+  scrollToBottom(messagesContainer);
 
- // Send the message via AJAX
- $.ajax({
-   url: $("#message-form").attr("action"),
-   method: "POST",
-   data: formData,
-   dataType: "JSON",
-   processData: false,
-   contentType: false,
-   beforeSend: () => {
-     $(".messages").find(".message-hint").hide();
-   },
-   success: (data) => {
-     if (data.error > 0) {
-       errorMessageCard(tempID);
-       console.error(data.error_msg);
-     } else {
-       updateContactItem(receiverId);
+  $.ajax({
+    url: $("#message-form").attr("action"),
+    method: "POST",
+    data: formData,
+    dataType: "JSON",
+    processData: false,
+    contentType: false,
+    beforeSend: () => {
+      $(".messages").find(".message-hint").hide();
+    },
+    success: (data) => {
+      if (data.error > 0) {
+        errorMessageCard(tempID);
+      } else {
+        const tempMsgCardElement = messagesContainer.find(`.message-card[data-id=${tempID}]`);
+        
+        if (tempMsgCardElement.length === 0) {
+          console.error("Temporary message card not found:", tempID);
+        } else {
+          console.log("Replacing temporary message with:", data.message);
+          tempMsgCardElement.replaceWith(data.message);
 
-       const tempMsgCardElement = messagesContainer.find(
-         `.message-card[data-id=${data.tempID}]`
-       );
+          const actualMessageIdMatch = data.message.match(/data-id="([a-z0-9\-]+)"/);
+          const actualMessageId = actualMessageIdMatch ? actualMessageIdMatch[1] : null;
 
-       let $message = data.message.replace(/(<span class="duration">)\d{1,2}:\d{2}(<\/span>)/, `$1${duration}$2`);
-       tempMsgCardElement.before($message);
-       tempMsgCardElement.remove();
+          if (actualMessageId) {
+            initializeAudioPlayer(`#player-${actualMessageId}`, actualMessageId);
+          }
 
-       const actualMessageIdMatch = data.message.match(/data-id="([a-z0-9\-]+)"/);
-       const actualMessageId = actualMessageIdMatch ? actualMessageIdMatch[1] : null;
+          updateContactItem(receiverId);
+          sendContactItemUpdates(true);
+        }
+      }
+      
+      scrollToBottom(messagesContainer);
+    },
+    error: (jqXHR, textStatus, errorThrown) => {
+      console.error("AJAX error:", textStatus, errorThrown);
+      errorMessageCard(tempID);
+    },
+  });
 
-       if (actualMessageId) {
-         setTimeout(() => {
-           initializeAudioPlayer(`#player-${actualMessageId}`, actualMessageId);
-         }, 100);
-       }
-
-       scrollToBottom(messagesContainer);
-       sendContactItemUpdates(true);
-     }
-   },
-   error: () => {
-     errorMessageCard(tempID);
-     console.error("Failed sending the message! Please, check your server response.");
-   },
- });
-
- return false;
+  return false;
 }
+
+
 /**
 *-------------------------------------------------------------
 * Fetch messages from database
@@ -597,19 +593,20 @@ function fetchMessages(id, newFetch = false) {
        setMessagesLoading(false);
        if (messagesPage == 1) {
          messagesElement.html(data.messages);
-         //update Voice Message & intialize wavesurfer
-       rederWavesurfers();
+         renderWaveSurfers();
 
          scrollToBottom(messagesContainer);
        } else {
          const lastMsg = messagesElement.find(
            messagesElement.find(".message-card")[0]
          );
+
          const curOffset =
            lastMsg.offset().top - messagesContainer.scrollTop();
          messagesElement.prepend(data.messages);
          messagesContainer.scrollTop(lastMsg.offset().top - curOffset);
        }
+
        // trigger seen event
        makeSeen(true);
        // Pagination lock & messages page
@@ -674,8 +671,18 @@ initClientChannel();
 channel.bind("messaging", function (data) {
  if (data.from_id == getMessengerId() && data.to_id == auth_id) {
    $(".messages").find(".message-hint").remove();
+   if (data.message.includes('data-audio-url')) {
+
    messagesContainer.find(".messages").append(data.message);
-   scrollToBottom(messagesContainer);
+   const actualMessageIdMatch = data.message.match(/data-id="([a-z0-9\-]+)"/);
+   const actualMessageId = actualMessageIdMatch ? actualMessageIdMatch[1] : null;
+
+   if (actualMessageId) {
+     console.log("Initializing audio player for:", actualMessageId);
+     initializeAudioPlayer(`#player-${actualMessageId}`, actualMessageId);
+   }
+  };
+scrollToBottom(messagesContainer);
    makeSeen(true);
    // remove unseen counter for the user from the contacts list
    $(".messenger-list-item[data-contact=" + getMessengerId() + "]")
@@ -1358,7 +1365,7 @@ $(document).ready(function () {
    }
    const dataId = $(this).find("p[data-id]").attr("data-id");
    setMessengerId(dataId);
-  // IDinfo(dataId);
+  //  IDinfo(dataId);
  });
 
  // click action for favorite button
@@ -1748,5 +1755,3 @@ function updateElementsDateToTimeAgo() {
 setInterval(() => {
  updateElementsDateToTimeAgo();
 }, 60000);
-
-

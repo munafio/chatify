@@ -1253,7 +1253,7 @@ div.loadingPlaceholder-date {
 .waveform {
   width: 80%;
   overflow: hidden;
-
+margin-left: 12px;
   
 }
 
@@ -1285,6 +1285,7 @@ div.loadingPlaceholder-date {
   display: flex;
   align-items: center;
   width: 100%;
+  height: 100%;
   position: relative;
   z-index: 2;
 }
@@ -1313,7 +1314,7 @@ div.loadingPlaceholder-date {
 .fa-trash , .fa-paper-plane {
   color: var(--primary-color) !important;
 }
-.fa-stop, .fa-play, .fa-pause{
+.fa-stop, .fa-play , .fa-pause{
 color: white !important;
 font-size: 15px !important;
 }

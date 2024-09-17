@@ -113,9 +113,9 @@ function startRecording() {
     }, 1000);
 
     microphoneButton.classList.add('recording');
-    stopButton.innerHTML = '<span class="fas fa-pause"></span>';
+    stopButton.innerHTML = '<span class="fas fa-stop"></span>';
 
-    const options = { mimeType: 'audio/mp4' };
+    const options = { mimeType: 'audio/webm' };
     mediaRecorder = new MediaRecorder(stream, options);
 
     mediaRecorder.start();
@@ -167,7 +167,7 @@ function togglePauseResume() {
     if (isPaused) {
         // Resume recording
         mediaRecorder.resume();
-        stopButton.innerHTML = '<span class="fas fa-play" style="color"></span>';
+        stopButton.innerHTML = '<span class="fas fa-play"></span>';
         isPaused = false;
     } else {
         // Pause recording
@@ -188,7 +188,7 @@ function sendRecording() {
   setTimeout(() => {
 
       if (audioChunks.length > 0) {
-          const audioBlob = new Blob(audioChunks, { type: 'audio/mp4' });
+          const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
 
           if (audioBlob.size > 0) {
               const duration = formatTime(recordingSeconds);
@@ -313,10 +313,14 @@ function initializeAudioPlayer(selector, playerId) {
       cursorColor: 'transparent', // No cursor
       barWidth: 2.5,
       barRadius: 3, 
-      height: 80, 
+      height: 28, 
       responsive: true,
       barGap:3,
-      hideScrollbar: true
+    //   fillParent:true,
+      hideScrollbar: true,
+      drawingContextAttributes: {desynchronized: true}	,
+      barMinHeight:5
+      	
   });
 
   wavesurfer.load(URL);
@@ -357,16 +361,26 @@ function initializeAudioPlayer(selector, playerId) {
 
 
 
-function rederWavesurfers(){
-var waveformElements = document.getElementsByClassName("waveform");
-
-for (let i = 0; i < waveformElements.length; i++) {
-let waveformElement = waveformElements[i]; // Use let here for block scoping
-let playerId = waveformElement.getAttribute('data-audio-id');
-let playButton = document.querySelector('.btn-toggle-play[data-player-id="' + playerId + '"]');
-if (typeof WaveSurfer !== 'undefined' && waveformElement) {
-initilaizeWavesurfer(waveformElement,waveformElement.getAttribute('data-audio-url'),playButton,playerId);
-}
-}
-}
+ function renderWaveSurfers() {
+    // Cache waveform elements to avoid querying the DOM repeatedly
+    const waveformElements = document.querySelectorAll(".waveform");
+  
+    for (let i = 0; i < waveformElements.length; i++) {
+      const waveformElement = waveformElements[i];
+      const playerId = waveformElement.getAttribute('data-audio-id');
+      
+      // Avoid repeated DOM querying by caching the result
+      const playButton = document.querySelector(`.btn-toggle-play[data-player-id="${playerId}"]`);
+      
+      // Ensure that WaveSurfer is only initialized if not already initialized
+      if (typeof WaveSurfer !== 'undefined' && waveformElement && !waveformElement.dataset.initialized) {
+        // Mark this element as initialized to avoid reinitialization
+        waveformElement.dataset.initialized = 'true';
+        
+        // Initialize WaveSurfer for this waveform
+        initilaizeWavesurfer(waveformElement, waveformElement.getAttribute('data-audio-url'), playButton, playerId);
+      }
+    }
+  }
+  
 
