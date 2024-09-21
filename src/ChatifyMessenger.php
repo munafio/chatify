@@ -23,6 +23,7 @@ class ChatifyMessenger
         return config('chatify.attachments.max_upload_size') * 1048576;
     }
 
+
     public function __construct()
     {
         $this->pusher = new Pusher(
@@ -150,7 +151,22 @@ class ChatifyMessenger
             $attachment = $attachmentOBJ->new_name;
             $attachment_title = htmlentities(trim($attachmentOBJ->old_name), ENT_QUOTES, 'UTF-8');
             $ext = pathinfo($attachment, PATHINFO_EXTENSION);
-            $attachment_type = in_array($ext, $this->getAllowedImages()) ? 'image' : 'file';
+        if (isset($msg->attachment)) {
+            $attachmentOBJ = json_decode($msg->attachment);
+            $attachment = $attachmentOBJ->new_name;
+            $attachment_title = htmlentities(trim($attachmentOBJ->old_name), ENT_QUOTES, 'UTF-8');
+            $ext = pathinfo($attachment, PATHINFO_EXTENSION);
+            //  
+           if( in_array($ext, $this->getAllowedImages())) { 
+            $attachment_type = 'image';
+            }else if(in_array($ext, $this->getAllowedVoiceMessages())){
+                $attachment_type = 'audio';
+            }else{
+            
+           $attachment_type = 'file';
+            }
+
+        }
         }
         return [
             'id' => $msg->id,
@@ -442,4 +458,16 @@ class ChatifyMessenger
     {
         return self::storage()->url(config('chatify.attachments.folder') . '/' . $attachment_name);
     }
+
+
+    /**
+     * This method returns the allowed voice messages extensions
+     *
+     * @return array
+     */
+    public function getAllowedVoiceMessages()
+    {
+        return config('chatify.attachments.allowed_voice_messages');
+    }
+
 }
