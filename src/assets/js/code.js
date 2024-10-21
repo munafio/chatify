@@ -1254,11 +1254,11 @@ function initializeUserConversationFromURL() {
   // Get the current URL
   const url = window.location.pathname;
 
-  // Assuming your URL looks like /chatify/1, extract the userID
+  // Extract the userID from url
   const parts = url.split("/");
   const userID = parts[parts.length - 1];
 
-  // Check if the userID is a number (or validate it in your own way)
+  // Check if the userID is a number
   if (userID && !isNaN(userID)) {
     updateSelectedContact(userID);
     setMessengerId(userID);
