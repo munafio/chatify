@@ -473,14 +473,14 @@ function sendMessage() {
             .find(".messages")
             .append(
               sendTempMessageCard(
-                inputValue + "\n" + loadingSVG("28px"),
+                sanitizeInput(inputValue) + "\n" + loadingSVG("28px"),
                 tempID
               )
             );
         } else {
           messagesContainer
             .find(".messages")
-            .append(sendTempMessageCard(inputValue, tempID));
+            .append(sendTempMessageCard(sanitizeInput(inputValue), tempID));
         }
         // scroll to bottom
         scrollToBottom(messagesContainer);

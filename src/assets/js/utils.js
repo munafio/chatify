@@ -39,3 +39,24 @@ function debounce(callback, delay) {
     }, delay);
   };
 }
+
+/**
+ * Escapes special characters in a string to prevent XSS and other injection issues.
+ * This function converts characters like `<`, `>`, `&`, and `"` into corresponding HTML entities,
+ * preventing any inserted HTML or JavaScript code from being interpreted or executed.
+ * 
+ * @param {string} inputValue - The potentially unsafe input string that needs to be sanitized.
+ * @returns {string} - The safe output string with special characters escaped as HTML entities.
+ * 
+ * Example usage:
+ * const unsafeString = '<script>alert("XSS!")</script>';
+ * const safeString = sanitizeInput(unsafeString);
+ * console.log(safeString); // Output: "&lt;script&gt;alert(&quot;XSS!&quot;)&lt;/script&gt;"
+ */
+
+
+function sanitizeInput(inputValue) {
+  const element = document.createElement('div');
+  element.textContent = inputValue; // Escapa HTML ao inserir como texto puro
+  return element.innerHTML; // Retorna o HTML escapado
+}
