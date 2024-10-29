@@ -10,8 +10,6 @@
 
 Laravel's #1 one-to-one chatting system package, helps you add a complete real-time chatting system to your new/existing Laravel application with only one command.
 
-<a href="https://www.producthunt.com/products/chatify/reviews?utm_source=badge-product_review&utm_medium=badge&utm_souce=badge-chatify" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/product_review.svg?product_id=467205&theme=light" alt="Chatify - Laravel&#0039;s&#0032;complete&#0032;real&#0045;time&#0032;messaging&#0032;system&#0046; | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
-
 ## Need a Help? 📣
 
 I have created a server for **Chatify** on `Discord` to let you **up-to-date** and help you as much as I can .. so now you can chat with me, get a help, showcases, and most importantly to get announcements and updates about **Chatify**.
