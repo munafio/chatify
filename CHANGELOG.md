@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 - Settings modal UI #351
 - Limit the data retrieved for the user #359
 - [FIX] - Init user conversation from URL #374
+- Sanitize inputs to prevent xss when sending message #377
 
 ## v1.6.4 (2024-04-27)
 
