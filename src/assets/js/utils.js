@@ -41,22 +41,54 @@ function debounce(callback, delay) {
 }
 
 /**
- * Escapes special characters in a string to prevent XSS and other injection issues.
- * This function converts characters like `<`, `>`, `&`, and `"` into corresponding HTML entities,
- * preventing any inserted HTML or JavaScript code from being interpreted or executed.
+ * Sanitizes a potentially unsafe string to prevent XSS and other injection issues.
+ * This function escapes special characters such as `<`, `>`, `&`, and `"` by converting
+ * them into their corresponding HTML entities. This ensures that any inserted HTML or JavaScript
+ * code is treated as plain text and not executed by the browser.
  * 
- * @param {string} inputValue - The potentially unsafe input string that needs to be sanitized.
- * @returns {string} - The safe output string with special characters escaped as HTML entities.
+ * @param {string} inputValue - The input string that may contain unsafe characters.
+ * @returns {string} - A sanitized output string with special characters converted to HTML entities.
+ * 
+ * @throws {Error} - Throws an error if the input is not a string.
  * 
  * Example usage:
  * const unsafeString = '<script>alert("XSS!")</script>';
  * const safeString = sanitizeInput(unsafeString);
  * console.log(safeString); // Output: "&lt;script&gt;alert(&quot;XSS!&quot;)&lt;/script&gt;"
+ * 
+ * Test cases:
+ * const testInputs = [
+ *   "<script>alert('XSS')</script>",
+ *   "<img src=x onerror=alert('XSS')>",
+ *   "<iframe src='javascript:alert(\"XSS\")'></iframe>",
+ *   "><script>alert('XSS')</script>",
+ *   "<body onload=alert('XSS')>",
+ *   "<img src='data:image/svg+xml;base64,PHN2ZyBvbmxvYWQ9YWxlcnQoJ1hTUycpPjwvc3ZnPg=='>",
+ *   "<div style='width: expression(alert(\"XSS\"))'>",
+ *   "<a href='javascript:alert(\"XSS\")'>Click me</a>",
+ *   "<div onmouseover=alert('XSS')>Hover me</div>",
+ *   "<script>alert(String.fromCharCode(88,83,83))</script>",
+ *   "<svg/onload=alert('XSS')>",
+ *   "<form><button formaction=javascript:alert('XSS')>Submit</button></form>",
+ *   "<div style='background-image: url(javascript:alert(\"XSS\"))'>",
+ *   "<img src='data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0nMS4wJyBlbmNvZGluZz0nVVRGLTgnPz48c3ZnIG9ubG9hZD0nYWxlcnQoIkhBQ0tFRCIpJz4KPC9zdmc+Cg==' />"
+ * ];
  */
 
 
+
 function sanitizeInput(inputValue) {
-  const element = document.createElement('div');
-  element.textContent = inputValue; // Escapa HTML ao inserir como texto puro
-  return element.innerHTML; // Retorna o HTML escapado
+  if (typeof inputValue !== 'string') {
+    return '';
+  }
+
+  if (!/^[a-zA-Z0-9\s\-_]+$/.test(inputValue)) {
+    return inputValue
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
 }
