@@ -90,5 +90,6 @@ function sanitizeInput(inputValue) {
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;');
   }
+  return inputValue
 
 }
