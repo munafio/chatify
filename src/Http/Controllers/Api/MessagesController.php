@@ -5,12 +5,10 @@ namespace Chatify\Http\Controllers\Api;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Response;
-use App\Models\ChMessage as Message;
 use App\Models\ChFavorite as Favorite;
 use Chatify\Facades\ChatifyMessenger as Chatify;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -207,20 +205,8 @@ class MessagesController extends Controller
      */
     public function getContacts(Request $request)
     {
-        // get all users that received/sent message from/to [Auth user]
-        $users = Message::join('users',  function ($join) {
-            $join->on('ch_messages.from_id', '=', 'users.id')
-                ->orOn('ch_messages.to_id', '=', 'users.id');
-        })
-        ->where(function ($q) {
-            $q->where('ch_messages.from_id', Auth::user()->id)
-            ->orWhere('ch_messages.to_id', Auth::user()->id);
-        })
-        ->where('users.id','!=',Auth::user()->id)
-        ->select('users.*',DB::raw('MAX(ch_messages.created_at) max_created_at'))
-        ->orderBy('max_created_at', 'desc')
-        ->groupBy('users.id')
-        ->paginate($request->per_page ?? $this->perPage);
+        $authId = (int) Auth::user()->id;
+        $users = Chatify::getContactsQuery($authId)->paginate($request->per_page ?? $this->perPage);
 
         return response()->json([
             'contacts' => $users->items(),

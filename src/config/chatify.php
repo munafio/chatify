@@ -88,6 +88,7 @@ return [
         'allowed_images' => (array) ['png','jpg','jpeg','gif'],
         'allowed_files' => (array) ['zip','rar','txt'],
         'allowed_voice_messages' => (array) ['mpeg','mpga','mp3','wav','webm','mp4'],
+        'max_voice_recording_time' => env('CHATIFY_MAX_VOICE_RECORDING_TIME', 60), // seconds
         'max_upload_size' => env('CHATIFY_MAX_FILE_SIZE', 150), // MB
     ],
 

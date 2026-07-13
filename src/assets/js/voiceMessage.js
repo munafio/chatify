@@ -4,7 +4,12 @@
 ****************************************************************************
 */
 (function () {
-  const MAX_RECORDING_TIME = 60;
+  const DEFAULT_MAX_RECORDING_TIME = 60;
+  const configuredMaxRecordingTime = Number.parseInt(window.chatify?.maxVoiceRecordingTime, 10);
+  const MAX_RECORDING_TIME =
+    Number.isFinite(configuredMaxRecordingTime) && configuredMaxRecordingTime > 0
+      ? configuredMaxRecordingTime
+      : DEFAULT_MAX_RECORDING_TIME;
   const AUDIO_TYPES = [
     { mimeType: "audio/webm;codecs=opus", extension: "webm" },
     { mimeType: "audio/webm", extension: "webm" },

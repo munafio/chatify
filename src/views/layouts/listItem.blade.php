@@ -20,8 +20,11 @@
 {{-- -------------------- Contact list -------------------- --}}
 @if($get == 'users' && !!$lastMessage)
 <?php
-$lastMessageBody = mb_convert_encoding($lastMessage->body, 'UTF-8', 'UTF-8');
+$lastMessageBody = mb_convert_encoding((string) ($lastMessage->body ?? ''), 'UTF-8', 'UTF-8');
 $lastMessageBody = strlen($lastMessageBody) > 30 ? mb_substr($lastMessageBody, 0, 30, 'UTF-8').'..' : $lastMessageBody;
+$lastMessageAttachment = $lastMessage->attachment ? json_decode($lastMessage->attachment) : null;
+$lastMessageExtension = $lastMessageAttachment ? strtolower(pathinfo($lastMessageAttachment->new_name ?? '', PATHINFO_EXTENSION)) : null;
+$lastMessageIsVoice = $lastMessageExtension && in_array($lastMessageExtension, config('chatify.attachments.allowed_voice_messages'));
 ?>
 <table class="messenger-list-item" data-contact="{{ $user->id }}">
     <tr data-action="0">
@@ -51,6 +54,8 @@ $lastMessageBody = strlen($lastMessageBody) > 30 ? mb_substr($lastMessageBody, 0
             {!!
                 $lastMessageBody
             !!}
+            @elseif($lastMessageIsVoice)
+            <span class="fas fa-microphone"></span> Voice message
             @else
             <span class="fas fa-file"></span> Attachment
             @endif
@@ -86,5 +91,4 @@ $lastMessageBody = strlen($lastMessageBody) > 30 ? mb_substr($lastMessageBody, 0
 @if($get == 'sharedPhoto')
 <div class="shared-photo chat-image" style="background-image: url('{{ $image }}')"></div>
 @endif
-
 

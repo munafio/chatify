@@ -4,6 +4,7 @@ namespace Chatify;
 
 use App\Models\ChMessage as Message;
 use App\Models\ChFavorite as Favorite;
+use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 use Pusher\Pusher;
 use Illuminate\Support\Facades\Auth;
@@ -263,6 +264,33 @@ class ChatifyMessenger
     }
 
     /**
+     * Get contacts ordered by the latest message with each contact.
+     *
+     * @param int $authId
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function getContactsQuery(int $authId)
+    {
+        $contactUserId = 'CASE WHEN from_id = ? THEN to_id ELSE from_id END';
+
+        $latestMessages = Message::query()
+            ->selectRaw("$contactUserId as user_id", [$authId])
+            ->selectRaw('MAX(created_at) as max_created_at')
+            ->where(function ($q) use ($authId) {
+                $q->where('from_id', $authId)
+                    ->orWhere('to_id', $authId);
+            })
+            ->groupBy('user_id');
+
+        return User::joinSub($latestMessages, 'latest_messages', function ($join) {
+            $join->on('users.id', '=', 'latest_messages.user_id');
+        })
+            ->where('users.id', '!=', $authId)
+            ->select('users.*', 'latest_messages.max_created_at')
+            ->orderBy('latest_messages.max_created_at', 'desc');
+    }
+
+    /**
      * Get user list's item data [Contact Itme]
      * (e.g. User data, Last message, Unseen Counter...)
      *
@@ -278,8 +306,9 @@ class ChatifyMessenger
             // Get Unseen messages counter
             $unseenCounter = $this->countUnseenMessages($user->id);
             if ($lastMessage) {
-                $lastMessage->created_at = $lastMessage->created_at->toIso8601String();
-                $lastMessage->timeAgo = $lastMessage->created_at->diffForHumans();
+                $lastMessageCreatedAt = $lastMessage->created_at;
+                $lastMessage->timeAgo = $lastMessageCreatedAt->diffForHumans();
+                $lastMessage->created_at = $lastMessageCreatedAt->toIso8601String();
             }
             return view('Chatify::layouts.listItem', [
                 'get' => 'users',

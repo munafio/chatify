@@ -8,6 +8,7 @@
         allowedImages: {!! json_encode(config('chatify.attachments.allowed_images')) !!},
         allowedFiles: {!! json_encode(config('chatify.attachments.allowed_files')) !!},
         allowedVoiceMessages: {!! json_encode(config('chatify.attachments.allowed_voice_messages')) !!},
+        maxVoiceRecordingTime: {{ (int) config('chatify.attachments.max_voice_recording_time', 60) }},
         maxUploadSize: {{ Chatify::getMaxUploadSize() }},
         pusher: {!! json_encode(config('chatify.pusher')) !!},
         pusherAuthEndpoint: '{{route("pusher.auth")}}'
