@@ -367,6 +367,4 @@
 
   window.initializeAudioPlayer = initializeAudioPlayer;
   window.renderWavesurfers = renderWavesurfers;
-  window.rederWavesurfers = renderWavesurfers;
-  window.renderWaveSurfers = renderWavesurfers;
 })();
