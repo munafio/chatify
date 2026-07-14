@@ -190,7 +190,7 @@ class MessagesController extends Controller
             return;
         }
 
-        $extension = strtolower($file->getClientOriginalExtension());
+        $extension = strtolower($file->extension());
 
         if (!in_array($extension, $allowedExtensions)) {
             $this->setError($error, "File extension not allowed!");
