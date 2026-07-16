@@ -26,7 +26,7 @@
   "require": {
     "php": "^8.2",
     "illuminate/support": "^11.0|^12.0|^13.0",
-    "pusher/pusher-php-server": "^7.0"
+    "pusher/pusher-php-server": "^6.0|^7.0|^7.1"
   },
   "autoload": {
     "psr-4": {

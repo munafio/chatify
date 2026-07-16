@@ -5,8 +5,8 @@ With every upgrade, make sure to re-publish Chatify's assets:
 ## For v1.2.3 and earlier versions
 
 ```
-php artisan verndor:publish --tag=chatify-views --force
-php artisan verndor:publish --tag=chatify-assets --force
+php artisan vendor:publish --tag=chatify-views --force
+php artisan vendor:publish --tag=chatify-assets --force
 ```
 
 If needed, you can re-publish the other assets the same way above by just replacing the name of the asset (chatify-NAME).

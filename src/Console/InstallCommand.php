@@ -45,6 +45,9 @@ class InstallCommand extends Command
         $this->modifyModelsPath('/../Http/Controllers/MessagesController.php','User');
         $this->modifyModelsPath('/../Http/Controllers/MessagesController.php','ChFavorite');
         $this->modifyModelsPath('/../Http/Controllers/MessagesController.php','ChMessage');
+        $this->modifyModelsPath('/../Http/Controllers/Api/MessagesController.php','User');
+        $this->modifyModelsPath('/../Http/Controllers/Api/MessagesController.php','ChFavorite');
+        $this->modifyModelsPath('/../Http/Controllers/Api/MessagesController.php','ChMessage');
         $this->modifyModelsPath('/../ChatifyMessenger.php','ChFavorite');
         $this->modifyModelsPath('/../ChatifyMessenger.php','ChMessage');
         $this->modifyModelsPath('/../Models/ChFavorite.php');
@@ -58,6 +61,7 @@ class InstallCommand extends Command
             'models' => app_path(($this->isV8 ? 'Models/' : '').'ChMessage.php'),
             'controllers' => app_path('Http/Controllers/vendor/Chatify/MessagesController.php'),
             'migrations' => database_path('migrations/2019_09_22_192348_create_messages_table.php'),
+            'routes' => base_path('routes/chatify'),
         ];
 
         foreach ($assetsToBePublished as $target => $path) {
@@ -159,18 +163,24 @@ class InstallCommand extends Command
      */
     private function fixPublishedControllerNamespace()
     {
-        $controllerPath = app_path('Http/Controllers/vendor/Chatify/MessagesController.php');
+        $controllers = [
+            app_path('Http/Controllers/vendor/Chatify/MessagesController.php') => [
+                'namespace Chatify\Http\Controllers;',
+                'namespace App\Http\Controllers\vendor\Chatify;',
+            ],
+            app_path('Http/Controllers/vendor/Chatify/Api/MessagesController.php') => [
+                'namespace Chatify\Http\Controllers\Api;',
+                'namespace App\Http\Controllers\vendor\Chatify\Api;',
+            ],
+        ];
 
-        if (!File::exists($controllerPath)) {
-            return;
+        foreach ($controllers as $controllerPath => [$search, $replace]) {
+            if (!File::exists($controllerPath)) {
+                continue;
+            }
+
+            $contents = str_replace($search, $replace, File::get($controllerPath));
+            File::put($controllerPath, $contents);
         }
-
-        $contents = File::get($controllerPath);
-        $contents = str_replace(
-            'namespace Chatify\Http\Controllers;',
-            'namespace App\Http\Controllers\vendor\Chatify;',
-            $contents
-        );
-        File::put($controllerPath, $contents);
     }
 }

@@ -30,9 +30,8 @@ class ChatifyServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        // Load Views, Migrations and Routes
+        // Load Views and Routes
         $this->loadViewsFrom(__DIR__ . '/views', 'Chatify');
-        $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
         $this->loadRoutes();
 
         if ($this->app->runningInConsole()) {
@@ -42,7 +41,6 @@ class ChatifyServiceProvider extends ServiceProvider
             ]);
             $this->setPublishes();
         }
-
     }
 
     /**
@@ -62,11 +60,16 @@ class ChatifyServiceProvider extends ServiceProvider
 
         // Migrations
         $this->publishes([
-            __DIR__ . '/database/migrations/' => database_path('migrations')
+            __DIR__ . '/database/migrations/2022_01_10_99999_add_active_status_to_users.php' => database_path('migrations/' . date('Y_m_d') . '_999999_add_active_status_to_users.php'),
+            __DIR__ . '/database/migrations/2022_01_10_99999_add_avatar_to_users.php' => database_path('migrations/' . date('Y_m_d') . '_999999_add_avatar_to_users.php'),
+            __DIR__ . '/database/migrations/2022_01_10_99999_add_dark_mode_to_users.php' => database_path('migrations/' . date('Y_m_d') . '_999999_add_dark_mode_to_users.php'),
+            __DIR__ . '/database/migrations/2022_01_10_99999_add_messenger_color_to_users.php' => database_path('migrations/' . date('Y_m_d') . '_999999_add_messenger_color_to_users.php'),
+            __DIR__ . '/database/migrations/2022_01_10_99999_create_chatify_favorites_table.php' => database_path('migrations/' . date('Y_m_d') . '_999999_create_chatify_favorites_table.php'),
+            __DIR__ . '/database/migrations/2022_01_10_99999_create_chatify_messages_table.php' => database_path('migrations/' . date('Y_m_d') . '_999999_create_chatify_messages_table.php'),
         ], 'chatify-migrations');
 
         // Models
-        $isV8 = explode('.',app()->version())[0] >= 8;
+        $isV8 = explode('.', app()->version())[0] >= 8;
         $this->publishes([
             __DIR__ . '/Models' => app_path($isV8 ? 'Models' : '')
         ], 'chatify-models');
@@ -89,7 +92,14 @@ class ChatifyServiceProvider extends ServiceProvider
             __DIR__ . '/assets/js' => public_path('js/chatify'),
             // Images
             __DIR__ . '/assets/imgs' => storage_path('app/public/' . $userAvatarFolder),
+             // CSS
+             __DIR__ . '/assets/sounds' => public_path('sounds/chatify'),
         ], 'chatify-assets');
+
+        // Routes (API and Web)
+        $this->publishes([
+            __DIR__ . '/routes' => base_path('routes/chatify')
+        ], 'chatify-routes');
     }
 
     /**
@@ -99,12 +109,21 @@ class ChatifyServiceProvider extends ServiceProvider
      */
     protected function loadRoutes()
     {
-        Route::group($this->routesConfigurations(), function () {
-            $this->loadRoutesFrom(__DIR__ . '/routes/web.php');
-        });
-        Route::group($this->apiRoutesConfigurations(), function () {
-            $this->loadRoutesFrom(__DIR__ . '/routes/api.php');
-        });
+        if (config('chatify.routes.custom')) {
+            Route::group($this->routesConfigurations(), function () {
+                $this->loadRoutesFrom(base_path('routes/chatify/web.php'));
+            });
+            Route::group($this->apiRoutesConfigurations(), function () {
+                $this->loadRoutesFrom(base_path('routes/chatify/api.php'));
+            });
+        } else {
+            Route::group($this->routesConfigurations(), function () {
+                $this->loadRoutesFrom(__DIR__ . '/routes/web.php');
+            });
+            Route::group($this->apiRoutesConfigurations(), function () {
+                $this->loadRoutesFrom(__DIR__ . '/routes/api.php');
+            });
+        }
     }
 
     /**
