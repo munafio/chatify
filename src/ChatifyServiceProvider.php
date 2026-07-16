@@ -16,6 +16,8 @@ class ChatifyServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->mergeConfigFrom(__DIR__.'/config/chatify.php', 'chatify');
+
         app()->bind('ChatifyMessenger', function () {
             return new \Chatify\ChatifyMessenger;
         });
@@ -100,6 +102,9 @@ class ChatifyServiceProvider extends ServiceProvider
         Route::group($this->routesConfigurations(), function () {
             $this->loadRoutesFrom(__DIR__ . '/routes/web.php');
         });
+        Route::group($this->apiRoutesConfigurations(), function () {
+            $this->loadRoutesFrom(__DIR__ . '/routes/api.php');
+        });
     }
 
     /**
@@ -111,8 +116,19 @@ class ChatifyServiceProvider extends ServiceProvider
     {
         return [
             'prefix' => config('chatify.routes.prefix'),
-            'namespace' =>  config('chatify.routes.namespace'),
             'middleware' => config('chatify.routes.middleware'),
+        ];
+    }
+    /**
+     * API routes configurations.
+     *
+     * @return array
+     */
+    private function apiRoutesConfigurations()
+    {
+        return [
+            'prefix' => config('chatify.api_routes.prefix'),
+            'middleware' => config('chatify.api_routes.middleware'),
         ];
     }
 }

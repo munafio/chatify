@@ -56,6 +56,7 @@ class InstallCommand extends Command
             'views' => resource_path('views/vendor/Chatify'),
             'assets' => public_path('css/chatify'),
             'models' => app_path(($this->isV8 ? 'Models/' : '').'ChMessage.php'),
+            'controllers' => app_path('Http/Controllers/vendor/Chatify/MessagesController.php'),
             'migrations' => database_path('migrations/2019_09_22_192348_create_messages_table.php'),
         ];
 
@@ -104,12 +105,18 @@ class InstallCommand extends Command
         $this->line('Publishing '.$target.'...');
         if (!File::exists($path)) {
             $this->publish($target);
+            if ($target === 'controllers') {
+                $this->fixPublishedControllerNamespace();
+            }
             $this->info('[✓] '.$target.' published.');
             return;
         }
         if ($this->shouldOverwrite($target)) {
             $this->line('Overwriting '.$target.'...');
             $this->publish($target,true);
+            if ($target === 'controllers') {
+                $this->fixPublishedControllerNamespace();
+            }
             $this->info('[✓] '.$target.' published.');
             return;
         }
@@ -143,5 +150,27 @@ class InstallCommand extends Command
             '--tag' => 'chatify-'.$tag,
             '--force' => $forcePublish,
         ]);
+    }
+
+    /**
+     * Update published controller namespace for the host application.
+     *
+     * @return void
+     */
+    private function fixPublishedControllerNamespace()
+    {
+        $controllerPath = app_path('Http/Controllers/vendor/Chatify/MessagesController.php');
+
+        if (!File::exists($controllerPath)) {
+            return;
+        }
+
+        $contents = File::get($controllerPath);
+        $contents = str_replace(
+            'namespace Chatify\Http\Controllers;',
+            'namespace App\Http\Controllers\vendor\Chatify;',
+            $contents
+        );
+        File::put($controllerPath, $contents);
     }
 }

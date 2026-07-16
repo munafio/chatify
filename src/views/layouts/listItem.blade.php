@@ -1,6 +1,6 @@
 {{-- -------------------- Saved Messages -------------------- --}}
 @if($get == 'saved')
-    <table class="messenger-list-item m-li-divider @if('user_'.Auth::user()->id == $id && $id != "0") m-list-active @endif">
+    <table class="messenger-list-item m-li-divider" data-contact="{{ Auth::user()->id }}">
         <tr data-action="0">
             {{-- Avatar side --}}
             <td>
@@ -10,7 +10,7 @@
             </td>
             {{-- center side --}}
             <td>
-                <p data-id="{{ 'user_'.Auth::user()->id }}">Saved Messages <span>You</span></p>
+                <p data-id="{{ Auth::user()->id }}" data-type="user">Saved Messages <span>You</span></p>
                 <span>Save messages secretly</span>
             </td>
         </tr>
@@ -19,33 +19,33 @@
 
 {{-- -------------------- All users/group list -------------------- --}}
 @if($get == 'users')
-<table class="messenger-list-item @if($user->id == $id && $id != "0") m-list-active @endif" data-contact="{{ $user->id }}">
+<table class="messenger-list-item" data-contact="{{ $user->id }}">
     <tr data-action="0">
         {{-- Avatar side --}}
         <td style="position: relative">
             @if($user->active_status)
                 <span class="activeStatus"></span>
             @endif
-        <div class="avatar av-m" 
+        <div class="avatar av-m"
         style="background-image: url('{{ asset('/storage/'.config('chatify.user_avatar.folder').'/'.$user->avatar) }}');">
         </div>
         </td>
         {{-- center side --}}
         <td>
-        <p data-id="{{ $type.'_'.$user->id }}">
-            {{ strlen($user->name) > 12 ? trim(substr($user->name,0,12)).'..' : $user->name }} 
+        <p data-id="{{ $user->id }}" data-type="user">
+            {{ strlen($user->name) > 12 ? trim(substr($user->name,0,12)).'..' : $user->name }}
             <span>{{ $lastMessage->created_at->diffForHumans() }}</span></p>
         <span>
             {{-- Last Message user indicator --}}
             {!!
-                $lastMessage->from_id == Auth::user()->id 
+                $lastMessage->from_id == Auth::user()->id
                 ? '<span class="lastMessageIndicator">You :</span>'
                 : ''
             !!}
             {{-- Last message body --}}
             @if($lastMessage->attachment == null)
             {{
-                strlen($lastMessage->body) > 30 
+                strlen($lastMessage->body) > 30
                 ? trim(substr($lastMessage->body, 0, 30)).'..'
                 : $lastMessage->body
             }}
@@ -56,7 +56,7 @@
         {{-- New messages counter --}}
             {!! $unseenCounter > 0 ? "<b>".$unseenCounter."</b>" : '' !!}
         </td>
-        
+
     </tr>
 </table>
 @endif
@@ -73,10 +73,10 @@
         </td>
         {{-- center side --}}
         <td>
-        <p data-id="{{ $type.'_'.$user->id }}">
-            {{ strlen($user->name) > 12 ? trim(substr($user->name,0,12)).'..' : $user->name }} 
+            <p data-id="{{ $user->id }}" data-type="user">
+            {{ strlen($user->name) > 12 ? trim(substr($user->name,0,12)).'..' : $user->name }}
         </td>
-        
+
     </tr>
 </table>
 @endif

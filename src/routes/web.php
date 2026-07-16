@@ -10,86 +10,88 @@
 
 use Illuminate\Support\Facades\Route;
 
+$controller = config('chatify.routes.namespace') . '\\MessagesController';
+
 /*
 * This is the main app route [Chatify Messenger]
 */
-Route::get('/', 'MessagesController@index')->name(config('chatify.routes.prefix'));
+Route::get('/', [$controller, 'index'])->name(config('chatify.routes.prefix'));
 
 /**
  *  Fetch info for specific id [user/group]
  */
-Route::post('/idInfo', 'MessagesController@idFetchData');
+Route::post('/idInfo', [$controller, 'idFetchData']);
 
 /**
  * Send message route
  */
-Route::post('/sendMessage', 'MessagesController@send')->name('send.message');
+Route::post('/sendMessage', [$controller, 'send'])->name('send.message');
 
 /**
  * Fetch messages
  */
-Route::post('/fetchMessages', 'MessagesController@fetch')->name('fetch.messages');
+Route::post('/fetchMessages', [$controller, 'fetch'])->name('fetch.messages');
 
 /**
  * Download attachments route to create a downloadable links
  */
-Route::get('/download/{fileName}', 'MessagesController@download')->name(config('chatify.attachments.download_route_name'));
+Route::get('/download/{fileName}', [$controller, 'download'])->name(config('chatify.attachments.download_route_name'));
 
 /**
  * Authintication for pusher private channels
  */
-Route::post('/chat/auth', 'MessagesController@pusherAuth')->name('pusher.auth');
+Route::post('/chat/auth', [$controller, 'pusherAuth'])->name('pusher.auth');
 
 /**
  * Make messages as seen
  */
-Route::post('/makeSeen', 'MessagesController@seen')->name('messages.seen');
+Route::post('/makeSeen', [$controller, 'seen'])->name('messages.seen');
 
 /**
  * Get contacts
  */
-Route::post('/getContacts', 'MessagesController@getContacts')->name('contacts.get');
+Route::get('/getContacts', [$controller, 'getContacts'])->name('contacts.get');
 
 /**
  * Update contact item data
  */
-Route::post('/updateContacts', 'MessagesController@updateContactItem')->name('contacts.update');
+Route::post('/updateContacts', [$controller, 'updateContactItem'])->name('contacts.update');
 
 
 /**
  * Star in favorite list
  */
-Route::post('/star', 'MessagesController@favorite')->name('star');
+Route::post('/star', [$controller, 'favorite'])->name('star');
 
 /**
  * get favorites list
  */
-Route::post('/favorites', 'MessagesController@getFavorites')->name('favorites');
+Route::post('/favorites', [$controller, 'getFavorites'])->name('favorites');
 
 /**
  * Search in messenger
  */
-Route::post('/search', 'MessagesController@search')->name('search');
+Route::get('/search', [$controller, 'search'])->name('search');
 
 /**
  * Get shared photos
  */
-Route::post('/shared', 'MessagesController@sharedPhotos')->name('shared');
+Route::post('/shared', [$controller, 'sharedPhotos'])->name('shared');
 
 /**
  * Delete Conversation
  */
-Route::post('/deleteConversation', 'MessagesController@deleteConversation')->name('conversation.delete');
+Route::post('/deleteConversation', [$controller, 'deleteConversation'])->name('conversation.delete');
 
 /**
  * Delete Conversation
  */
-Route::post('/updateSettings', 'MessagesController@updateSettings')->name('avatar.update');
+Route::post('/updateSettings', [$controller, 'updateSettings'])->name('avatar.update');
 
 /**
  * Set active status
  */
-Route::post('/setActiveStatus', 'MessagesController@setActiveStatus')->name('activeStatus.set');
+Route::post('/setActiveStatus', [$controller, 'setActiveStatus'])->name('activeStatus.set');
 
 
 
@@ -99,7 +101,7 @@ Route::post('/setActiveStatus', 'MessagesController@setActiveStatus')->name('act
 /*
 * [Group] view by id
 */
-Route::get('/group/{id}', 'MessagesController@index')->name('group');
+Route::get('/group/{id}', [$controller, 'index'])->name('group');
 
 /*
 * user view by id.
@@ -109,5 +111,5 @@ Route::get('/group/{id}', 'MessagesController@index')->name('group');
 * e.g. - The commented routes below :
 */
 // Route::get('/route', function(){ return 'Munaf'; }); // works as a route
-Route::get('/{id}', 'MessagesController@index')->name('user');
+Route::get('/{id}', [$controller, 'index'])->name('user');
 // Route::get('/route', function(){ return 'Munaf'; }); // works as a user id
