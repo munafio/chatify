@@ -1,0 +1,113 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Chatify\Services;
+
+use Chatify\Data\SendMessageData;
+use Chatify\Models\Conversation;
+use Chatify\Models\Message;
+use Chatify\Models\MessageUserState;
+use Chatify\Support\ChatifyModels;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
+
+final class MessageService
+{
+    public function send(Conversation $conversation, Model $sender, SendMessageData $data): Message
+    {
+        /** @var Message $message */
+        $message = ChatifyModels::messageClass()::query()->create([
+            'id' => (string) Str::uuid(),
+            'conversation_id' => $conversation->id,
+            'user_id' => $sender->getKey(),
+            'body' => $data->body !== null ? strip_tags($data->body) : null,
+            'attachment' => $data->attachmentMeta,
+            'reply_to_message_id' => $data->replyToMessageId,
+            'forwarded_from_message_id' => $data->forwardedFromMessageId,
+        ]);
+
+        return $message->load(['sender', 'replyTo.sender']);
+    }
+
+    public function forConversation(Conversation $conversation, ?int $viewerId = null): Builder
+    {
+        $query = ChatifyModels::messageClass()::query()
+            ->forConversation($conversation->id)
+            ->with(['sender', 'replyTo.sender'])
+            ->latest();
+
+        if ($viewerId !== null) {
+            $query->whereNotIn('id', function ($sub) use ($viewerId) {
+                $sub->select('message_id')
+                    ->from('ch_message_user_states')
+                    ->where('user_id', $viewerId)
+                    ->whereNotNull('hidden_at');
+            });
+        }
+
+        return $query;
+    }
+
+    public function paginate(
+        Conversation $conversation,
+        int $perPage = 30,
+        ?string $after = null,
+        ?int $viewerId = null,
+    ): LengthAwarePaginator {
+        $query = $this->forConversation($conversation, $viewerId);
+
+        if ($after !== null) {
+            $query->after($after);
+        }
+
+        return $query->paginate($perPage);
+    }
+
+    public function edit(Message $message, string $body): Message
+    {
+        $message->update([
+            'body' => strip_tags($body),
+            'edited_at' => now(),
+        ]);
+
+        return $message->fresh(['sender', 'replyTo.sender']);
+    }
+
+    public function hideForUser(Message $message, int $userId): void
+    {
+        $state = MessageUserState::query()->firstOrNew([
+            'message_id' => $message->id,
+            'user_id' => $userId,
+        ]);
+
+        if (! $state->exists) {
+            $state->id = (string) Str::uuid();
+        }
+
+        $state->hidden_at = now();
+        $state->save();
+    }
+
+    public function delete(Message $message): void
+    {
+        $message->delete();
+    }
+
+    public function unreadCount(Conversation $conversation, int $userId): int
+    {
+        $participant = $conversation->participants()->where('user_id', $userId)->first();
+
+        $query = ChatifyModels::messageClass()::query()
+            ->forConversation($conversation->id)
+            ->where('user_id', '!=', $userId);
+
+        if ($participant?->last_read_at !== null) {
+            $query->where('created_at', '>', $participant->last_read_at);
+        }
+
+        return $query->count();
+    }
+}

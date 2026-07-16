@@ -1,75 +1,63 @@
 <?php
 
+declare(strict_types=1);
+
+use Chatify\Http\Controllers\Api\AttachmentController;
+use Chatify\Http\Controllers\Api\BroadcastAuthController;
+use Chatify\Http\Controllers\Api\ContactController;
+use Chatify\Http\Controllers\Api\ConversationController;
+use Chatify\Http\Controllers\Api\FavoriteController;
+use Chatify\Http\Controllers\Api\MessageController;
+use Chatify\Http\Controllers\Api\TypingController;
+use Chatify\Http\Controllers\Api\UserController;
+use Chatify\Http\Controllers\Api\UserSettingsController;
 use Illuminate\Support\Facades\Route;
 
-$controller = config('chatify.api_routes.namespace') . '\\MessagesController';
+Route::middleware(config('chatify.api.middleware', ['api', 'auth:sanctum']))
+    ->prefix(config('chatify.api.prefix', 'api/chatify/v1'))
+    ->group(function () {
+        Route::get('conversations', [ConversationController::class, 'index']);
+        Route::post('conversations/direct', [ConversationController::class, 'storeDirect']);
+        Route::post('conversations/group', [ConversationController::class, 'storeGroup']);
+        Route::get('conversations/{conversation}', [ConversationController::class, 'show']);
+        Route::patch('conversations/{conversation}', [ConversationController::class, 'update']);
+        Route::delete('conversations/{conversation}', [ConversationController::class, 'destroy']);
+        Route::post('conversations/{conversation}/read', [ConversationController::class, 'markRead']);
+        Route::post('conversations/{conversation}/typing', [TypingController::class, 'store'])
+            ->middleware('throttle:chatify-messages');
+        Route::post('conversations/{conversation}/forward', [MessageController::class, 'forward'])
+            ->middleware('throttle:chatify-messages');
+        Route::post('conversations/{conversation}/participants', [ConversationController::class, 'addParticipants']);
+        Route::delete('conversations/{conversation}/participants/{user}', [ConversationController::class, 'removeParticipant']);
+        Route::post('conversations/{conversation}/leave', [ConversationController::class, 'leave']);
 
-/**
- * Authentication for pusher private channels
- */
-Route::post('/chat/auth', [$controller, 'pusherAuth'])->name('api.pusher.auth');
+        Route::get('conversations/{conversation}/messages', [MessageController::class, 'index'])
+            ->middleware('throttle:chatify-messages');
+        Route::post('conversations/{conversation}/messages', [MessageController::class, 'store'])
+            ->middleware('throttle:chatify-messages');
+        Route::patch('messages/{message}', [MessageController::class, 'update'])
+            ->middleware('throttle:chatify-messages');
+        Route::delete('messages/{message}', [MessageController::class, 'destroy']);
 
-/**
- *  Fetch info for specific id [user/group]
- */
-Route::post('/idInfo', [$controller, 'idFetchData'])->name('api.idInfo');
+        Route::get('contacts/search', [ContactController::class, 'search']);
 
-/**
- * Send message route
- */
-Route::post('/sendMessage', [$controller, 'send'])->name('api.send.message');
+        Route::get('favorites', [FavoriteController::class, 'index']);
+        Route::post('favorites/{user}', [FavoriteController::class, 'toggle']);
 
-/**
- * Fetch messages
- */
-Route::post('/fetchMessages', [$controller, 'fetch'])->name('api.fetch.messages');
+        Route::get('users/{user}', [UserController::class, 'show']);
 
-/**
- * Download attachments route to create a downloadable links
- */
-Route::get('/download/{fileName}', [$controller, 'download'])->name('api.'.config('chatify.attachments.download_route_name'));
+        Route::get('settings', [UserSettingsController::class, 'show']);
+        Route::post('settings/avatar', [UserSettingsController::class, 'updateAvatar'])
+            ->middleware('throttle:chatify-uploads');
+        Route::post('settings/chat-background', [UserSettingsController::class, 'updateChatBackground'])
+            ->middleware('throttle:chatify-uploads');
+        Route::put('settings', [UserSettingsController::class, 'update'])
+            ->middleware('throttle:chatify-uploads');
+        Route::patch('settings', [UserSettingsController::class, 'update'])
+            ->middleware('throttle:chatify-uploads');
 
-/**
- * Make messages as seen
- */
-Route::post('/makeSeen', [$controller, 'seen'])->name('api.messages.seen');
+        Route::get('conversations/{conversation}/attachments', [AttachmentController::class, 'index']);
+        Route::get('attachments/{filename}', [AttachmentController::class, 'download']);
 
-/**
- * Get contacts
- */
-Route::get('/getContacts', [$controller, 'getContacts'])->name('api.contacts.get');
-
-/**
- * Star in favorite list
- */
-Route::post('/star', [$controller, 'favorite'])->name('api.star');
-
-/**
- * get favorites list
- */
-Route::post('/favorites', [$controller, 'getFavorites'])->name('api.favorites');
-
-/**
- * Search in messenger
- */
-Route::get('/search', [$controller, 'search'])->name('api.search');
-
-/**
- * Get shared photos
- */
-Route::post('/shared', [$controller, 'sharedPhotos'])->name('api.shared');
-
-/**
- * Delete Conversation
- */
-Route::post('/deleteConversation', [$controller, 'deleteConversation'])->name('api.conversation.delete');
-
-/**
- * Update setting
- */
-Route::post('/updateSettings', [$controller, 'updateSettings'])->name('api.avatar.update');
-
-/**
- * Set active status
- */
-Route::post('/setActiveStatus', [$controller, 'setActiveStatus'])->name('api.activeStatus.set');
+        Route::post('broadcasting/auth', BroadcastAuthController::class);
+    });

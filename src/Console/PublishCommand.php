@@ -1,33 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Chatify\Console;
 
 use Illuminate\Console\Command;
 
 class PublishCommand extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'chatify:publish {--force : Overwrite any existing files}';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Publish all of the chatify assets';
+    protected $description = 'Publish Chatify views, assets, and frontend source';
 
-    /**
-     * Execute the console command.
-     *
-     * @return void
-     */
-    public function handle()
+    public function handle(): int
     {
-        if($this->option('force')){
+        if ($this->option('force')) {
             $this->call('vendor:publish', [
                 '--tag' => 'chatify-config',
                 '--force' => true,
@@ -35,11 +22,6 @@ class PublishCommand extends Command
 
             $this->call('vendor:publish', [
                 '--tag' => 'chatify-migrations',
-                '--force' => true,
-            ]);
-
-            $this->call('vendor:publish', [
-                '--tag' => 'chatify-models',
                 '--force' => true,
             ]);
         }
@@ -53,5 +35,14 @@ class PublishCommand extends Command
             '--tag' => 'chatify-assets',
             '--force' => true,
         ]);
+
+        $this->call('vendor:publish', [
+            '--tag' => 'chatify-frontend',
+            '--force' => true,
+        ]);
+
+        $this->info('Published. Rebuild frontend: cd resources/vendor/chatify/frontend && npm install && npm run build');
+
+        return self::SUCCESS;
     }
 }

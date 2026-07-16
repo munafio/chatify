@@ -1,38 +1,49 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Chatify;
 
 use Chatify\Console\InstallCommand;
 use Chatify\Console\PublishCommand;
+use Chatify\Contracts\RecipientResolver;
+use Chatify\Models\Conversation;
+use Chatify\Models\Message;
+use Chatify\Models\UserSetting;
+use Chatify\Policies\ConversationPolicy;
+use Chatify\Policies\MessagePolicy;
+use Chatify\Policies\UserSettingPolicy;
+use Chatify\Services\DefaultRecipientResolver;
+use Chatify\Support\ChatifyModels;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Broadcast;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
 class ChatifyServiceProvider extends ServiceProvider
 {
-    /**
-     * Register services.
-     *
-     * @return void
-     */
-    public function register()
+    public function register(): void
     {
         $this->mergeConfigFrom(__DIR__.'/config/chatify.php', 'chatify');
 
-        app()->bind('ChatifyMessenger', function () {
-            return new \Chatify\ChatifyMessenger;
-        });
+        $this->app->bind(RecipientResolver::class, DefaultRecipientResolver::class);
+
+        $this->app->bind('ChatifyMessenger', fn () => new ChatifyMessenger);
     }
 
-    /**
-     * Bootstrap services.
-     *
-     * @return void
-     */
-    public function boot()
+    public function boot(): void
     {
-        // Load Views and Routes
-        $this->loadViewsFrom(__DIR__ . '/views', 'Chatify');
+        $this->loadViewsFrom(__DIR__.'/views', 'Chatify');
+        $this->loadMigrationsFrom(__DIR__.'/database/migrations');
+
+        $this->registerPolicies();
+        $this->registerRateLimiters();
+        $this->registerRouteBindings();
         $this->loadRoutes();
+        $this->loadBroadcastChannels();
 
         if ($this->app->runningInConsole()) {
             $this->commands([
@@ -43,111 +54,116 @@ class ChatifyServiceProvider extends ServiceProvider
         }
     }
 
-    /**
-     * Publishing the files that the user may override.
-     *
-     * @return void
-     */
-    protected function setPublishes()
+    protected function registerPolicies(): void
     {
-        // Load user's avatar folder from package's config
-        $userAvatarFolder = json_decode(json_encode(include(__DIR__.'/config/chatify.php')))->user_avatar->folder;
-
-        // Config
-        $this->publishes([
-            __DIR__ . '/config/chatify.php' => config_path('chatify.php')
-        ], 'chatify-config');
-
-        // Migrations
-        $this->publishes([
-            __DIR__ . '/database/migrations/2022_01_10_99999_add_active_status_to_users.php' => database_path('migrations/' . date('Y_m_d') . '_999999_add_active_status_to_users.php'),
-            __DIR__ . '/database/migrations/2022_01_10_99999_add_avatar_to_users.php' => database_path('migrations/' . date('Y_m_d') . '_999999_add_avatar_to_users.php'),
-            __DIR__ . '/database/migrations/2022_01_10_99999_add_dark_mode_to_users.php' => database_path('migrations/' . date('Y_m_d') . '_999999_add_dark_mode_to_users.php'),
-            __DIR__ . '/database/migrations/2022_01_10_99999_add_messenger_color_to_users.php' => database_path('migrations/' . date('Y_m_d') . '_999999_add_messenger_color_to_users.php'),
-            __DIR__ . '/database/migrations/2022_01_10_99999_create_chatify_favorites_table.php' => database_path('migrations/' . date('Y_m_d') . '_999999_create_chatify_favorites_table.php'),
-            __DIR__ . '/database/migrations/2022_01_10_99999_create_chatify_messages_table.php' => database_path('migrations/' . date('Y_m_d') . '_999999_create_chatify_messages_table.php'),
-        ], 'chatify-migrations');
-
-        // Models
-        $isV8 = explode('.', app()->version())[0] >= 8;
-        $this->publishes([
-            __DIR__ . '/Models' => app_path($isV8 ? 'Models' : '')
-        ], 'chatify-models');
-
-        // Controllers
-        $this->publishes([
-            __DIR__ . '/Http/Controllers' => app_path('Http/Controllers/vendor/Chatify')
-        ], 'chatify-controllers');
-
-        // Views
-        $this->publishes([
-            __DIR__ . '/views' => resource_path('views/vendor/Chatify')
-        ], 'chatify-views');
-
-        // Assets
-        $this->publishes([
-            // CSS
-            __DIR__ . '/assets/css' => public_path('css/chatify'),
-            // JavaScript
-            __DIR__ . '/assets/js' => public_path('js/chatify'),
-            // Images
-            __DIR__ . '/assets/imgs' => storage_path('app/public/' . $userAvatarFolder),
-             // CSS
-             __DIR__ . '/assets/sounds' => public_path('sounds/chatify'),
-        ], 'chatify-assets');
-
-        // Routes (API and Web)
-        $this->publishes([
-            __DIR__ . '/routes' => base_path('routes/chatify')
-        ], 'chatify-routes');
+        Gate::policy(ChatifyModels::conversationClass(), ConversationPolicy::class);
+        Gate::policy(ChatifyModels::messageClass(), MessagePolicy::class);
+        Gate::policy(ChatifyModels::userSettingClass(), UserSettingPolicy::class);
     }
 
-    /**
-     * Group the routes and set up configurations to load them.
-     *
-     * @return void
-     */
-    protected function loadRoutes()
+    protected function registerRateLimiters(): void
     {
-        if (config('chatify.routes.custom')) {
-            Route::group($this->routesConfigurations(), function () {
-                $this->loadRoutesFrom(base_path('routes/chatify/web.php'));
-            });
-            Route::group($this->apiRoutesConfigurations(), function () {
-                $this->loadRoutesFrom(base_path('routes/chatify/api.php'));
-            });
-        } else {
-            Route::group($this->routesConfigurations(), function () {
-                $this->loadRoutesFrom(__DIR__ . '/routes/web.php');
-            });
-            Route::group($this->apiRoutesConfigurations(), function () {
-                $this->loadRoutesFrom(__DIR__ . '/routes/api.php');
-            });
+        RateLimiter::for('chatify-messages', function ($request) {
+            return Limit::perMinute(60)->by($request->user()?->getKey() ?: $request->ip());
+        });
+
+        RateLimiter::for('chatify-uploads', function ($request) {
+            return Limit::perMinute(10)->by($request->user()?->getKey() ?: $request->ip());
+        });
+    }
+
+    protected function registerRouteBindings(): void
+    {
+        Route::bind('conversation', function (string $value) {
+            $user = auth()->user();
+
+            if ($user === null) {
+                abort(401);
+            }
+
+            /** @var Conversation|null $conversation */
+            $conversation = ChatifyModels::conversationClass()::query()
+                ->forUser((int) $user->getKey())
+                ->where('id', $value)
+                ->first();
+
+            if ($conversation === null) {
+                abort(404);
+            }
+
+            return $conversation;
+        });
+
+        Route::bind('message', function (string $value) {
+            $user = auth()->user();
+
+            if ($user === null) {
+                abort(401);
+            }
+
+            $participantTable = config('chatify.tables.participants', 'ch_conversation_participants');
+            $messageTable = config('chatify.tables.messages', 'ch_messages');
+
+            /** @var Message|null $message */
+            $message = ChatifyModels::messageClass()::query()
+                ->where("{$messageTable}.id", $value)
+                ->whereIn('conversation_id', function ($query) use ($participantTable, $user) {
+                    $query->select('conversation_id')
+                        ->from($participantTable)
+                        ->where('user_id', $user->getKey());
+                })
+                ->first();
+
+            if ($message === null) {
+                abort(404);
+            }
+
+            return $message->load('conversation');
+        });
+    }
+
+    protected function loadRoutes(): void
+    {
+        $this->loadRoutesFrom(__DIR__.'/routes/api.php');
+
+        if (config('chatify.web.enabled', true)) {
+            $this->loadRoutesFrom(__DIR__.'/routes/web.php');
         }
     }
 
-    /**
-     * Routes configurations.
-     *
-     * @return array
-     */
-    private function routesConfigurations()
+    protected function loadBroadcastChannels(): void
     {
-        return [
-            'prefix' => config('chatify.routes.prefix'),
-            'middleware' => config('chatify.routes.middleware'),
-        ];
+        if (file_exists(__DIR__.'/routes/channels.php')) {
+            require __DIR__.'/routes/channels.php';
+        }
     }
-    /**
-     * API routes configurations.
-     *
-     * @return array
-     */
-    private function apiRoutesConfigurations()
+
+    protected function setPublishes(): void
     {
-        return [
-            'prefix' => config('chatify.api_routes.prefix'),
-            'middleware' => config('chatify.api_routes.middleware'),
-        ];
+        $this->publishes([
+            __DIR__.'/config/chatify.php' => config_path('chatify.php'),
+        ], 'chatify-config');
+
+        $this->publishes([
+            __DIR__.'/database/migrations/2024_01_01_000001_create_chatify_v2_tables.php' => database_path('migrations/2024_01_01_000001_create_chatify_v2_tables.php'),
+            __DIR__.'/database/migrations/2024_01_01_000002_add_theme_preferences_to_user_settings.php' => database_path('migrations/2024_01_01_000002_add_theme_preferences_to_user_settings.php'),
+            __DIR__.'/database/migrations/2024_01_01_000003_extend_messages_for_actions.php' => database_path('migrations/2024_01_01_000003_extend_messages_for_actions.php'),
+        ], 'chatify-migrations');
+
+        $this->publishes([
+            __DIR__.'/routes/channels.php' => base_path('routes/chatify/channels.php'),
+        ], 'chatify-channels');
+
+        $this->publishes([
+            __DIR__.'/../dist' => public_path('vendor/chatify'),
+        ], 'chatify-assets');
+
+        $this->publishes([
+            __DIR__.'/../frontend' => resource_path('vendor/chatify/frontend'),
+        ], 'chatify-frontend');
+
+        $this->publishes([
+            __DIR__.'/views' => resource_path('views/vendor/chatify'),
+        ], 'chatify-views');
     }
 }

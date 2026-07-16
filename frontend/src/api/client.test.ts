@@ -1,0 +1,64 @@
+import { describe, expect, it, vi } from 'vitest'
+import axios from 'axios'
+import { createApiClient, createChatifyApi } from '../api/client'
+import type { BootConfig } from '../types'
+
+const bootConfig: BootConfig = {
+  user: {
+    type: 'user',
+    id: 1,
+    attributes: { name: 'Test User', avatar: '/avatar.png', active_status: true },
+  },
+  apiBase: 'https://example.test/api/chatify/v1',
+  broadcastAuthUrl: 'https://example.test/api/chatify/v1/broadcasting/auth',
+  csrfToken: 'test-csrf-token',
+  conversationId: null,
+  debug: false,
+  groupsEnabled: true,
+  colors: ['#2180f3'],
+  attachments: {
+    maxUploadSize: 150,
+    allowedImages: ['png', 'jpg'],
+    allowedFiles: ['pdf'],
+  },
+  broadcast: {
+    driver: 'null',
+    key: null,
+    cluster: null,
+    wsHost: null,
+    wsPort: 443,
+    forceTLS: true,
+  },
+}
+
+describe('createApiClient', () => {
+  it('configures axios with credentials and csrf token', () => {
+    const createSpy = vi.spyOn(axios, 'create')
+    createApiClient(bootConfig)
+
+    expect(createSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        baseURL: bootConfig.apiBase,
+        withCredentials: true,
+        headers: expect.objectContaining({
+          'X-CSRF-TOKEN': 'test-csrf-token',
+          Accept: 'application/json',
+        }),
+      }),
+    )
+  })
+})
+
+describe('createChatifyApi', () => {
+  it('exposes conversation and message endpoints', () => {
+    const client = axios.create({ baseURL: bootConfig.apiBase })
+    const get = vi.spyOn(client, 'get').mockResolvedValue({ data: { data: [] } })
+    const api = createChatifyApi(client)
+
+    void api.getConversations()
+    void api.getMessages('conv-1')
+
+    expect(get).toHaveBeenCalledWith('/conversations', { params: undefined })
+    expect(get).toHaveBeenCalledWith('/conversations/conv-1/messages', { params: undefined })
+  })
+})

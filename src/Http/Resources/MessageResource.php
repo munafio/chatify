@@ -1,0 +1,94 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Chatify\Http\Resources;
+
+use Chatify\Models\Message;
+use Chatify\Services\AttachmentService;
+use Chatify\Services\ConversationService;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+/** @mixin Message */
+class MessageResource extends JsonResource
+{
+    public function toArray(Request $request): array
+    {
+        $viewer = $request->user();
+        $read = false;
+
+        if ($viewer !== null) {
+            $participant = app(ConversationService::class)->getParticipant(
+                $this->conversation,
+                (int) $viewer->getKey()
+            );
+            $read = $this->isReadByParticipant($participant);
+        }
+
+        $attachmentService = app(AttachmentService::class);
+        $attachment = null;
+        $attachments = [];
+
+        if (is_array($this->attachment)) {
+            if (($this->attachment['album'] ?? false) === true && is_array($this->attachment['items'] ?? null)) {
+                foreach ($this->attachment['items'] as $item) {
+                    if (! is_array($item) || empty($item['stored_name'])) {
+                        continue;
+                    }
+
+                    $attachments[] = [
+                        'filename' => $item['stored_name'],
+                        'original_name' => $item['original_name'] ?? null,
+                        'type' => $item['type'] ?? 'image',
+                        'url' => $attachmentService->url($item['stored_name']),
+                    ];
+                }
+
+                $attachment = $attachments[0] ?? null;
+            } elseif (! empty($this->attachment['stored_name'])) {
+                $attachment = [
+                    'filename' => $this->attachment['stored_name'],
+                    'original_name' => $this->attachment['original_name'] ?? null,
+                    'type' => $this->attachment['type'] ?? 'file',
+                    'url' => $attachmentService->url($this->attachment['stored_name']),
+                ];
+                $attachments = [$attachment];
+            }
+        }
+
+        $replyTo = null;
+
+        if ($this->relationLoaded('replyTo') && $this->replyTo !== null) {
+            $replyTo = [
+                'id' => $this->replyTo->id,
+                'body' => $this->replyTo->body,
+                'sender_name' => $this->replyTo->sender?->name ?? 'User',
+            ];
+        }
+
+        return [
+            'type' => 'message',
+            'id' => $this->id,
+            'attributes' => [
+                'conversation_id' => $this->conversation_id,
+                'body' => $this->body,
+                'attachment' => $attachment,
+                'attachments' => $attachments,
+                'read' => $read,
+                'edited_at' => $this->edited_at?->toIso8601String(),
+                'reply_to' => $replyTo,
+                'created_at' => $this->created_at?->toIso8601String(),
+                'updated_at' => $this->updated_at?->toIso8601String(),
+            ],
+            'relationships' => [
+                'sender' => [
+                    'data' => [
+                        'type' => 'user',
+                        'id' => $this->user_id,
+                    ],
+                ],
+            ],
+        ];
+    }
+}

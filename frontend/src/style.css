@@ -1,0 +1,672 @@
+@import 'tailwindcss' prefix(chatify);
+
+@source "./**/*.{vue,ts}";
+
+@theme {
+  --color-chatify-primary: #25d366;
+  --color-chatify-primary-dark: #128c7e;
+  --color-chatify-sidebar: #f0f2f5;
+  --color-chatify-panel: #efeae2;
+  --color-chatify-bubble-out: #d9fdd3;
+  --color-chatify-bubble-in: #ffffff;
+  --color-chatify-text: #111b21;
+  --color-chatify-muted: #667781;
+  --color-chatify-border: #e9edef;
+  --color-chatify-danger: #ea0038;
+}
+
+#chatify-app {
+  font-family: var(--chatify-font-family, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif);
+  color: var(--chatify-color-chatify-text);
+  background-color: var(--chatify-color-chatify-panel);
+  height: 100vh;
+  height: 100dvh;
+  width: 100%;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  overscroll-behavior: none;
+}
+
+#chatify-app input,
+#chatify-app textarea,
+#chatify-app [contenteditable='true'] {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+#chatify-app .chatify-message-body,
+#chatify-app .chatify-message-body * {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+body.chatify-dark {
+  background-color: var(--chatify-color-chatify-panel, #0b141a);
+}
+
+#chatify-app.chatify-dark {
+  color: var(--chatify-color-chatify-text);
+  background-color: var(--chatify-color-chatify-panel);
+}
+
+.chatify-chat-bg-base {
+  background-color: var(--chatify-color-chatify-panel);
+}
+
+.chatify-chat-bg-pattern {
+  background-color: var(--chatify-chat-bg-pattern-tint, var(--chatify-color-chatify-primary));
+  opacity: 0.2;
+  mask-image: var(--chatify-chat-bg-pattern-url);
+  -webkit-mask-image: var(--chatify-chat-bg-pattern-url);
+  mask-repeat: repeat;
+  -webkit-mask-repeat: repeat;
+  mask-size: var(--chatify-chat-bg-pattern-size, 120px);
+  -webkit-mask-size: var(--chatify-chat-bg-pattern-size, 120px);
+}
+
+.chatify-chat-bg-image {
+  background-image: var(--chatify-chat-bg-image-url);
+  background-size: cover;
+  background-position: center;
+  filter: blur(var(--chatify-chat-bg-blur, 0px));
+  transform: scale(calc(1 + (var(--chatify-chat-bg-blur-enabled, 0) * 0.06)));
+}
+
+.chatify-wallpaper-tile-pattern {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.chatify-tile-selected {
+  box-shadow: inset 0 0 0 2px var(--chatify-color-chatify-primary);
+  border-color: var(--chatify-color-chatify-primary);
+}
+
+.chatify-settings-modal {
+  height: min(520px, 82vh);
+  max-height: min(520px, 82vh);
+  padding: 1.275rem 1.5rem;
+  overflow: hidden;
+}
+
+.chatify-settings-scroll {
+  overflow-x: hidden;
+  overflow-y: auto;
+  min-width: 0;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--chatify-color-chatify-muted) 55%, transparent) transparent;
+}
+
+.chatify-settings-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+
+.chatify-settings-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chatify-settings-scroll::-webkit-scrollbar-thumb {
+  background-color: color-mix(in srgb, var(--chatify-color-chatify-muted) 45%, transparent);
+  border-radius: 999px;
+}
+
+.chatify-settings-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: color-mix(in srgb, var(--chatify-color-chatify-muted) 70%, transparent);
+}
+
+.chatify-settings-toggle {
+  position: relative;
+  width: 2.75rem;
+  height: 1.5rem;
+  border-radius: 999px;
+  background-color: color-mix(in srgb, var(--chatify-color-chatify-muted) 35%, var(--chatify-color-chatify-sidebar));
+  transition: background-color 120ms ease;
+}
+
+.chatify-settings-toggle::after {
+  content: '';
+  position: absolute;
+  top: 0.125rem;
+  left: 0.125rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 999px;
+  background-color: #fff;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 22%);
+  transition: transform 120ms ease;
+}
+
+.chatify-settings-toggle-on {
+  background-color: var(--chatify-color-chatify-primary);
+}
+
+.chatify-settings-toggle-on::after {
+  transform: translateX(1.25rem);
+}
+
+.chatify-settings-range {
+  width: 100%;
+  height: 0.25rem;
+  appearance: none;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--chatify-color-chatify-muted) 35%, var(--chatify-color-chatify-sidebar));
+  outline: none;
+}
+
+.chatify-settings-range::-webkit-slider-thumb {
+  appearance: none;
+  width: 1.125rem;
+  height: 1.125rem;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 28%);
+  cursor: pointer;
+}
+
+.chatify-settings-range::-moz-range-thumb {
+  width: 1.125rem;
+  height: 1.125rem;
+  border: none;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 28%);
+  cursor: pointer;
+}
+
+.chatify-profile-menu {
+  min-width: 9.5rem;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--chatify-color-chatify-text) 7%, var(--chatify-color-chatify-bubble-in));
+  background-color: var(--chatify-color-chatify-panel);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 28%);
+}
+
+.chatify-profile-menu-floating {
+  position: fixed;
+  z-index: 60;
+}
+
+.chatify-profile-menu-item {
+  display: block;
+  width: 100%;
+  padding: 0.625rem 0.875rem;
+  text-align: left;
+  font-size: 0.875rem;
+  color: var(--chatify-color-chatify-text);
+  transition: background-color 120ms ease;
+}
+
+.chatify-profile-menu-item:hover {
+  background-color: color-mix(in srgb, var(--chatify-color-chatify-text) 6%, var(--chatify-color-chatify-sidebar));
+}
+
+.chatify-profile-menu-item-danger {
+  color: var(--chatify-color-chatify-danger);
+}
+
+@keyframes chatify-avatar-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.82;
+    transform: scale(1.03);
+  }
+}
+
+.chatify-avatar-pulse {
+  animation: chatify-avatar-pulse 1.1s ease-in-out infinite;
+}
+
+.chatify-avatar-ring {
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--chatify-color-chatify-text) 7%, var(--chatify-color-chatify-bubble-in));
+}
+
+.chatify-avatar-uploading {
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--chatify-color-chatify-primary) 35%, transparent);
+}
+
+.chatify-chat-bg-image {
+  background-image: var(--chatify-chat-bg-image-url);
+  background-size: cover;
+  background-position: center;
+}
+
+.chatify-sidebar-divide {
+  border-color: color-mix(in srgb, var(--chatify-color-chatify-text) 7%, var(--chatify-color-chatify-sidebar));
+}
+
+.chatify-border-soft {
+  border-color: color-mix(in srgb, var(--chatify-color-chatify-text) 7%, var(--chatify-color-chatify-bubble-in));
+}
+
+.chatify-ring-soft {
+  --tw-ring-color: color-mix(in srgb, var(--chatify-color-chatify-text) 7%, var(--chatify-color-chatify-bubble-in));
+}
+
+.chatify-settings-input {
+  background-color: color-mix(in srgb, var(--chatify-color-chatify-bubble-in) 72%, var(--chatify-color-chatify-sidebar));
+  border: 1px solid color-mix(in srgb, var(--chatify-color-chatify-text) 7%, var(--chatify-color-chatify-bubble-in));
+}
+
+.chatify-settings-input:focus {
+  outline: none;
+  border-color: color-mix(in srgb, var(--chatify-color-chatify-primary) 45%, var(--chatify-color-chatify-bubble-in));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--chatify-color-chatify-primary) 20%, transparent);
+}
+
+.chatify-accent-swatches {
+  min-width: 0;
+}
+
+.chatify-accent-swatch-ring {
+  border: 2px solid currentColor;
+  pointer-events: none;
+}
+
+.chatify-accent-swatch-mix-dot {
+  width: 0.42rem;
+  height: 0.42rem;
+  transform: translate(-50%, -50%);
+}
+
+.chatify-list-item {
+  transition: background-color 100ms ease;
+}
+
+.chatify-list-item:hover {
+  background-color: color-mix(in srgb, var(--chatify-color-chatify-bubble-in) 72%, var(--chatify-color-chatify-sidebar));
+}
+
+.chatify-list-item-active {
+  background-color: color-mix(in srgb, var(--chatify-color-chatify-bubble-in) 88%, var(--chatify-color-chatify-sidebar));
+}
+
+.chatify-sidebar-input {
+  background-color: color-mix(in srgb, var(--chatify-color-chatify-bubble-in) 80%, var(--chatify-color-chatify-sidebar));
+  border: 1px solid color-mix(in srgb, var(--chatify-color-chatify-text) 5%, var(--chatify-color-chatify-sidebar));
+  font-size: 16px;
+}
+
+.chatify-sidebar-input:focus {
+  outline: none;
+  border-color: color-mix(in srgb, var(--chatify-color-chatify-primary) 45%, var(--chatify-color-chatify-sidebar));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--chatify-color-chatify-primary) 20%, transparent);
+}
+
+.chatify-sidebar-bottom-nav {
+  border-color: color-mix(in srgb, var(--chatify-color-chatify-text) 7%, var(--chatify-color-chatify-sidebar));
+}
+
+.chatify-bottom-bar {
+  --chatify-bottom-bar-height: 3.25rem;
+  box-sizing: border-box;
+  height: var(--chatify-bottom-bar-height);
+  min-height: var(--chatify-bottom-bar-height);
+  flex-shrink: 0;
+}
+
+.chatify-composer-footer {
+  border-color: color-mix(in srgb, var(--chatify-color-chatify-text) 7%, var(--chatify-color-chatify-sidebar));
+  overflow: hidden;
+}
+
+.chatify-composer-bar {
+  --chatify-bottom-bar-height: 3.25rem;
+  box-sizing: border-box;
+  min-height: var(--chatify-bottom-bar-height);
+  overflow: hidden;
+  flex-shrink: 0;
+  padding-top: 0.375rem;
+  padding-bottom: 0.375rem;
+}
+
+.chatify-composer-input {
+  min-height: 2.25rem;
+  height: 2.25rem;
+  max-height: 8rem;
+  font-size: 16px;
+  line-height: 1.25rem;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  field-sizing: content;
+}
+
+.chatify-composer-input::-webkit-scrollbar {
+  display: none;
+}
+
+@media (max-width: 639px) {
+  .chatify-message-actions-trigger {
+    opacity: 1 !important;
+  }
+}
+
+.chatify-sidebar-nav-item {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  min-width: 0;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.5rem;
+  color: var(--chatify-color-chatify-muted);
+  font-size: 0.625rem;
+  font-weight: 500;
+  line-height: 1;
+  transition: color 120ms ease, background-color 120ms ease;
+}
+
+.chatify-sidebar-nav-item:hover {
+  color: var(--chatify-color-chatify-text);
+  background-color: color-mix(in srgb, var(--chatify-color-chatify-bubble-in) 55%, var(--chatify-color-chatify-sidebar));
+}
+
+.chatify-sidebar-nav-item-active {
+  color: var(--chatify-color-chatify-primary);
+}
+
+.chatify-sidebar-nav-item-active svg {
+  stroke-width: 2.25;
+}
+
+.chatify-settings-group {
+  border: 1px solid color-mix(in srgb, var(--chatify-color-chatify-text) 7%, var(--chatify-color-chatify-bubble-in));
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background-color: var(--chatify-color-chatify-bubble-in);
+}
+
+.chatify-settings-row + .chatify-settings-row {
+  border-top: 1px solid color-mix(in srgb, var(--chatify-color-chatify-text) 7%, var(--chatify-color-chatify-bubble-in));
+}
+
+.chatify-modal-enter-active,
+.chatify-modal-leave-active {
+  transition: opacity 100ms ease;
+}
+
+.chatify-modal-enter-active .chatify-modal-panel,
+.chatify-modal-leave-active .chatify-modal-panel {
+  transition: transform 100ms ease, opacity 100ms ease;
+}
+
+.chatify-modal-enter-from,
+.chatify-modal-leave-to {
+  opacity: 0;
+}
+
+.chatify-modal-enter-from .chatify-modal-panel,
+.chatify-modal-leave-to .chatify-modal-panel {
+  transform: scale(0.95);
+  opacity: 0;
+}
+
+.chatify-slide-left-enter-active,
+.chatify-slide-left-leave-active,
+.chatify-slide-right-enter-active,
+.chatify-slide-right-leave-active {
+  transition: transform 100ms ease, opacity 100ms ease;
+}
+
+.chatify-slide-left-enter-from {
+  transform: translateX(10px);
+  opacity: 0;
+}
+
+.chatify-slide-left-leave-to {
+  transform: translateX(-10px);
+  opacity: 0;
+}
+
+.chatify-slide-right-enter-from {
+  transform: translateX(-10px);
+  opacity: 0;
+}
+
+.chatify-slide-right-leave-to {
+  transform: translateX(10px);
+  opacity: 0;
+}
+
+.chatify-toast-host {
+  position: fixed;
+  left: 50%;
+  z-index: 100;
+  display: flex;
+  width: min(92vw, 22rem);
+  flex-direction: column;
+  gap: 0.5rem;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.chatify-toast-host-top {
+  top: 1.25rem;
+}
+
+.chatify-toast-host-bottom {
+  bottom: 1.25rem;
+}
+
+.chatify-toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  background: rgba(20, 20, 20, 0.92);
+  padding: 0.625rem 1rem;
+  color: #fff;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(8px);
+}
+
+.chatify-toast-icon {
+  height: 1rem;
+  width: 1rem;
+  flex-shrink: 0;
+  opacity: 0.9;
+}
+
+.chatify-toast-message {
+  min-width: 0;
+}
+
+.chatify-toast-enter-active,
+.chatify-toast-leave-active {
+  transition: transform 180ms ease, opacity 180ms ease;
+}
+
+.chatify-toast-enter-from,
+.chatify-toast-leave-to {
+  transform: translateY(8px);
+  opacity: 0;
+}
+
+.chatify-toast-host-top .chatify-toast-enter-from,
+.chatify-toast-host-top .chatify-toast-leave-to {
+  transform: translateY(-8px);
+}
+
+.chatify-message-ticks {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.125rem;
+}
+
+.chatify-message-ticks-sent {
+  color: color-mix(in srgb, var(--chatify-color-chatify-muted) 90%, transparent);
+}
+
+.chatify-message-ticks-read {
+  color: #53bdeb;
+}
+
+.chatify-message-ticks-second {
+  margin-left: -0.35rem;
+}
+
+.chatify-message-pending {
+  opacity: 0.88;
+}
+
+.chatify-message-failed {
+  outline: 1px solid color-mix(in srgb, var(--chatify-color-chatify-danger) 35%, transparent);
+}
+
+.chatify-message-status-sending {
+  display: inline-flex;
+  color: color-mix(in srgb, var(--chatify-color-chatify-muted) 90%, transparent);
+  animation: chatify-clock-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes chatify-clock-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+.chatify-typing-bubble {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border-radius: 1rem;
+  background-color: var(--chatify-color-chatify-bubble-in);
+  padding: 0.625rem 0.875rem;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 8%);
+}
+
+.chatify-typing-dot {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 9999px;
+  background-color: color-mix(in srgb, var(--chatify-color-chatify-muted) 75%, transparent);
+  animation: chatify-typing-bounce 1.2s infinite ease-in-out;
+}
+
+.chatify-typing-dot-delay-1 {
+  animation-delay: 0.15s;
+}
+
+.chatify-typing-dot-delay-2 {
+  animation-delay: 0.3s;
+}
+
+@keyframes chatify-typing-bounce {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.45;
+  }
+
+  30% {
+    transform: translateY(-3px);
+    opacity: 1;
+  }
+}
+
+.chatify-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(0 0 0 / 88%);
+  padding: 3.5rem 1rem 1rem;
+}
+
+.chatify-lightbox-toolbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  color: #fff;
+}
+
+.chatify-lightbox-counter {
+  font-size: 0.875rem;
+  opacity: 0.85;
+}
+
+.chatify-lightbox-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.chatify-lightbox-btn {
+  border-radius: 0.5rem;
+  background: rgb(255 255 255 / 12%);
+  padding: 0.375rem 0.75rem;
+  font-size: 0.8125rem;
+  color: #fff;
+  transition: background-color 120ms ease;
+}
+
+.chatify-lightbox-btn:hover {
+  background: rgb(255 255 255 / 22%);
+}
+
+.chatify-lightbox-image {
+  max-width: min(92vw, 72rem);
+  max-height: calc(100vh - 6rem);
+  border-radius: 0.375rem;
+  object-fit: contain;
+}
+
+.chatify-lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  height: 2.75rem;
+  width: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-radius: 9999px;
+  background: rgb(255 255 255 / 14%);
+  color: #fff;
+  line-height: 0;
+}
+
+.chatify-lightbox-nav-icon {
+  display: block;
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+}
+
+.chatify-lightbox-nav:hover {
+  background: rgb(255 255 255 / 24%);
+}
+
+.chatify-lightbox-nav-prev {
+  left: 1rem;
+}
+
+.chatify-lightbox-nav-next {
+  right: 1rem;
+}

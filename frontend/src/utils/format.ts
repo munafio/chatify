@@ -1,0 +1,86 @@
+export function formatRelativeTime(iso: string | null | undefined): string {
+  if (!iso) {
+    return ''
+  }
+
+  const date = new Date(iso)
+  const now = new Date()
+  const diffMs = now.getTime() - date.getTime()
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+
+  if (diffDays === 0) {
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  }
+
+  if (diffDays === 1) {
+    return 'Yesterday'
+  }
+
+  if (diffDays < 7) {
+    return date.toLocaleDateString([], { weekday: 'short' })
+  }
+
+  return date.toLocaleDateString([], { month: 'short', day: 'numeric' })
+}
+
+export function formatMessageTime(iso: string | null | undefined): string {
+  if (!iso) {
+    return ''
+  }
+
+  return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+}
+
+export function formatMessageDate(iso: string | null | undefined): string {
+  if (!iso) {
+    return ''
+  }
+
+  const date = new Date(iso)
+  const now = new Date()
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const startOfDate = new Date(date.getFullYear(), date.getMonth(), date.getDate())
+  const diffDays = Math.round((startOfToday.getTime() - startOfDate.getTime()) / (1000 * 60 * 60 * 24))
+
+  if (diffDays === 0) {
+    return 'Today'
+  }
+
+  if (diffDays === 1) {
+    return 'Yesterday'
+  }
+
+  return date.toLocaleDateString([], { month: 'numeric', day: 'numeric', year: 'numeric' })
+}
+
+export function truncate(text: string, max = 48): string {
+  if (text.length <= max) {
+    return text
+  }
+
+  return `${text.slice(0, max - 1)}…`
+}
+
+export function userIdKey(id: number | string): string {
+  return String(id)
+}
+
+export function conversationDisplayName(
+  conversation: { attributes: { conversation_type: string; name: string | null }; relationships: { other_user: { attributes: { name: string } } | null } },
+): string {
+  if (conversation.attributes.conversation_type === 'group') {
+    return conversation.attributes.name ?? 'Group'
+  }
+
+  return conversation.relationships.other_user?.attributes.name ?? 'Unknown'
+}
+
+export function conversationAvatar(
+  conversation: { attributes: { conversation_type: string }; relationships: { other_user: { attributes: { avatar: string } } | null; participants: Array<{ attributes: { avatar: string } }> } },
+): string | null {
+  if (conversation.attributes.conversation_type === 'direct') {
+    return conversation.relationships.other_user?.attributes.avatar ?? null
+  }
+
+  return conversation.relationships.participants[0]?.attributes.avatar ?? null
+}
