@@ -3,6 +3,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import UserAvatar from '../ui/UserAvatar.vue'
 import { useConfigStore } from '../../stores/config'
+import { CHATIFY_TELEPORT_TARGET } from '../../constants/dom'
 
 const configStore = useConfigStore()
 const { user, savedAvatarUrl, avatarUploading } = storeToRefs(configStore)
@@ -141,7 +142,7 @@ onBeforeUnmount(() => {
       </button>
     </div>
 
-    <Teleport to="body">
+    <Teleport :to="CHATIFY_TELEPORT_TARGET">
       <div
         v-if="menuOpen"
         ref="menuPanel"

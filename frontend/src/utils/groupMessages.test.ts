@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { ChatifyMessage } from '../types'
-import { groupMessagesByDate } from './groupMessages'
+import { groupMessagesByDate } from './groupMessageClusters'
 
 function makeMessage(id: string, createdAt: string): ChatifyMessage {
   return {

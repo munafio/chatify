@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, watch } from 'vue'
 import { useImageLightbox } from '../../composables/useImageLightbox'
+import { CHATIFY_TELEPORT_TARGET } from '../../constants/dom'
 
 const { open, images, activeIndex, close, next, prev } = useImageLightbox()
 
@@ -34,7 +35,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <Teleport to="body">
+  <Teleport :to="CHATIFY_TELEPORT_TARGET">
     <div
       v-if="open && current"
       class="chatify-lightbox"

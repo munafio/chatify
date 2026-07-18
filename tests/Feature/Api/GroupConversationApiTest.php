@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Chatify\Tests\Feature\Api;
 
 use Chatify\Models\Conversation;
+use Chatify\Models\Message;
 use Chatify\Services\ConversationService;
 use Chatify\Tests\TestCase;
 
@@ -76,6 +77,62 @@ class GroupConversationApiTest extends TestCase
             ->deleteJson("/api/chatify/v1/conversations/{$conversation->id}/participants/{$newMember->id}")
             ->assertOk()
             ->assertJsonPath('data.attributes.participant_count', 2);
+    }
+
+    public function test_adding_participant_creates_system_message(): void
+    {
+        $owner = $this->createUser();
+        $member = $this->createUser();
+        $newMember = $this->createUser();
+
+        $conversation = app(ConversationService::class)->createGroup(
+            $owner,
+            'Project',
+            [(int) $member->getKey()],
+        );
+
+        $this->actingAs($owner, 'sanctum')
+            ->postJson("/api/chatify/v1/conversations/{$conversation->id}/participants", [
+                'user_ids' => [$newMember->id],
+            ])
+            ->assertOk();
+
+        $message = Message::query()
+            ->where('conversation_id', $conversation->id)
+            ->where('kind', 'system')
+            ->latest('created_at')
+            ->first();
+
+        $this->assertNotNull($message);
+        $this->assertSame('participant_added', $message->system_event['event'] ?? null);
+        $this->assertStringContainsString('added', (string) $message->body);
+    }
+
+    public function test_removing_participant_creates_system_message(): void
+    {
+        $owner = $this->createUser();
+        $member = $this->createUser();
+        $newMember = $this->createUser();
+
+        $conversation = app(ConversationService::class)->createGroup(
+            $owner,
+            'Project',
+            [(int) $member->getKey(), (int) $newMember->getKey()],
+        );
+
+        $this->actingAs($owner, 'sanctum')
+            ->deleteJson("/api/chatify/v1/conversations/{$conversation->id}/participants/{$newMember->id}")
+            ->assertOk();
+
+        $message = Message::query()
+            ->where('conversation_id', $conversation->id)
+            ->where('kind', 'system')
+            ->latest('created_at')
+            ->first();
+
+        $this->assertNotNull($message);
+        $this->assertSame('participant_removed', $message->system_event['event'] ?? null);
+        $this->assertStringContainsString('removed', (string) $message->body);
     }
 
     public function test_member_can_leave_group(): void

@@ -36,6 +36,7 @@ describe('MessageBubble group chat', () => {
         isOwn: false,
         isGroup: true,
         senderName: 'Alice',
+        showSenderName: true,
       },
     })
 
@@ -51,6 +52,7 @@ describe('MessageBubble group chat', () => {
         isOwn: true,
         isGroup: true,
         senderName: 'Alice',
+        showSenderName: false,
       },
     })
 

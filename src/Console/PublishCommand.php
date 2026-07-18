@@ -37,11 +37,16 @@ class PublishCommand extends Command
         ]);
 
         $this->call('vendor:publish', [
+            '--tag' => 'chatify-patterns',
+            '--force' => true,
+        ]);
+
+        $this->call('vendor:publish', [
             '--tag' => 'chatify-frontend',
             '--force' => true,
         ]);
 
-        $this->info('Published. Rebuild frontend: cd resources/vendor/chatify/frontend && npm install && npm run build');
+        $this->info('Published. Rebuild assets: php artisan chatify:build');
 
         return self::SUCCESS;
     }

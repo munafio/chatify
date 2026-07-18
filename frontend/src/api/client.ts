@@ -3,8 +3,12 @@ import type {
   BootConfig,
   ChatifyConversation,
   ChatifyMessage,
+  ChatifyParticipant,
   ChatifyUser,
+  GroupPermissionKey,
+  LinkPreview,
   PaginatedResponse,
+  SharedAttachment,
   SingleResponse,
   UserSettings,
 } from '../types'
@@ -48,8 +52,21 @@ export function createChatifyApi(client: ApiClient) {
       })
     },
 
-    updateConversation(id: string, payload: { name?: string }) {
+    updateConversation(id: string, payload: { name?: string; description?: string | null }) {
       return client.patch<SingleResponse<ChatifyConversation>>(`/conversations/${id}`, payload)
+    },
+
+    uploadGroupAvatar(
+      id: string,
+      file: File,
+      config?: Pick<AxiosRequestConfig, 'onUploadProgress'>,
+    ) {
+      const form = new FormData()
+      form.append('avatar', file)
+      return client.post<SingleResponse<ChatifyConversation>>(`/conversations/${id}/avatar`, form, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        ...config,
+      })
     },
 
     deleteConversation(id: string) {
@@ -76,6 +93,33 @@ export function createChatifyApi(client: ApiClient) {
 
     leaveGroup(id: string) {
       return client.post(`/conversations/${id}/leave`)
+    },
+
+    getMembers(conversationId: string, params?: { page?: number; per_page?: number; search?: string }) {
+      return client.get<PaginatedResponse<ChatifyParticipant>>(`/conversations/${conversationId}/participants`, {
+        params,
+      })
+    },
+
+    updateMemberRole(
+      conversationId: string,
+      userId: number | string,
+      payload: {
+        role: 'admin' | 'moderator' | 'member'
+        permissions?: Partial<Record<GroupPermissionKey, boolean>> | null
+      },
+    ) {
+      return client.patch<SingleResponse<ChatifyConversation>>(
+        `/conversations/${conversationId}/participants/${userId}`,
+        payload,
+      )
+    },
+
+    transferOwnership(conversationId: string, userId: number | string) {
+      return client.post<SingleResponse<ChatifyConversation>>(
+        `/conversations/${conversationId}/transfer-ownership`,
+        { user_id: userId },
+      )
     },
 
     getMessages(conversationId: string, params?: { per_page?: number; after?: string }) {
@@ -166,8 +210,28 @@ export function createChatifyApi(client: ApiClient) {
       return client.post(`/favorites/${userId}`)
     },
 
-    getAttachments(conversationId: string) {
-      return client.get(`/conversations/${conversationId}/attachments`)
+    getAttachments(
+      conversationId: string,
+      params?: { type?: 'media' | 'docs' | 'links'; page?: number; per_page?: number },
+    ) {
+      return client.get<PaginatedResponse<SharedAttachment>>(`/conversations/${conversationId}/attachments`, {
+        params,
+      })
+    },
+
+    searchMessages(
+      conversationId: string,
+      q: string,
+      params?: { page?: number; per_page?: number },
+    ) {
+      return client.get<PaginatedResponse<ChatifyMessage>>(
+        `/conversations/${conversationId}/messages/search`,
+        { params: { q, ...params } },
+      )
+    },
+
+    fetchLinkPreview(url: string) {
+      return client.get<SingleResponse<LinkPreview>>('/link-preview', { params: { url } })
     },
   }
 }

@@ -4,7 +4,7 @@ export interface FontOption {
   stack: string
 }
 
-export const FONT_OPTIONS: FontOption[] = [
+const FONT_REGISTRY: FontOption[] = [
   { id: 'system', label: 'System font', stack: 'system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif' },
   { id: 'segoe', label: 'Segoe UI', stack: '"Segoe UI", system-ui, sans-serif' },
   { id: 'arial', label: 'Arial', stack: 'Arial, Helvetica, sans-serif' },
@@ -25,6 +25,34 @@ export const FONT_OPTIONS: FontOption[] = [
   { id: 'comic', label: 'Comic Sans MS', stack: '"Comic Sans MS", cursive, sans-serif' },
 ]
 
+let allowedFontIds: string[] | null = null
+
+export function setAllowedFonts(ids: string[]): void {
+  allowedFontIds = ids
+}
+
+export function fontOptions(): FontOption[] {
+  if (allowedFontIds === null) {
+    return FONT_REGISTRY
+  }
+
+  return allowedFontIds
+    .map((id) => FONT_REGISTRY.find((font) => font.id === id))
+    .filter((font): font is FontOption => font !== undefined)
+}
+
+export function defaultFontId(): string {
+  return fontOptions()[0]?.id ?? FONT_REGISTRY[0].id
+}
+
+export function sanitizeFontId(id: string | undefined): string {
+  if (id && fontOptions().some((font) => font.id === id)) {
+    return id
+  }
+
+  return defaultFontId()
+}
+
 export function getFontById(id: string): FontOption {
-  return FONT_OPTIONS.find((font) => font.id === id) ?? FONT_OPTIONS[0]
+  return FONT_REGISTRY.find((font) => font.id === id) ?? fontOptions()[0] ?? FONT_REGISTRY[0]
 }

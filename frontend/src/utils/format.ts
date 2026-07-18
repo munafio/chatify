@@ -1,3 +1,6 @@
+import type { ChatifyConversation } from '../types'
+import { isParticipantRecord, participantUser } from './group'
+
 export function formatRelativeTime(iso: string | null | undefined): string {
   if (!iso) {
     return ''
@@ -21,6 +24,13 @@ export function formatRelativeTime(iso: string | null | undefined): string {
   }
 
   return date.toLocaleDateString([], { month: 'short', day: 'numeric' })
+}
+
+export function formatDurationMs(ms: number): string {
+  const totalSeconds = Math.max(0, Math.floor(ms / 1000))
+  const minutes = Math.floor(totalSeconds / 60)
+  const seconds = totalSeconds % 60
+  return `${minutes}:${String(seconds).padStart(2, '0')}`
 }
 
 export function formatMessageTime(iso: string | null | undefined): string {
@@ -61,10 +71,6 @@ export function truncate(text: string, max = 48): string {
   return `${text.slice(0, max - 1)}…`
 }
 
-export function userIdKey(id: number | string): string {
-  return String(id)
-}
-
 export function conversationDisplayName(
   conversation: { attributes: { conversation_type: string; name: string | null }; relationships: { other_user: { attributes: { name: string } } | null } },
 ): string {
@@ -75,12 +81,23 @@ export function conversationDisplayName(
   return conversation.relationships.other_user?.attributes.name ?? 'Unknown'
 }
 
-export function conversationAvatar(
-  conversation: { attributes: { conversation_type: string }; relationships: { other_user: { attributes: { avatar: string } } | null; participants: Array<{ attributes: { avatar: string } }> } },
-): string | null {
+export function conversationAvatar(conversation: ChatifyConversation): string | null {
   if (conversation.attributes.conversation_type === 'direct') {
     return conversation.relationships.other_user?.attributes.avatar ?? null
   }
 
-  return conversation.relationships.participants[0]?.attributes.avatar ?? null
+  if (conversation.attributes.avatar_url) {
+    return conversation.attributes.avatar_url
+  }
+
+  const first = conversation.relationships.participants[0]
+  if (!first) {
+    return null
+  }
+
+  if (isParticipantRecord(first)) {
+    return participantUser(first)?.attributes.avatar ?? null
+  }
+
+  return first.attributes.avatar ?? null
 }

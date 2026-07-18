@@ -1,7 +1,7 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import App from './components/App.vue'
-import { parseBootConfig } from './composables/useBootConfig'
+import { applyBootCatalog, parseBootConfig } from './composables/useBootConfig'
 import { useConfigStore } from './stores/config'
 import './style.css'
 
@@ -12,6 +12,7 @@ function mount() {
   }
 
   const config = parseBootConfig(element)
+  applyBootCatalog(config)
   const pinia = createPinia()
   const app = createApp(App, { config })
 

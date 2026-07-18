@@ -7,6 +7,7 @@ namespace Chatify\Services;
 use Chatify\Models\Conversation;
 use Chatify\Models\ConversationParticipant;
 use Chatify\Support\ChatifyModels;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -30,7 +31,6 @@ final class ConversationService
                 return $again;
             }
 
-            /** @var Conversation $conversation */
             $conversation = ChatifyModels::conversationClass()::query()->create([
                 'id' => (string) Str::uuid(),
                 'type' => Conversation::TYPE_DIRECT,
@@ -43,6 +43,7 @@ final class ConversationService
                     'id' => (string) Str::uuid(),
                     'conversation_id' => $conversation->id,
                     'user_id' => $user->getKey(),
+                    'role' => ConversationParticipant::ROLE_MEMBER,
                 ]);
             }
 
@@ -63,7 +64,6 @@ final class ConversationService
         $this->assertParticipantLimits(count($allParticipantIds));
 
         return DB::transaction(function () use ($ownerId, $name, $allParticipantIds): Conversation {
-            /** @var Conversation $conversation */
             $conversation = ChatifyModels::conversationClass()::query()->create([
                 'id' => (string) Str::uuid(),
                 'type' => Conversation::TYPE_GROUP,
@@ -76,6 +76,9 @@ final class ConversationService
                     'id' => (string) Str::uuid(),
                     'conversation_id' => $conversation->id,
                     'user_id' => $userId,
+                    'role' => $userId === $ownerId
+                        ? ConversationParticipant::ROLE_OWNER
+                        : ConversationParticipant::ROLE_MEMBER,
                 ]);
             }
 
@@ -83,9 +86,6 @@ final class ConversationService
         });
     }
 
-    /**
-     * @param  list<int>  $userIds
-     */
     public function addParticipants(Conversation $conversation, array $userIds): Conversation
     {
         $this->assertIsGroup($conversation);
@@ -107,6 +107,7 @@ final class ConversationService
                 'id' => (string) Str::uuid(),
                 'conversation_id' => $conversation->id,
                 'user_id' => $userId,
+                'role' => ConversationParticipant::ROLE_MEMBER,
             ]);
         }
 
@@ -123,12 +124,138 @@ final class ConversationService
             return;
         }
 
+        if ($participant->role === ConversationParticipant::ROLE_OWNER) {
+            throw ValidationException::withMessages([
+                'user_id' => ['Cannot remove the group owner. Transfer ownership first.'],
+            ]);
+        }
+
         $participant->delete();
     }
 
     public function isOwner(Conversation $conversation, int $userId): bool
     {
-        return (int) $conversation->created_by === $userId;
+        $participant = $this->getParticipant($conversation, $userId);
+
+        return $participant !== null && $participant->role === ConversationParticipant::ROLE_OWNER;
+    }
+
+    public function transferOwnership(Conversation $conversation, Model $from, Model $to): Conversation
+    {
+        $this->assertIsGroup($conversation);
+
+        $fromId = (int) $from->getKey();
+        $toId = (int) $to->getKey();
+
+        if ($fromId === $toId) {
+            throw ValidationException::withMessages([
+                'user_id' => ['Cannot transfer ownership to yourself.'],
+            ]);
+        }
+
+        if (! $this->isOwner($conversation, $fromId)) {
+            throw ValidationException::withMessages([
+                'conversation' => ['Only the group owner can transfer ownership.'],
+            ]);
+        }
+
+        $targetParticipant = $this->getParticipant($conversation, $toId);
+
+        if ($targetParticipant === null) {
+            throw ValidationException::withMessages([
+                'user_id' => ['Target user must be a group member.'],
+            ]);
+        }
+
+        return DB::transaction(function () use ($conversation, $fromId, $toId, $targetParticipant): Conversation {
+            $ownerParticipant = $this->getParticipant($conversation, $fromId);
+
+            $targetParticipant->forceFill([
+                'role' => ConversationParticipant::ROLE_OWNER,
+                'permissions' => null,
+            ])->save();
+
+            $ownerParticipant?->forceFill([
+                'role' => ConversationParticipant::ROLE_ADMIN,
+                'permissions' => null,
+            ])->save();
+
+            return $conversation->fresh(['participants.user', 'creator', 'messages' => fn ($q) => $q->latest()->limit(1)]);
+        });
+    }
+
+    public function updateParticipantRole(
+        Conversation $conversation,
+        int $targetUserId,
+        string $role,
+        ?array $permissions,
+    ): ConversationParticipant {
+        $this->assertIsGroup($conversation);
+
+        $participant = $this->getParticipant($conversation, $targetUserId);
+
+        if ($participant === null) {
+            throw ValidationException::withMessages([
+                'user_id' => ['User is not a group member.'],
+            ]);
+        }
+
+        if ($participant->role === ConversationParticipant::ROLE_OWNER) {
+            throw ValidationException::withMessages([
+                'role' => ['Cannot change the owner role directly. Use transfer ownership.'],
+            ]);
+        }
+
+        if (! in_array($role, [
+            ConversationParticipant::ROLE_ADMIN,
+            ConversationParticipant::ROLE_MODERATOR,
+            ConversationParticipant::ROLE_MEMBER,
+        ], true)) {
+            throw ValidationException::withMessages([
+                'role' => ['Invalid role.'],
+            ]);
+        }
+
+        $participant->forceFill([
+            'role' => $role,
+            'permissions' => $role === ConversationParticipant::ROLE_ADMIN ? $permissions : null,
+        ])->save();
+
+        return $participant->fresh('user');
+    }
+
+    public function paginateParticipants(
+        Conversation $conversation,
+        int $perPage = 20,
+        ?string $search = null,
+    ): LengthAwarePaginator {
+        $userModel = ChatifyModels::userClass();
+        $userTable = (new $userModel)->getTable();
+        $participantTable = config('chatify.tables.participants', 'ch_conversation_participants');
+
+        $query = $conversation->participants()
+            ->with('user')
+            ->join($userTable, "{$userTable}.id", '=', "{$participantTable}.user_id")
+            ->select("{$participantTable}.*")
+            ->orderByRaw("CASE {$participantTable}.role WHEN 'owner' THEN 0 WHEN 'admin' THEN 1 WHEN 'moderator' THEN 2 ELSE 3 END")
+            ->orderBy("{$userTable}.name");
+
+        if ($search !== null && $search !== '') {
+            $query->where("{$userTable}.name", 'like', '%'.$search.'%');
+        }
+
+        return $query->paginate($perPage);
+    }
+
+    public function participantsPreview(Conversation $conversation, ?int $limit = null): \Illuminate\Support\Collection
+    {
+        $limit ??= (int) config('chatify.groups.preview_members', 6);
+
+        return $conversation->participants()
+            ->with('user')
+            ->orderByRaw("CASE role WHEN 'owner' THEN 0 WHEN 'admin' THEN 1 WHEN 'moderator' THEN 2 ELSE 3 END")
+            ->limit($limit)
+            ->get();
     }
 
     public function leaveGroup(Conversation $conversation, Model $user): void
@@ -139,7 +266,7 @@ final class ConversationService
 
         if ($this->isOwner($conversation, $userId)) {
             throw ValidationException::withMessages([
-                'conversation' => ['Group owner cannot leave. Delete the group instead.'],
+                'conversation' => ['Group owner cannot leave. Transfer ownership or delete the group instead.'],
             ]);
         }
 

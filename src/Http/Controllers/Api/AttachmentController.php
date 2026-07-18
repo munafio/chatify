@@ -18,9 +18,32 @@ class AttachmentController extends Controller
 {
     use AuthorizesRequests;
 
-    public function index(Conversation $conversation, AttachmentService $attachmentService): JsonResponse
-    {
+    public function index(
+        Conversation $conversation,
+        Request $request,
+        AttachmentService $attachmentService,
+    ): JsonResponse {
         $this->authorize('view', $conversation);
+
+        $type = $request->string('type', 'media')->toString();
+        $page = (int) $request->integer('page', 1);
+        $perPage = (int) $request->integer('per_page', 20);
+
+        if ($request->has('type') || $request->has('page')) {
+            $paginator = $attachmentService->paginateForConversation($conversation, $type, $perPage, $page);
+
+            return AttachmentResource::collection($paginator)
+                ->additional([
+                    'meta' => [
+                        'total' => $paginator->total(),
+                        'current_page' => $paginator->currentPage(),
+                        'last_page' => $paginator->lastPage(),
+                        'per_page' => $paginator->perPage(),
+                        'total_all' => $attachmentService->totalCount($conversation),
+                    ],
+                ])
+                ->response();
+        }
 
         $photos = $attachmentService->sharedPhotos($conversation);
 

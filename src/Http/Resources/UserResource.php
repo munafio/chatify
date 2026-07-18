@@ -10,7 +10,6 @@ use Chatify\Services\UserSettingsService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/** @mixin Model */
 class UserResource extends JsonResource
 {
     public function toArray(Request $request): array
@@ -24,7 +23,6 @@ class UserResource extends JsonResource
             'attributes' => [
                 'name' => $this->resource->name,
                 'avatar' => $this->avatarUrl($settings),
-                'active_status' => $settings->active_status,
             ],
         ];
 

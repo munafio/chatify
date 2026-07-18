@@ -1,5 +1,5 @@
-export type ThemeId = 'classic' | 'day' | 'tinted' | 'night'
-export type PatternId = 'bubbles' | 'circuit-board' | 'glamorous' | 'hideout'
+export type ThemeId = string
+export type PatternId = string
 export type WallpaperKind = 'none' | 'pattern' | 'image'
 
 export interface ThemeTokenSet {

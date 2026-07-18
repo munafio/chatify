@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { CHATIFY_TELEPORT_TARGET } from '../../constants/dom'
 
 const props = defineProps<{
   isOwn: boolean
@@ -114,7 +115,7 @@ onBeforeUnmount(() => {
       </svg>
     </button>
 
-    <Teleport to="body">
+    <Teleport :to="CHATIFY_TELEPORT_TARGET">
       <div
         v-if="open"
         ref="menu"
@@ -123,6 +124,8 @@ onBeforeUnmount(() => {
       >
         <template v-if="isOwn">
           <button type="button" class="chatify-profile-menu-item" @click="emit('edit'); close()">Edit</button>
+          <button type="button" class="chatify-profile-menu-item" @click="emit('reply'); close()">Reply</button>
+          <button type="button" class="chatify-profile-menu-item" @click="emit('forward'); close()">Forward</button>
           <button type="button" class="chatify-profile-menu-item" @click="emit('removeForMe'); close()">Remove for me</button>
           <button type="button" class="chatify-profile-menu-item chatify-profile-menu-item-danger" @click="emit('removeForAll'); close()">Remove for everyone</button>
         </template>

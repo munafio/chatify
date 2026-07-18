@@ -10,7 +10,6 @@ use Chatify\Services\ConversationService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/** @mixin Message */
 class MessageResource extends JsonResource
 {
     public function toArray(Request $request): array
@@ -67,17 +66,38 @@ class MessageResource extends JsonResource
             ];
         }
 
+        $forwardedFrom = null;
+
+        if ($this->forwarded_from_message_id !== null) {
+            if ($this->relationLoaded('forwardedFrom') && $this->forwardedFrom !== null) {
+                $forwardedFrom = [
+                    'id' => $this->forwardedFrom->id,
+                    'body' => $this->forwardedFrom->body,
+                    'sender_name' => $this->forwardedFrom->sender?->name ?? 'User',
+                ];
+            } else {
+                $forwardedFrom = [
+                    'id' => $this->forwarded_from_message_id,
+                    'body' => null,
+                    'sender_name' => 'User',
+                ];
+            }
+        }
+
         return [
             'type' => 'message',
             'id' => $this->id,
             'attributes' => [
                 'conversation_id' => $this->conversation_id,
+                'kind' => $this->kind ?? 'user',
+                'system_event' => $this->system_event,
                 'body' => $this->body,
                 'attachment' => $attachment,
                 'attachments' => $attachments,
                 'read' => $read,
                 'edited_at' => $this->edited_at?->toIso8601String(),
                 'reply_to' => $replyTo,
+                'forwarded_from' => $forwardedFrom,
                 'created_at' => $this->created_at?->toIso8601String(),
                 'updated_at' => $this->updated_at?->toIso8601String(),
             ],

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
+import { CHATIFY_TELEPORT_TARGET } from '../../constants/dom'
 import { useToastStore, type ToastIcon, type ToastPlacement } from '../../stores/toast'
 
 const toastStore = useToastStore()
@@ -26,7 +27,7 @@ function iconPath(icon: ToastIcon): string | null {
 </script>
 
 <template>
-  <Teleport to="body">
+  <Teleport :to="CHATIFY_TELEPORT_TARGET">
     <div
       v-for="placement in (['top', 'bottom'] as ToastPlacement[])"
       :key="placement"

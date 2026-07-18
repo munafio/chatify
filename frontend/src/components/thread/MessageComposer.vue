@@ -2,8 +2,13 @@
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useTyping } from '../../composables/useTyping'
+import { useVoiceRecorder } from '../../composables/useVoiceRecorder'
+import { stopAllVoicePlayback } from '../../utils/voicePlayback'
 import { useConfigStore } from '../../stores/config'
 import { useMessagesStore } from '../../stores/messages'
+import ComposerAttachMenu from './ComposerAttachMenu.vue'
+import StickerPicker from './StickerPicker.vue'
+import VoiceRecorderOverlay from './VoiceRecorderOverlay.vue'
 
 const props = defineProps<{
   conversationId: string
@@ -11,24 +16,46 @@ const props = defineProps<{
 
 const messagesStore = useMessagesStore()
 const configStore = useConfigStore()
+const giphyEnabled = computed(() => configStore.giphyEnabled)
 const { replyToMessage, editingMessage } = storeToRefs(messagesStore)
 
 const body = ref('')
 const attachments = ref<File[]>([])
 const previewUrls = ref<string[]>([])
-const fileInput = ref<HTMLInputElement | null>(null)
+const mediaInput = ref<HTMLInputElement | null>(null)
+const documentInput = ref<HTMLInputElement | null>(null)
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
+const attachMenuRef = ref<InstanceType<typeof ComposerAttachMenu> | null>(null)
+const stickerPickerRef = ref<InstanceType<typeof StickerPicker> | null>(null)
 
 const TEXTAREA_MAX_HEIGHT = 128
+const isMultiline = ref(false)
 
 const { notifyTyping, stopTyping } = useTyping(() => props.conversationId)
+const {
+  isRecording,
+  durationMs,
+  waveform,
+  startRecording,
+  stopRecording,
+  cancelRecording,
+} = useVoiceRecorder()
+
+const VIDEO_EXTENSIONS = new Set([
+  'mp4', 'webm', 'mov', 'avi', 'mkv', 'm4v', 'ogv', '3gp', 'mpeg', 'mpg',
+])
 
 const accept = [
   ...(configStore.attachments?.allowedImages.map((ext) => `.${ext}`) ?? []),
   ...(configStore.attachments?.allowedFiles.map((ext) => `.${ext}`) ?? []),
 ].join(',')
 
-const imageOnlyAccept = (configStore.attachments?.allowedImages.map((ext) => `.${ext}`) ?? []).join(',')
+const mediaAccept = [
+  ...(configStore.attachments?.allowedImages ?? []),
+  ...(configStore.attachments?.allowedFiles ?? []).filter((ext) => VIDEO_EXTENSIONS.has(ext)),
+]
+  .map((ext) => `.${ext}`)
+  .join(',')
 
 const modeLabel = computed(() => {
   if (editingMessage.value) {
@@ -39,6 +66,34 @@ const modeLabel = computed(() => {
   }
   return ''
 })
+
+const hasContent = computed(() => Boolean(body.value.trim()) || attachments.value.length > 0)
+const showSendButton = computed(() => hasContent.value || Boolean(editingMessage.value))
+const imagePreviews = computed(() =>
+  attachments.value.flatMap((file, attachmentIndex) => {
+    if (!file.type.startsWith('image/')) {
+      return []
+    }
+
+    const previewIndex = attachments.value
+      .slice(0, attachmentIndex)
+      .filter((item) => item.type.startsWith('image/')).length
+
+    return [{
+      file,
+      url: previewUrls.value[previewIndex],
+      attachmentIndex,
+    }]
+  }).filter((item) => item.url),
+)
+
+const nonImageAttachments = computed(() =>
+  attachments.value.filter((file) => !file.type.startsWith('image/')),
+)
+
+const hasComposerExtras = computed(
+  () => Boolean(modeLabel.value) || imagePreviews.value.length > 0 || nonImageAttachments.value.length > 0,
+)
 
 watch(editingMessage, async (message) => {
   if (message) {
@@ -57,19 +112,24 @@ function revokePreviews() {
 function clearAttachments() {
   revokePreviews()
   attachments.value = []
-  if (fileInput.value) {
-    fileInput.value.value = ''
+  if (mediaInput.value) {
+    mediaInput.value.value = ''
+  }
+  if (documentInput.value) {
+    documentInput.value.value = ''
   }
 }
 
 function resetTextareaHeight() {
   const el = textareaRef.value
   if (!el) {
+    isMultiline.value = false
     return
   }
 
   el.style.height = '2.25rem'
   el.style.overflowY = 'hidden'
+  isMultiline.value = false
 }
 
 function resizeTextarea() {
@@ -82,6 +142,7 @@ function resizeTextarea() {
   const nextHeight = Math.min(el.scrollHeight, TEXTAREA_MAX_HEIGHT)
   el.style.height = `${Math.max(nextHeight, 36)}px`
   el.style.overflowY = el.scrollHeight > TEXTAREA_MAX_HEIGHT ? 'auto' : 'hidden'
+  isMultiline.value = nextHeight > 44
 }
 
 function cancelMode() {
@@ -109,17 +170,27 @@ function buildReplyPreview() {
   }
 }
 
-async function send() {
-  const text = body.value.trim()
-  if (!text && attachments.value.length === 0) {
+function splitAttachments(files: File[]) {
+  const imageFiles = files.filter((file) => file.type.startsWith('image/'))
+  const otherFiles = files.filter((file) => !file.type.startsWith('image/'))
+  return { imageFiles, otherFiles }
+}
+
+async function dispatchSend(options?: {
+  text?: string
+  files?: File[]
+}) {
+  const text = (options?.text ?? body.value).trim()
+  const files = options?.files ?? attachments.value
+
+  if (!text && files.length === 0) {
     return
   }
 
   const editing = editingMessage.value
   const replyId = replyToMessage.value?.id
   const replyPreview = buildReplyPreview()
-  const imageFiles = attachments.value.filter((file) => file.type.startsWith('image/'))
-  const otherFiles = attachments.value.filter((file) => !file.type.startsWith('image/'))
+  const { imageFiles, otherFiles } = splitAttachments(files)
 
   body.value = ''
   clearAttachments()
@@ -151,6 +222,22 @@ async function send() {
   })
 }
 
+async function send() {
+  await dispatchSend()
+}
+
+function addFiles(files: File[]) {
+  if (files.length === 0) {
+    return
+  }
+
+  revokePreviews()
+  attachments.value = files
+  previewUrls.value = files
+    .filter((file) => file.type.startsWith('image/'))
+    .map((file) => URL.createObjectURL(file))
+}
+
 function onKeydown(event: KeyboardEvent) {
   if (event.key === 'Enter' && !event.shiftKey) {
     event.preventDefault()
@@ -168,120 +255,190 @@ function onInput() {
   resizeTextarea()
 }
 
-function onFileChange(event: Event) {
+function onMediaChange(event: Event) {
   const target = event.target as HTMLInputElement
-  const files = Array.from(target.files ?? [])
-  if (files.length === 0) {
-    return
-  }
+  addFiles(Array.from(target.files ?? []))
+}
 
-  revokePreviews()
-  attachments.value = files
-  previewUrls.value = files
-    .filter((file) => file.type.startsWith('image/'))
-    .map((file) => URL.createObjectURL(file))
+function onDocumentChange(event: Event) {
+  const target = event.target as HTMLInputElement
+  addFiles(Array.from(target.files ?? []))
 }
 
 function removeAttachment(index: number) {
+  const file = attachments.value[index]
+  if (!file) {
+    return
+  }
+
+  if (file.type.startsWith('image/')) {
+    const previewIndex = attachments.value
+      .slice(0, index)
+      .filter((item) => item.type.startsWith('image/')).length
+    if (previewUrls.value[previewIndex]) {
+      URL.revokeObjectURL(previewUrls.value[previewIndex])
+      previewUrls.value = previewUrls.value.filter((_, i) => i !== previewIndex)
+    }
+  }
+
   attachments.value = attachments.value.filter((_, i) => i !== index)
-  if (previewUrls.value[index]) {
-    URL.revokeObjectURL(previewUrls.value[index])
-    previewUrls.value = previewUrls.value.filter((_, i) => i !== index)
+}
+
+function openMediaPicker() {
+  mediaInput.value?.click()
+}
+
+function openDocumentPicker() {
+  documentInput.value?.click()
+}
+
+async function onStickerSelect(file: File) {
+  await dispatchSend({ text: '', files: [file] })
+}
+
+function closePopups() {
+  attachMenuRef.value?.close()
+  stickerPickerRef.value?.close()
+}
+
+function onAttachMenuOpen() {
+  stickerPickerRef.value?.close()
+}
+
+function onStickerPickerOpen() {
+  attachMenuRef.value?.close()
+}
+
+function beginVoiceRecording() {
+  if (showSendButton.value || isRecording.value) {
+    return
+  }
+
+  closePopups()
+  stopAllVoicePlayback()
+  void startRecording()
+}
+
+async function sendVoiceRecording() {
+  const file = await stopRecording()
+  if (file) {
+    await dispatchSend({ text: '', files: [file] })
   }
 }
 
-function openPicker(multiple = true) {
-  if (fileInput.value) {
-    fileInput.value.multiple = multiple
-    fileInput.value.accept = multiple ? imageOnlyAccept || accept : accept
-    fileInput.value.click()
-  }
+function discardVoiceRecording() {
+  cancelRecording()
 }
 
 onBeforeUnmount(revokePreviews)
 
-const hasComposerExtras = computed(
-  () => Boolean(modeLabel.value) || previewUrls.value.length > 0,
-)
+defineExpose({
+  addFiles,
+  closePopups,
+})
 </script>
 
 <template>
-  <footer class="chatify-composer-footer chatify-sidebar-divide chatify:shrink-0 chatify:border-t chatify:bg-chatify-sidebar">
-    <div v-if="hasComposerExtras" class="chatify-composer-extras chatify:px-4 chatify:pt-2 chatify:pb-1">
+  <div class="chatify-composer-floating">
+    <div v-if="hasComposerExtras && !isRecording" class="chatify-composer-floating-extras">
       <div
         v-if="modeLabel"
-        class="chatify:mb-2 chatify:flex chatify:items-center chatify:justify-between chatify:rounded-lg chatify:border chatify:border-chatify-border chatify:bg-chatify-bubble-in chatify:px-3 chatify:py-2 chatify:text-xs"
+        class="chatify-composer-mode-banner"
       >
-        <span class="chatify:truncate chatify:text-chatify-muted">{{ modeLabel }}</span>
-        <button type="button" class="chatify:ml-2 chatify:text-chatify-muted chatify:hover:text-chatify-text" @click="cancelMode">
+        <span class="chatify:truncate">{{ modeLabel }}</span>
+        <button type="button" class="chatify-composer-mode-close" @click="cancelMode">
           ✕
         </button>
       </div>
 
-      <div v-if="previewUrls.length > 0" class="chatify:mb-3 chatify:flex chatify:flex-wrap chatify:gap-2">
+      <div v-if="imagePreviews.length > 0" class="chatify-composer-preview-row">
         <div
-          v-for="(url, index) in previewUrls"
-          :key="url"
-          class="chatify:relative chatify:h-16 chatify:w-16 chatify:overflow-hidden chatify:rounded-md"
+          v-for="preview in imagePreviews"
+          :key="preview.url"
+          class="chatify-composer-preview-thumb"
         >
-          <img :src="url" alt="" class="chatify:h-full chatify:w-full chatify:object-cover" />
+          <img :src="preview.url" alt="" />
           <button
             type="button"
-            class="chatify:absolute chatify:right-0.5 chatify:top-0.5 chatify:rounded-full chatify:bg-black/60 chatify:px-1 chatify:text-[10px] chatify:text-white"
-            @click="removeAttachment(index)"
+            class="chatify-composer-preview-remove"
+            @click="removeAttachment(preview.attachmentIndex)"
           >
             ✕
           </button>
         </div>
       </div>
+
+      <div v-if="nonImageAttachments.length > 0" class="chatify-composer-file-row">
+        <div
+          v-for="file in nonImageAttachments"
+          :key="`${file.name}-${file.size}`"
+          class="chatify-composer-file-chip"
+        >
+          <span class="chatify:truncate">{{ file.name }}</span>
+        </div>
+      </div>
     </div>
 
-    <div class="chatify-composer-bar chatify:flex chatify:items-end chatify:gap-2 chatify:px-4">
+    <VoiceRecorderOverlay
+      v-if="isRecording"
+      class="chatify-composer-floating-pill"
+      :duration-ms="durationMs"
+      :waveform="waveform"
+      @cancel="discardVoiceRecording"
+      @send="sendVoiceRecording"
+    />
+
+    <div
+      v-else
+      class="chatify-composer-floating-pill"
+      :class="isMultiline ? 'chatify-composer-floating-pill-expanded' : ''"
+    >
       <input
-        ref="fileInput"
+        ref="mediaInput"
         type="file"
         class="chatify:hidden"
         multiple
+        :accept="mediaAccept"
+        @change="onMediaChange"
+      />
+      <input
+        ref="documentInput"
+        type="file"
+        class="chatify:hidden"
         :accept="accept"
-        @change="onFileChange"
+        @change="onDocumentChange"
       />
 
-      <button
-        type="button"
-        class="chatify:mb-0.5 chatify:shrink-0 chatify:rounded-full chatify:p-2 chatify:text-chatify-muted chatify:hover:bg-chatify-border"
-        aria-label="Attach images"
-        @click="openPicker(true)"
-      >
-        <svg class="chatify:h-5 chatify:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-        </svg>
-      </button>
+      <ComposerAttachMenu
+        ref="attachMenuRef"
+        @pick-media="openMediaPicker"
+        @pick-document="openDocumentPicker"
+        @open="onAttachMenuOpen"
+      />
 
-      <button
-        type="button"
-        class="chatify:mb-0.5 chatify:shrink-0 chatify:rounded-full chatify:p-2 chatify:text-chatify-muted chatify:hover:bg-chatify-border"
-        aria-label="Attach file"
-        @click="openPicker(false)"
-      >
-        <svg class="chatify:h-5 chatify:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-        </svg>
-      </button>
+      <StickerPicker
+        v-if="giphyEnabled"
+        ref="stickerPickerRef"
+        @select="onStickerSelect"
+        @open="onStickerPickerOpen"
+      />
 
       <textarea
         ref="textareaRef"
         v-model="body"
         rows="1"
         placeholder="Type a message"
-        class="chatify-composer-input chatify:flex-1 chatify:resize-none chatify:rounded-lg chatify:border chatify:border-chatify-border chatify:bg-chatify-bubble-in chatify:px-3 chatify:py-2 chatify:text-sm chatify:text-chatify-text chatify:focus:outline-none chatify:focus:ring-2 chatify:focus:ring-chatify-primary"
+        class="chatify-composer-input chatify-composer-floating-input"
         @keydown="onKeydown"
         @input="onInput"
+        @focus="closePopups"
       />
 
       <button
+        v-if="showSendButton"
         type="button"
-        class="chatify:mb-0.5 chatify:shrink-0 chatify:rounded-full chatify:bg-chatify-primary chatify-accent-gradient chatify:p-2 chatify:text-white chatify:disabled:opacity-50"
-        :disabled="!body.trim() && attachments.length === 0"
+        class="chatify-composer-send-btn"
+        :disabled="!hasContent && !editingMessage"
         aria-label="Send message"
         @click="send"
       >
@@ -289,6 +446,18 @@ const hasComposerExtras = computed(
           <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
         </svg>
       </button>
+
+      <button
+        v-else
+        type="button"
+        class="chatify-composer-mic-btn"
+        aria-label="Record voice message"
+        @click="beginVoiceRecording"
+      >
+        <svg class="chatify:h-5 chatify:w-5" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 14a3 3 0 003-3V5a3 3 0 10-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 0014 0h-2zm-5 7a7 7 0 007-7h-2a5 5 0 01-10 0H5a7 7 0 007 7z" />
+        </svg>
+      </button>
     </div>
-  </footer>
+  </div>
 </template>

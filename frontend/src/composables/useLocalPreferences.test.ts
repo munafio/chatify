@@ -1,4 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { setAllowedFonts } from '../themes/fonts'
+import { setAllowedThemes } from '../themes/presets'
+import { setWallpaperPatterns } from '../themes/patterns'
 import {
   applyPreferences,
   defaultPreferences,
@@ -11,6 +14,11 @@ const STORAGE_KEY = 'chatify.preferences'
 
 describe('useLocalPreferences', () => {
   beforeEach(() => {
+    setWallpaperPatterns([
+      { id: 'bubbles', name: 'Bubbles', url: '/vendor/chatify/patterns/bubbles.svg' },
+    ])
+    setAllowedThemes(['classic', 'day', 'tinted', 'night'])
+    setAllowedFonts(['system', 'georgia'])
     localStorage.clear()
     document.documentElement.removeAttribute('style')
     document.body.classList.remove('chatify-dark')

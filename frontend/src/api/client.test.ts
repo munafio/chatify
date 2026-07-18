@@ -7,7 +7,7 @@ const bootConfig: BootConfig = {
   user: {
     type: 'user',
     id: 1,
-    attributes: { name: 'Test User', avatar: '/avatar.png', active_status: true },
+    attributes: { name: 'Test User', avatar: '/avatar.png' },
   },
   apiBase: 'https://example.test/api/chatify/v1',
   broadcastAuthUrl: 'https://example.test/api/chatify/v1/broadcasting/auth',
@@ -15,7 +15,16 @@ const bootConfig: BootConfig = {
   conversationId: null,
   debug: false,
   groupsEnabled: true,
+  features: {
+    giphy: false,
+    colors: true,
+    themes: true,
+    fonts: true,
+    wallpaper: true,
+  },
   colors: ['#2180f3'],
+  themes: ['classic'],
+  fonts: ['system'],
   attachments: {
     maxUploadSize: 150,
     allowedImages: ['png', 'jpg'],

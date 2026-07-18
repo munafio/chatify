@@ -22,8 +22,10 @@ class Message extends ChatifyModel
         'id',
         'conversation_id',
         'user_id',
+        'kind',
         'body',
         'attachment',
+        'system_event',
         'edited_at',
         'reply_to_message_id',
         'forwarded_from_message_id',
@@ -33,6 +35,7 @@ class Message extends ChatifyModel
     {
         return [
             'attachment' => 'array',
+            'system_event' => 'array',
             'edited_at' => 'datetime',
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
@@ -58,6 +61,11 @@ class Message extends ChatifyModel
     public function replyTo(): BelongsTo
     {
         return $this->belongsTo(static::class, 'reply_to_message_id');
+    }
+
+    public function forwardedFrom(): BelongsTo
+    {
+        return $this->belongsTo(static::class, 'forwarded_from_message_id');
     }
 
     public function scopeForConversation(Builder $query, string $conversationId): Builder

@@ -46,9 +46,6 @@ async function toggleFavorite() {
       />
       <div class="chatify:text-center">
         <p class="chatify:text-lg chatify:font-semibold">{{ user.attributes.name }}</p>
-        <p class="chatify:text-sm chatify:text-chatify-muted">
-          {{ user.attributes.active_status ? 'Online' : 'Offline' }}
-        </p>
       </div>
       <div class="chatify:flex chatify:w-full chatify:gap-2">
         <button

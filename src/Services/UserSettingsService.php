@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Chatify\Services;
 
 use Chatify\Models\UserSetting;
+use Chatify\Support\ChatifyAppearanceConfig;
 use Chatify\Support\ChatifyModels;
 use Chatify\Support\ThemePreferencesValidator;
 use Illuminate\Database\Eloquent\Model;
@@ -18,14 +19,12 @@ final class UserSettingsService
 
     public function forUser(Model $user): UserSetting
     {
-        /** @var UserSetting $settings */
         $settings = ChatifyModels::userSettingClass()::query()->firstOrCreate(
             ['user_id' => $user->getKey()],
             [
                 'avatar' => config('chatify.user_avatar.default', 'avatar.png'),
                 'dark_mode' => false,
-                'messenger_color' => config('chatify.colors.0', '#2180f3'),
-                'active_status' => false,
+                'messenger_color' => ChatifyAppearanceConfig::defaultColor(),
             ]
         );
 
@@ -47,6 +46,10 @@ final class UserSettingsService
         }
 
         if ($chatBackground !== null) {
+            if (! ChatifyAppearanceConfig::isEnabled('chat_background')) {
+                throw new \InvalidArgumentException('Wallpaper upload is disabled.');
+            }
+
             $this->deleteChatBackgroundIfCustom($settings->chat_background);
             $stored = $this->attachmentService->storeChatBackground($chatBackground);
             $settings->chat_background = $stored['stored_name'];
@@ -58,10 +61,6 @@ final class UserSettingsService
 
         if (array_key_exists('messenger_color', $attributes)) {
             $settings->messenger_color = $attributes['messenger_color'];
-        }
-
-        if (array_key_exists('active_status', $attributes)) {
-            $settings->active_status = (bool) $attributes['active_status'];
         }
 
         if (! empty($attributes['reset_avatar'])) {

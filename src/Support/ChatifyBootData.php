@@ -14,7 +14,6 @@ final class ChatifyBootData
 {
     public static function fromRequest(Request $request, ?string $conversationId = null): array
     {
-        /** @var Authenticatable $user */
         $user = $request->user();
 
         $broadcast = config('chatify.frontend.broadcast', []);
@@ -30,7 +29,11 @@ final class ChatifyBootData
             'appName' => config('chatify.name', 'Chatify Messenger'),
             'debug' => (bool) config('app.debug', false),
             'groupsEnabled' => (bool) config('chatify.groups.enabled', true),
-            'colors' => config('chatify.colors', []),
+            'features' => ChatifyAppearanceConfig::features(),
+            'colors' => ChatifyAppearanceConfig::colorValues(),
+            'themes' => ChatifyAppearanceConfig::themeIds(),
+            'fonts' => ChatifyAppearanceConfig::fontIds(),
+            'wallpaperPatterns' => ChatBackgroundPatterns::all(),
             'preferences' => [
                 'dark_mode' => (bool) $settings->dark_mode,
                 'theme_preferences' => $settings->theme_preferences,
@@ -40,6 +43,10 @@ final class ChatifyBootData
                 'maxUploadSize' => (int) config('chatify.attachments.max_upload_size', 150),
                 'allowedImages' => config('chatify.attachments.allowed_images', []),
                 'allowedFiles' => config('chatify.attachments.allowed_files', []),
+            ],
+            'giphy' => [
+                'enabled' => ChatifyAppearanceConfig::features()['giphy'],
+                'apiKey' => ChatifyAppearanceConfig::giphyApiKey(),
             ],
             'broadcast' => [
                 'driver' => in_array(config('broadcasting.default', 'null'), ['pusher', 'reverb'], true)

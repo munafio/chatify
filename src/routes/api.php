@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
+use Chatify\Http\Controllers\Api\GroupParticipantController;
 use Chatify\Http\Controllers\Api\AttachmentController;
 use Chatify\Http\Controllers\Api\BroadcastAuthController;
 use Chatify\Http\Controllers\Api\ContactController;
+use Chatify\Http\Controllers\Api\LinkPreviewController;
 use Chatify\Http\Controllers\Api\ConversationController;
 use Chatify\Http\Controllers\Api\FavoriteController;
 use Chatify\Http\Controllers\Api\MessageController;
@@ -21,6 +23,8 @@ Route::middleware(config('chatify.api.middleware', ['api', 'auth:sanctum']))
         Route::post('conversations/group', [ConversationController::class, 'storeGroup']);
         Route::get('conversations/{conversation}', [ConversationController::class, 'show']);
         Route::patch('conversations/{conversation}', [ConversationController::class, 'update']);
+        Route::post('conversations/{conversation}/avatar', [ConversationController::class, 'uploadAvatar'])
+            ->middleware('throttle:chatify-uploads');
         Route::delete('conversations/{conversation}', [ConversationController::class, 'destroy']);
         Route::post('conversations/{conversation}/read', [ConversationController::class, 'markRead']);
         Route::post('conversations/{conversation}/typing', [TypingController::class, 'store'])
@@ -28,10 +32,15 @@ Route::middleware(config('chatify.api.middleware', ['api', 'auth:sanctum']))
         Route::post('conversations/{conversation}/forward', [MessageController::class, 'forward'])
             ->middleware('throttle:chatify-messages');
         Route::post('conversations/{conversation}/participants', [ConversationController::class, 'addParticipants']);
+        Route::get('conversations/{conversation}/participants', [GroupParticipantController::class, 'index']);
+        Route::patch('conversations/{conversation}/participants/{user}', [GroupParticipantController::class, 'update']);
+        Route::post('conversations/{conversation}/transfer-ownership', [GroupParticipantController::class, 'transferOwnership']);
         Route::delete('conversations/{conversation}/participants/{user}', [ConversationController::class, 'removeParticipant']);
         Route::post('conversations/{conversation}/leave', [ConversationController::class, 'leave']);
 
         Route::get('conversations/{conversation}/messages', [MessageController::class, 'index'])
+            ->middleware('throttle:chatify-messages');
+        Route::get('conversations/{conversation}/messages/search', [MessageController::class, 'search'])
             ->middleware('throttle:chatify-messages');
         Route::post('conversations/{conversation}/messages', [MessageController::class, 'store'])
             ->middleware('throttle:chatify-messages');
@@ -40,6 +49,7 @@ Route::middleware(config('chatify.api.middleware', ['api', 'auth:sanctum']))
         Route::delete('messages/{message}', [MessageController::class, 'destroy']);
 
         Route::get('contacts/search', [ContactController::class, 'search']);
+        Route::get('link-preview', [LinkPreviewController::class, 'show']);
 
         Route::get('favorites', [FavoriteController::class, 'index']);
         Route::post('favorites/{user}', [FavoriteController::class, 'toggle']);
@@ -50,8 +60,6 @@ Route::middleware(config('chatify.api.middleware', ['api', 'auth:sanctum']))
         Route::post('settings/avatar', [UserSettingsController::class, 'updateAvatar'])
             ->middleware('throttle:chatify-uploads');
         Route::post('settings/chat-background', [UserSettingsController::class, 'updateChatBackground'])
-            ->middleware('throttle:chatify-uploads');
-        Route::put('settings', [UserSettingsController::class, 'update'])
             ->middleware('throttle:chatify-uploads');
         Route::patch('settings', [UserSettingsController::class, 'update'])
             ->middleware('throttle:chatify-uploads');

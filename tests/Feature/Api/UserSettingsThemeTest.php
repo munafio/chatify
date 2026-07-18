@@ -98,4 +98,74 @@ class UserSettingsThemeTest extends TestCase
         $this->assertNotEmpty($filename);
         Storage::disk('public')->assertExists('chat-backgrounds/'.$filename);
     }
+
+    public function test_theme_patch_rejected_when_themes_disabled(): void
+    {
+        config(['chatify.themes.enabled' => false]);
+
+        $user = $this->createUser();
+
+        $this->actingAs($user, 'sanctum')->patchJson('/api/chatify/v1/settings', [
+            'theme_preferences' => [
+                'themeId' => 'night',
+            ],
+        ])->assertUnprocessable();
+    }
+
+    public function test_accent_color_rejected_when_colors_disabled(): void
+    {
+        config(['chatify.colors.enabled' => false]);
+
+        $user = $this->createUser();
+
+        $this->actingAs($user, 'sanctum')->patchJson('/api/chatify/v1/settings', [
+            'theme_preferences' => [
+                'accentColor' => '#2180f3',
+            ],
+        ])->assertUnprocessable();
+    }
+
+    public function test_font_rejected_when_fonts_disabled(): void
+    {
+        config(['chatify.fonts.enabled' => false]);
+
+        $user = $this->createUser();
+
+        $this->actingAs($user, 'sanctum')->patchJson('/api/chatify/v1/settings', [
+            'theme_preferences' => [
+                'fontFamily' => 'system',
+            ],
+        ])->assertUnprocessable();
+    }
+
+    public function test_wallpaper_rejected_when_chat_background_disabled(): void
+    {
+        config(['chatify.chat_background.enabled' => false]);
+
+        $user = $this->createUser();
+
+        $this->actingAs($user, 'sanctum')->patchJson('/api/chatify/v1/settings', [
+            'theme_preferences' => [
+                'wallpaper' => [
+                    'kind' => 'pattern',
+                    'patternId' => 'bubbles',
+                ],
+            ],
+        ])->assertUnprocessable();
+    }
+
+    public function test_chat_background_upload_rejected_when_disabled(): void
+    {
+        Storage::fake('public');
+        config(['chatify.chat_background.enabled' => false]);
+
+        $user = $this->createUser();
+        $file = UploadedFile::fake()->image('background.jpg', 800, 600);
+
+        $this->actingAs($user, 'sanctum')
+            ->post('/api/chatify/v1/settings/chat-background', [
+                'background' => $file,
+            ])
+            ->assertForbidden();
+    }
 }

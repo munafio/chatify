@@ -15,10 +15,3 @@ Broadcast::channel('chatify.conversation.{conversationId}', function ($user, str
 Broadcast::channel('chatify.user.{userId}', function ($user, int|string $userId) {
     return (int) $user->getKey() === (int) $userId;
 });
-
-Broadcast::channel('chatify.presence', function ($user) {
-    return [
-        'id' => $user->getKey(),
-        'name' => $user->name ?? 'User',
-    ];
-});

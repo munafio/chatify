@@ -14,9 +14,14 @@ class AttachmentResource extends JsonResource
         return [
             'type' => 'attachment',
             'attributes' => [
-                'filename' => $this->resource['filename'],
-                'url' => $this->resource['url'],
+                'kind' => $this->resource['kind'] ?? 'media',
+                'filename' => $this->resource['filename'] ?? null,
+                'url' => $this->resource['url'] ?? null,
+                'original_name' => $this->resource['original_name'] ?? null,
+                'mime' => $this->resource['mime'] ?? null,
+                'snippet' => $this->resource['snippet'] ?? null,
                 'message_id' => $this->resource['message_id'] ?? null,
+                'created_at' => $this->resource['created_at'] ?? null,
             ],
         ];
     }

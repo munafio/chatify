@@ -11,14 +11,17 @@ use Chatify\Actions\Conversations\FindOrCreateDirectConversation;
 use Chatify\Actions\Conversations\LeaveGroupConversation;
 use Chatify\Actions\Conversations\RemoveGroupParticipant;
 use Chatify\Actions\Conversations\UpdateGroupConversation;
+use Chatify\Actions\Conversations\UpdateGroupAvatar;
 use Chatify\Actions\Messages\MarkConversationRead;
 use Chatify\Http\Requests\CreateDirectConversationRequest;
 use Chatify\Http\Requests\CreateGroupConversationRequest;
 use Chatify\Http\Requests\ManageGroupParticipantsRequest;
 use Chatify\Http\Requests\UpdateGroupConversationRequest;
+use Chatify\Http\Requests\UploadGroupAvatarRequest;
 use Chatify\Http\Resources\ConversationResource;
 use Chatify\Models\Conversation;
 use Chatify\Services\ContactService;
+use Chatify\Services\ConversationService;
 use Chatify\Services\InboxBroadcastService;
 use Chatify\Support\ChatifyModels;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -79,7 +82,7 @@ class ConversationController extends Controller
     {
         $this->authorize('view', $conversation);
 
-        $conversation->load(['participants.user', 'messages' => fn ($q) => $q->latest()->limit(1)]);
+        $conversation->load(['participants.user', 'creator', 'messages' => fn ($q) => $q->latest()->limit(1)]);
 
         return (new ConversationResource($conversation))->response();
     }
@@ -91,7 +94,23 @@ class ConversationController extends Controller
     ): JsonResponse {
         $this->authorize('updateGroup', $conversation);
 
-        $conversation = $action->handle($conversation, $request->string('name')->toString());
+        $conversation = $action->handle(
+            $conversation,
+            $request->has('name') ? $request->string('name')->toString() : null,
+            $request->has('description') ? $request->input('description') : null,
+        );
+
+        return (new ConversationResource($conversation))->response();
+    }
+
+    public function uploadAvatar(
+        UploadGroupAvatarRequest $request,
+        Conversation $conversation,
+        UpdateGroupAvatar $action,
+    ): JsonResponse {
+        $this->authorize('updateGroup', $conversation);
+
+        $conversation = $action->handle($conversation, $request->file('avatar'));
 
         return (new ConversationResource($conversation))->response();
     }
@@ -105,6 +124,7 @@ class ConversationController extends Controller
 
         $conversation = $action->handle(
             $conversation,
+            $request->user(),
             array_map('intval', $request->input('user_ids', [])),
         );
 
@@ -119,11 +139,13 @@ class ConversationController extends Controller
     ): JsonResponse {
         $this->authorize('removeParticipant', [$conversation, $user]);
 
-        if ((int) $request->user()->getKey() === $user && $conversation->created_by === $user) {
-            abort(422, 'Group owner cannot leave via remove. Use leave or delete the group.');
+        $conversationService = app(ConversationService::class);
+
+        if ((int) $request->user()->getKey() === $user && $conversationService->isOwner($conversation, $user)) {
+            abort(422, 'Group owner cannot leave via remove. Transfer ownership or delete the group.');
         }
 
-        $conversation = $action->handle($conversation, $user);
+        $conversation = $action->handle($conversation, $request->user(), $user);
 
         return (new ConversationResource($conversation))->response();
     }

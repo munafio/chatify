@@ -1,8 +1,11 @@
 <script setup lang="ts">
+import { ref } from 'vue'
+
 defineProps<{
   title: string
   showBack?: boolean
   showFooter?: boolean
+  contentScroll?: boolean
 }>()
 
 defineEmits<{
@@ -11,6 +14,14 @@ defineEmits<{
   cancel: []
   save: []
 }>()
+
+const scrollContainer = ref<HTMLElement | null>(null)
+
+function scrollToTop() {
+  scrollContainer.value?.scrollTo({ top: 0 })
+}
+
+defineExpose({ scrollToTop })
 </script>
 
 <template>
@@ -40,7 +51,11 @@ defineEmits<{
       </button>
     </header>
 
-    <div class="chatify-settings-scroll chatify:min-h-0 chatify:flex-1 chatify:overflow-y-auto">
+    <div
+      ref="scrollContainer"
+      class="chatify:min-h-0 chatify:flex-1 chatify:overflow-x-hidden chatify:min-w-0"
+      :class="contentScroll === false ? 'chatify:overflow-hidden' : 'chatify:overflow-y-auto'"
+    >
       <slot />
     </div>
 

@@ -38,6 +38,27 @@ class MessageController extends Controller
         return MessageResource::collection($messages)->response();
     }
 
+    public function search(Conversation $conversation, Request $request, MessageService $messageService): JsonResponse
+    {
+        $this->authorize('view', $conversation);
+
+        $query = trim($request->string('q')->toString());
+
+        if (mb_strlen($query) < 2) {
+            abort(422, 'Search query must be at least 2 characters.');
+        }
+
+        $messages = $messageService->search(
+            $conversation,
+            $query,
+            (int) $request->integer('per_page', 20),
+            (int) $request->integer('page', 1),
+            (int) $request->user()->getKey(),
+        );
+
+        return MessageResource::collection($messages)->response();
+    }
+
     public function store(
         Conversation $conversation,
         SendMessageRequest $request,

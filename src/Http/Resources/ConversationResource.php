@@ -8,10 +8,10 @@ use Chatify\Models\Conversation;
 use Chatify\Services\ContactService;
 use Chatify\Services\ConversationService;
 use Chatify\Services\MessageService;
+use Chatify\Services\ParticipantPermissionService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/** @mixin Conversation */
 class ConversationResource extends JsonResource
 {
     public function toArray(Request $request): array
@@ -19,6 +19,8 @@ class ConversationResource extends JsonResource
         $user = $request->user();
         $unread = 0;
         $otherUser = null;
+        $conversationService = app(ConversationService::class);
+        $permissionService = app(ParticipantPermissionService::class);
 
         if ($user !== null) {
             $unread = app(MessageService::class)->unreadCount($this->resource, (int) $user->getKey());
@@ -39,30 +41,44 @@ class ConversationResource extends JsonResource
             'updated_at' => $this->updated_at?->toIso8601String(),
         ];
 
+        $relationships = [
+            'participants' => UserResource::collection(
+                $this->participants->map->user->filter()
+            ),
+            'last_message' => $lastMessage !== null
+                ? (new MessageResource($lastMessage))->resolve()
+                : null,
+            'other_user' => $otherUser,
+            'participants_preview' => null,
+        ];
+
         if ($this->isGroup()) {
             $attributes['participant_count'] = $this->participants->count();
+            $attributes['description'] = $this->description;
+            $attributes['avatar_url'] = $this->avatarUrl();
+
+            if ($this->relationLoaded('creator') && $this->creator !== null) {
+                $attributes['created_by'] = [
+                    'id' => $this->creator->getKey(),
+                    'name' => $this->creator->name,
+                ];
+            }
 
             if ($user !== null) {
-                $attributes['is_owner'] = app(ConversationService::class)->isOwner(
-                    $this->resource,
-                    (int) $user->getKey()
-                );
+                $userId = (int) $user->getKey();
+                $attributes['is_owner'] = $permissionService->isOwner($this->resource, $userId);
+                $attributes['my_membership'] = $permissionService->membership($this->resource, $userId);
             }
+
+            $preview = $conversationService->participantsPreview($this->resource);
+            $relationships['participants_preview'] = ParticipantResource::collection($preview);
         }
 
         return [
             'type' => 'conversation',
             'id' => $this->id,
             'attributes' => $attributes,
-            'relationships' => [
-                'participants' => UserResource::collection(
-                    $this->participants->map->user->filter()
-                ),
-                'last_message' => $lastMessage !== null
-                    ? (new MessageResource($lastMessage))->resolve()
-                    : null,
-                'other_user' => $otherUser,
-            ],
+            'relationships' => $relationships,
         ];
     }
 }

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import type { AxiosRequestConfig } from 'axios'
+import { CanceledError, type AxiosRequestConfig } from 'axios'
 import type { ChatifyMessage, MessageDeletedPayload, MessageReplyPreview } from '../types'
 import {
   buildOptimisticMessage,
@@ -36,6 +36,7 @@ export const useMessagesStore = defineStore('messages', () => {
   const forwardMessage = ref<ChatifyMessage | null>(null)
   const pendingScrollToBottom = ref(false)
   const outboundDrafts = ref<Record<string, OutboundMessageDraft>>({})
+  const outboundAbortControllers = new Map<string, AbortController>()
 
   const configStore = useConfigStore()
   const conversationsStore = useConversationsStore()
@@ -124,6 +125,18 @@ export const useMessagesStore = defineStore('messages', () => {
     }
   }
 
+  function setMessageUploadProgress(conversationId: string, messageId: string, progress: number | null) {
+    const bucket = ensureBucket(conversationId)
+    const message = bucket.items.find((item) => item.id === messageId)
+    if (message) {
+      message.attributes.upload_progress = progress
+    }
+  }
+
+  function hasOutboundAttachment(draft: OutboundMessageDraft): boolean {
+    return Boolean(draft.attachment) || Boolean(draft.attachments?.length)
+  }
+
   function replacePendingWithServer(conversationId: string, serverMessage: ChatifyMessage) {
     const bucket = ensureBucket(conversationId)
     const userId = String(serverMessage.relationships.sender.data.id)
@@ -160,19 +173,46 @@ export const useMessagesStore = defineStore('messages', () => {
 
     setMessageLocalStatus(draft.conversationId, tempId, 'sending')
 
-    try {
-      const { data } = await configStore.api.sendMessage(draft.conversationId, {
-        body: draft.body,
-        attachment: draft.attachment,
-        attachments: draft.attachments,
-        reply_to_message_id: draft.reply_to_message_id,
-      })
+    const trackProgress = hasOutboundAttachment(draft)
+    if (trackProgress) {
+      setMessageUploadProgress(draft.conversationId, tempId, 0)
+    }
 
+    const controller = new AbortController()
+    outboundAbortControllers.set(tempId, controller)
+
+    try {
+      const { data } = await configStore.api.sendMessage(
+        draft.conversationId,
+        {
+          body: draft.body,
+          attachment: draft.attachment,
+          attachments: draft.attachments,
+          reply_to_message_id: draft.reply_to_message_id,
+        },
+        {
+          signal: controller.signal,
+          onUploadProgress: trackProgress
+            ? (event) => {
+                const total = event.total ?? 0
+                const percent = total > 0 ? Math.round((event.loaded / total) * 100) : 0
+                setMessageUploadProgress(draft.conversationId, tempId, percent)
+              }
+            : undefined,
+        },
+      )
+
+      outboundAbortControllers.delete(tempId)
       cleanupOutboundDraft(tempId)
       removeMessage(draft.conversationId, tempId)
       upsertMessage(draft.conversationId, data.data)
       pendingScrollToBottom.value = true
-    } catch {
+    } catch (error) {
+      outboundAbortControllers.delete(tempId)
+      if (error instanceof CanceledError || (error as { name?: string })?.name === 'CanceledError') {
+        return
+      }
+      setMessageUploadProgress(draft.conversationId, tempId, null)
       setMessageLocalStatus(draft.conversationId, tempId, 'failed')
     }
   }
@@ -213,6 +253,12 @@ export const useMessagesStore = defineStore('messages', () => {
     const draft = outboundDrafts.value[tempId]
     if (!draft) {
       return
+    }
+
+    const controller = outboundAbortControllers.get(tempId)
+    if (controller) {
+      controller.abort()
+      outboundAbortControllers.delete(tempId)
     }
 
     cleanupOutboundDraft(tempId)
@@ -342,6 +388,8 @@ export const useMessagesStore = defineStore('messages', () => {
     if (conversationId === conversationsStore.activeId) {
       upsertMessage(conversationId, data.data)
       pendingScrollToBottom.value = true
+    } else {
+      conversationsStore.updateLastMessage(conversationId, data.data)
     }
     forwardMessage.value = null
     return data.data
@@ -349,6 +397,13 @@ export const useMessagesStore = defineStore('messages', () => {
 
   function handleMessageSent(payload: ChatifyMessage) {
     const conversationId = payload.attributes.conversation_id
+
+    if (payload.attributes.kind === 'system') {
+      upsertMessage(conversationId, payload)
+      conversationsStore.updateLastMessage(conversationId, payload)
+      return
+    }
+
     const userId = configStore.user?.id
 
     if (userId && String(payload.relationships.sender.data.id) === String(userId)) {

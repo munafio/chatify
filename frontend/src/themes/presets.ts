@@ -1,6 +1,6 @@
 import type { ChatifyThemePreferences, ThemeId, ThemePreset, ThemeTokenSet } from './types'
 
-export const THEME_PRESETS: ThemePreset[] = [
+const THEME_REGISTRY: ThemePreset[] = [
   {
     id: 'classic',
     name: 'Classic',
@@ -67,19 +67,47 @@ export const THEME_PRESETS: ThemePreset[] = [
   },
 ]
 
+let allowedThemeIds: string[] | null = null
+
+export function setAllowedThemes(ids: string[]): void {
+  allowedThemeIds = ids
+}
+
+export function themePresets(): ThemePreset[] {
+  if (allowedThemeIds === null) {
+    return THEME_REGISTRY
+  }
+
+  return allowedThemeIds
+    .map((id) => THEME_REGISTRY.find((theme) => theme.id === id))
+    .filter((theme): theme is ThemePreset => theme !== undefined)
+}
+
+export function defaultThemeId(): string {
+  return themePresets()[0]?.id ?? THEME_REGISTRY[0].id
+}
+
+export function sanitizeThemeId(id: string | undefined): string {
+  if (id && themePresets().some((theme) => theme.id === id)) {
+    return id
+  }
+
+  return defaultThemeId()
+}
+
 export function getThemeById(id: string): ThemePreset {
-  return THEME_PRESETS.find((theme) => theme.id === id) ?? THEME_PRESETS[0]
+  return THEME_REGISTRY.find((theme) => theme.id === id) ?? themePresets()[0] ?? THEME_REGISTRY[0]
 }
 
 export function isThemeId(id: string): id is ThemeId {
-  return THEME_PRESETS.some((theme) => theme.id === id)
+  return themePresets().some((theme) => theme.id === id)
 }
 
 export function accentSwatchesForTheme(themeId: ThemeId, bootColors: string[]): string[] {
   const theme = getThemeById(themeId)
   const unique = new Set<string>([
     theme.defaultAccent,
-    ...bootColors.slice(0, 8),
+    ...bootColors,
   ])
 
   return Array.from(unique)

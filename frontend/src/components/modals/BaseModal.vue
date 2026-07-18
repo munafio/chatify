@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onBeforeUnmount, watch } from 'vue'
+import { CHATIFY_TELEPORT_TARGET } from '../../constants/dom'
 
 const props = defineProps<{
   title: string
@@ -41,7 +42,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <Teleport to="body">
+  <Teleport :to="CHATIFY_TELEPORT_TARGET">
     <Transition name="chatify-modal">
       <div
         v-if="open"
@@ -52,7 +53,7 @@ onBeforeUnmount(() => {
           role="dialog"
           aria-modal="true"
           :aria-label="title"
-          class="chatify-modal-panel chatify:flex chatify:w-full chatify:flex-col chatify:overflow-hidden chatify:rounded-xl chatify:bg-chatify-bubble-in chatify:text-chatify-text chatify:shadow-xl"
+          class="chatify-modal-panel chatify:flex chatify:max-h-[min(90dvh,720px)] chatify:w-full chatify:flex-col chatify:overflow-hidden chatify:rounded-xl chatify:bg-chatify-bubble-in chatify:text-chatify-text chatify:shadow-xl"
           :class="[
             panelClass,
             {

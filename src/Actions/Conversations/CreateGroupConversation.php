@@ -14,9 +14,6 @@ final class CreateGroupConversation
         private readonly ConversationService $conversationService,
     ) {}
 
-    /**
-     * @param  list<int>  $userIds
-     */
     public function handle(Model $owner, string $name, array $userIds): Conversation
     {
         return $this->conversationService->createGroup($owner, $name, $userIds);

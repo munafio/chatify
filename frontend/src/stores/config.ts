@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { createApiClient, createChatifyApi } from '../api/client'
 import {
+  applyBootCatalog,
   applyPreferences,
   applyThemeColors,
   clonePreferences,
@@ -9,11 +10,13 @@ import {
   loadPreferences,
   savePreferences,
 } from '../composables/useBootConfig'
-import type { ChatifyThemePreferences, ThemeId, WallpaperPreferences } from '../themes/types'
-import { getThemeById } from '../themes/presets'
+import { fontOptions } from '../themes/fonts'
+import { getThemeById, themePresets } from '../themes/presets'
+import type { ChatifyThemePreferences, WallpaperPreferences } from '../themes/types'
 import type { BootConfig } from '../types'
 import { extractErrorMessage } from '../utils/errors'
 import { useToastStore } from './toast'
+import { wallpaperPatterns } from '../themes/patterns'
 
 function cacheBustUrl(url: string): string {
   return `${url}${url.includes('?') ? '&' : '?'}t=${Date.now()}`
@@ -40,6 +43,21 @@ export const useConfigStore = defineStore('config', () => {
   const user = computed(() => boot.value?.user ?? null)
   const groupsEnabled = computed(() => boot.value?.groupsEnabled ?? false)
   const colors = computed(() => boot.value?.colors ?? [])
+  const features = computed(() => boot.value?.features ?? {
+    giphy: false,
+    colors: true,
+    themes: true,
+    fonts: true,
+    wallpaper: true,
+  })
+  const colorsEnabled = computed(() => features.value.colors)
+  const themesEnabled = computed(() => features.value.themes)
+  const fontsEnabled = computed(() => features.value.fonts)
+  const wallpaperEnabled = computed(() => features.value.wallpaper)
+  const giphyEnabled = computed(() => features.value.giphy)
+  const themePresetsList = computed(() => themePresets())
+  const fontOptionsList = computed(() => fontOptions())
+  const wallpaperPatternsList = computed(() => wallpaperPatterns())
   const attachments = computed(() => boot.value?.attachments)
   const debug = computed(() => boot.value?.debug ?? false)
   const broadcastEnabled = computed(() => {
@@ -66,6 +84,7 @@ export const useConfigStore = defineStore('config', () => {
 
   function init(config: BootConfig) {
     boot.value = config
+    applyBootCatalog(config)
     const client = createApiClient(config)
     api.value = createChatifyApi(client)
 
@@ -91,7 +110,7 @@ export const useConfigStore = defineStore('config', () => {
     previewDraft()
   }
 
-  function setTheme(themeId: ThemeId) {
+  function setTheme(themeId: string) {
     const theme = getThemeById(themeId)
     updateDraft({ themeId, accentColor: theme.defaultAccent })
   }
@@ -296,6 +315,15 @@ export const useConfigStore = defineStore('config', () => {
     user,
     groupsEnabled,
     colors,
+    features,
+    colorsEnabled,
+    themesEnabled,
+    fontsEnabled,
+    wallpaperEnabled,
+    giphyEnabled,
+    themePresets: themePresetsList,
+    fontOptions: fontOptionsList,
+    wallpaperPatterns: wallpaperPatternsList,
     attachments,
     debug,
     broadcastEnabled,

@@ -24,7 +24,6 @@ export function useTyping(conversationId: () => string | null) {
     try {
       await configStore.api.sendTyping(id, next)
     } catch {
-      // ignore typing errors
     }
   }
 

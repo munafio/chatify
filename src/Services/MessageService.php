@@ -18,7 +18,6 @@ final class MessageService
 {
     public function send(Conversation $conversation, Model $sender, SendMessageData $data): Message
     {
-        /** @var Message $message */
         $message = ChatifyModels::messageClass()::query()->create([
             'id' => (string) Str::uuid(),
             'conversation_id' => $conversation->id,
@@ -29,6 +28,29 @@ final class MessageService
             'forwarded_from_message_id' => $data->forwardedFromMessageId,
         ]);
 
+        return $message->load(['sender', 'replyTo.sender', 'forwardedFrom.sender']);
+    }
+
+    public function sendSystemMessage(
+        Conversation $conversation,
+        Model $actor,
+        string $event,
+        array $targetUserIds,
+        string $body,
+    ): Message {
+        $message = ChatifyModels::messageClass()::query()->create([
+            'id' => (string) Str::uuid(),
+            'conversation_id' => $conversation->id,
+            'user_id' => $actor->getKey(),
+            'kind' => 'system',
+            'body' => $body,
+            'system_event' => [
+                'event' => $event,
+                'actor_user_id' => (int) $actor->getKey(),
+                'target_user_ids' => array_values(array_map('intval', $targetUserIds)),
+            ],
+        ]);
+
         return $message->load(['sender', 'replyTo.sender']);
     }
 
@@ -36,7 +58,7 @@ final class MessageService
     {
         $query = ChatifyModels::messageClass()::query()
             ->forConversation($conversation->id)
-            ->with(['sender', 'replyTo.sender'])
+            ->with(['sender', 'replyTo.sender', 'forwardedFrom.sender'])
             ->latest();
 
         if ($viewerId !== null) {
@@ -64,6 +86,19 @@ final class MessageService
         }
 
         return $query->paginate($perPage);
+    }
+
+    public function search(
+        Conversation $conversation,
+        string $query,
+        int $perPage = 20,
+        int $page = 1,
+        ?int $viewerId = null,
+    ): LengthAwarePaginator {
+        $builder = $this->forConversation($conversation, $viewerId)
+            ->where('body', 'like', '%'.$query.'%');
+
+        return $builder->paginate($perPage, ['*'], 'page', $page);
     }
 
     public function edit(Message $message, string $body): Message

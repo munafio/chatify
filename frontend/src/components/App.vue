@@ -6,6 +6,7 @@ import type {
   ChatifyConversation,
   ChatifyMessage,
   ConversationReadPayload,
+  GroupMembershipRevokedPayload,
   GroupParticipantsChangedPayload,
   MessageDeletedPayload,
   UserTypingPayload,
@@ -15,6 +16,7 @@ import { useContactsStore } from '../stores/contacts'
 import { useConversationsStore } from '../stores/conversations'
 import { useMessagesStore } from '../stores/messages'
 import { useTypingStore } from '../stores/typing'
+import { useUiStore } from '../stores/ui'
 import ChatifyApp from './layout/ChatifyApp.vue'
 import ContactInfoModal from './modals/ContactInfoModal.vue'
 import CreateGroupModal from './modals/CreateGroupModal.vue'
@@ -22,6 +24,7 @@ import ForwardMessageModal from './modals/ForwardMessageModal.vue'
 import GroupInfoModal from './modals/GroupInfoModal.vue'
 import NewChatModal from './modals/NewChatModal.vue'
 import SettingsModal from './modals/SettingsModal.vue'
+import ConfirmDialog from './ui/ConfirmDialog.vue'
 import ToastHost from './ui/ToastHost.vue'
 
 const props = defineProps<{
@@ -32,6 +35,7 @@ const conversationsStore = useConversationsStore()
 const messagesStore = useMessagesStore()
 const contactsStore = useContactsStore()
 const typingStore = useTypingStore()
+const uiStore = useUiStore()
 
 const echo = useEcho(props.config)
 let unsubscribeConversation: (() => void) | null = null
@@ -48,11 +52,7 @@ function bindEcho(conversationId: string | null) {
 
   unsubscribeConversation = subscribeToConversation(echo as Echo<'pusher'> | null, conversationId, {
     onMessageSent: (payload) => {
-      const message = payload as ChatifyMessage
-      messagesStore.handleMessageSent(message)
-      if (conversationId === conversationsStore.activeId) {
-        messagesStore.requestScrollToBottom()
-      }
+      messagesStore.handleMessageSent(payload as ChatifyMessage)
     },
     onMessageUpdated: (payload) => messagesStore.handleMessageUpdated(payload as ChatifyMessage),
     onMessageDeleted: (payload) => messagesStore.handleMessageDeleted(payload as MessageDeletedPayload),
@@ -68,7 +68,11 @@ function bindEcho(conversationId: string | null) {
     },
     onGroupParticipantsChanged: (payload) => {
       const data = payload as GroupParticipantsChangedPayload
-      conversationsStore.updateParticipants(data.conversation_id, data.participants, data.participant_count)
+      conversationsStore.updateParticipants(data.conversation_id, {
+        participant_count: data.participant_count,
+        participants: data.participants,
+        participants_preview: data.participants_preview,
+      })
     },
     onUserTyping: (payload) => {
       const data = payload as UserTypingPayload
@@ -87,8 +91,24 @@ onMounted(async () => {
   unsubscribeInbox = subscribeToUserInbox(
     echo as Echo<'pusher'> | null,
     props.config.user.id,
-    (payload) => {
-      conversationsStore.handleInboxUpdate(payload as ChatifyConversation, props.config.user.id)
+    {
+      onInboxUpdated: (payload) => {
+        conversationsStore.handleInboxUpdate(payload as ChatifyConversation, props.config.user.id)
+      },
+      onGroupMembershipRevoked: (payload) => {
+        const data = payload as GroupMembershipRevokedPayload
+        if (String(data.user_id) !== String(props.config.user.id)) {
+          return
+        }
+
+        if (conversationsStore.activeId === data.conversation_id) {
+          messagesStore.clearConversation(data.conversation_id)
+          conversationsStore.clearActive()
+        }
+
+        conversationsStore.handleMembershipRevoked(data.conversation_id)
+        uiStore.closeModal()
+      },
     },
   )
 
@@ -145,5 +165,6 @@ watch(
   <NewChatModal />
   <ForwardMessageModal />
   <SettingsModal />
+  <ConfirmDialog />
   <ToastHost />
 </template>

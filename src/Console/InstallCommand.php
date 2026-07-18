@@ -47,6 +47,11 @@ class InstallCommand extends Command
                 '--tag' => 'chatify-assets',
                 '--force' => true,
             ]);
+
+            $this->call('vendor:publish', [
+                '--tag' => 'chatify-patterns',
+                '--force' => true,
+            ]);
         }
 
         $this->line('Add Chatify\\Traits\\InteractsWithChatify to your User model.');

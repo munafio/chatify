@@ -16,16 +16,16 @@ class SendMessageRequest extends FormRequest
     public function rules(): array
     {
         $maxKb = (int) config('chatify.attachments.max_upload_size', 150) * 1024;
-        $mimes = array_merge(
+        $extensions = array_merge(
             config('chatify.attachments.allowed_images', []),
             config('chatify.attachments.allowed_files', [])
         );
 
         return [
             'body' => ['nullable', 'string', 'max:5000', 'required_without_all:attachment,attachments'],
-            'attachment' => ['nullable', 'file', 'max:'.$maxKb, 'mimes:'.implode(',', $mimes)],
+            'attachment' => ['nullable', 'file', 'max:'.$maxKb, 'extensions:'.implode(',', $extensions)],
             'attachments' => ['nullable', 'array', 'max:10'],
-            'attachments.*' => ['file', 'max:'.$maxKb, 'mimes:'.implode(',', $mimes)],
+            'attachments.*' => ['file', 'max:'.$maxKb, 'extensions:'.implode(',', $extensions)],
             'reply_to_message_id' => ['nullable', 'uuid'],
             'forwarded_from_message_id' => ['nullable', 'uuid'],
         ];

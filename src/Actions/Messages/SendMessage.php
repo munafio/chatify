@@ -27,9 +27,6 @@ final class SendMessage
         private readonly InboxBroadcastService $inboxBroadcastService,
     ) {}
 
-    /**
-     * @param  list<UploadedFile>  $attachments
-     */
     public function handle(
         Conversation $conversation,
         Model $sender,
@@ -38,6 +35,7 @@ final class SendMessage
         array $attachments = [],
         ?string $replyToMessageId = null,
         ?string $forwardedFromMessageId = null,
+        ?array $prebuiltAttachmentMeta = null,
     ): Message {
         $this->assertSenderIsParticipant($conversation, $sender);
 
@@ -55,9 +53,9 @@ final class SendMessage
         }
 
         $uploadedFiles = $attachments !== [] ? $attachments : ($attachment !== null ? [$attachment] : []);
-        $attachmentMeta = null;
+        $attachmentMeta = $prebuiltAttachmentMeta;
 
-        if ($uploadedFiles !== []) {
+        if ($attachmentMeta === null && $uploadedFiles !== []) {
             $attachmentMeta = $this->attachmentService->storeMessageAttachments($uploadedFiles);
         }
 

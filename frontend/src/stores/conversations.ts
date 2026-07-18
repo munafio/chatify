@@ -88,12 +88,43 @@ export const useConversationsStore = defineStore('conversations', () => {
     }
   }
 
-  function updateParticipants(conversationId: string, participants: ChatifyConversation['relationships']['participants'], count: number) {
+  function updateParticipants(
+    conversationId: string,
+    payload: {
+      participant_count: number
+      participants?: ChatifyConversation['relationships']['participants']
+      participants_preview?: ChatifyConversation['relationships']['participants_preview']
+    },
+  ) {
     const conversation = items.value.find((item) => item.id === conversationId)
     if (conversation) {
-      conversation.relationships.participants = participants
-      conversation.attributes.participant_count = count
+      if (payload.participants) {
+        conversation.relationships.participants = payload.participants
+      }
+      if (payload.participants_preview) {
+        conversation.relationships.participants_preview = payload.participants_preview
+      }
+      conversation.attributes.participant_count = payload.participant_count
     }
+  }
+
+  function updateGroupDetails(conversation: ChatifyConversation) {
+    upsert(conversation)
+  }
+
+  function removeConversation(conversationId: string) {
+    const index = items.value.findIndex((item) => item.id === conversationId)
+    if (index >= 0) {
+      items.value.splice(index, 1)
+    }
+
+    if (activeId.value === conversationId) {
+      activeId.value = null
+    }
+  }
+
+  function handleMembershipRevoked(conversationId: string) {
+    removeConversation(conversationId)
   }
 
   async function fetchAll() {
@@ -124,7 +155,6 @@ export const useConversationsStore = defineStore('conversations', () => {
       const { data } = await configStore.api.getConversation(id)
       upsert(data.data)
     } catch {
-      // keep cached conversation if fetch fails
     }
   }
 
@@ -195,7 +225,10 @@ export const useConversationsStore = defineStore('conversations', () => {
     updateLastMessage,
     updateUnreadCount,
     updateParticipants,
+    updateGroupDetails,
     handleInboxUpdate,
+    handleMembershipRevoked,
+    removeConversation,
     fetchAll,
     select,
     startDirect,

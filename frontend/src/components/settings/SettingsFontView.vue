@@ -1,21 +1,20 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { storeToRefs } from 'pinia'
-import { FONT_OPTIONS } from '../../themes/fonts'
 import { useConfigStore } from '../../stores/config'
 
 const configStore = useConfigStore()
-const { preferences } = storeToRefs(configStore)
+const { preferences, fontOptions } = storeToRefs(configStore)
 
 const query = ref('')
 
 const filteredFonts = computed(() => {
   const q = query.value.trim().toLowerCase()
   if (!q) {
-    return FONT_OPTIONS
+    return fontOptions.value
   }
 
-  return FONT_OPTIONS.filter((font) => font.label.toLowerCase().includes(q))
+  return fontOptions.value.filter((font) => font.label.toLowerCase().includes(q))
 })
 
 function selectFont(fontId: string) {

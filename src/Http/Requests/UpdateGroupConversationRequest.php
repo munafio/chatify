@@ -16,9 +16,11 @@ class UpdateGroupConversationRequest extends FormRequest
     public function rules(): array
     {
         $maxName = (int) config('chatify.groups.max_name_length', 100);
+        $maxDescription = (int) config('chatify.groups.max_description_length', 500);
 
         return [
-            'name' => ['required', 'string', 'max:'.$maxName],
+            'name' => ['sometimes', 'required', 'string', 'max:'.$maxName],
+            'description' => ['sometimes', 'nullable', 'string', 'max:'.$maxDescription],
         ];
     }
 }

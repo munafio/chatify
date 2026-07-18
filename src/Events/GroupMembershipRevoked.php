@@ -5,40 +5,41 @@ declare(strict_types=1);
 namespace Chatify\Events;
 
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class UserPresenceChanged implements ShouldBroadcast
+class GroupMembershipRevoked implements ShouldBroadcastNow
 {
     use Dispatchable;
     use InteractsWithSockets;
     use SerializesModels;
 
     public function __construct(
-        public Model $user,
-        public bool $active,
+        public string $conversationId,
+        public int $userId,
+        public string $reason,
     ) {}
 
     public function broadcastOn(): array
     {
         return [
-            new PresenceChannel('chatify.presence'),
+            new PrivateChannel('chatify.user.'.$this->userId),
         ];
     }
 
     public function broadcastAs(): string
     {
-        return 'UserPresenceChanged';
+        return 'GroupMembershipRevoked';
     }
 
     public function broadcastWith(): array
     {
         return [
-            'user_id' => $this->user->getKey(),
-            'active' => $this->active,
+            'conversation_id' => $this->conversationId,
+            'user_id' => $this->userId,
+            'reason' => $this->reason,
         ];
     }
 }

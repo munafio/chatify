@@ -4,7 +4,16 @@ import {
   loadPreferences,
   normalizePreferences,
 } from './useLocalPreferences'
+import { setAllowedFonts } from '../themes/fonts'
+import { setAllowedThemes } from '../themes/presets'
+import { setWallpaperPatterns } from '../themes/patterns'
 import type { ChatifyThemePreferences } from '../themes/types'
+
+export function applyBootCatalog(config: BootConfig): void {
+  setWallpaperPatterns(config.wallpaperPatterns ?? [])
+  setAllowedThemes(config.themes ?? [])
+  setAllowedFonts(config.fonts ?? [])
+}
 
 export function parseBootConfig(element: HTMLElement): BootConfig {
   const raw = element.dataset.config
@@ -27,9 +36,9 @@ export {
   savePreferences,
 } from './useLocalPreferences'
 
-export type { ChatifyThemePreferences as ChatifyPreferences } from '../themes/types'
-
 export function hydratePreferencesFromBoot(config: BootConfig): ChatifyThemePreferences {
+  applyBootCatalog(config)
+
   const defaultColor = config.colors[0] ?? '#25d366'
   const local = loadPreferences(defaultColor)
 
@@ -48,6 +57,7 @@ export function hydratePreferencesFromBoot(config: BootConfig): ChatifyThemePref
 }
 
 export function applyThemeColors(config: BootConfig, preferences?: ChatifyThemePreferences): void {
+  applyBootCatalog(config)
   const resolved = preferences ?? hydratePreferencesFromBoot(config)
   applyPreferences(resolved)
 }

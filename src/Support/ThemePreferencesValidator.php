@@ -6,9 +6,6 @@ namespace Chatify\Support;
 
 final class ThemePreferencesValidator
 {
-    /**
-     * @return array<string, mixed>|null
-     */
     public static function validate(?array $preferences): ?array
     {
         if ($preferences === null) {
@@ -19,9 +16,9 @@ final class ThemePreferencesValidator
             throw new \InvalidArgumentException('Theme preferences must be an array.');
         }
 
-        $themes = config('chatify.themes', []);
-        $patterns = config('chatify.chat_background.patterns', []);
-        $fonts = config('chatify.fonts', []);
+        $themes = ChatifyAppearanceConfig::themeIds();
+        $patterns = ChatBackgroundPatterns::ids();
+        $fonts = ChatifyAppearanceConfig::fontIds();
         $maxBytes = 4096;
 
         if (strlen(json_encode($preferences) ?: '') > $maxBytes) {
@@ -31,6 +28,10 @@ final class ThemePreferencesValidator
         $validated = [];
 
         if (array_key_exists('themeId', $preferences)) {
+            if (! ChatifyAppearanceConfig::isEnabled('themes')) {
+                throw new \InvalidArgumentException('Theme selection is disabled.');
+            }
+
             $themeId = (string) $preferences['themeId'];
             if (! in_array($themeId, $themes, true)) {
                 throw new \InvalidArgumentException('Invalid theme id.');
@@ -39,10 +40,18 @@ final class ThemePreferencesValidator
         }
 
         if (array_key_exists('accentColor', $preferences)) {
+            if (! ChatifyAppearanceConfig::isEnabled('colors')) {
+                throw new \InvalidArgumentException('Accent color selection is disabled.');
+            }
+
             $validated['accentColor'] = self::validateHexColor((string) $preferences['accentColor']);
         }
 
         if (array_key_exists('fontFamily', $preferences)) {
+            if (! ChatifyAppearanceConfig::isEnabled('fonts')) {
+                throw new \InvalidArgumentException('Font selection is disabled.');
+            }
+
             $fontFamily = (string) $preferences['fontFamily'];
             if ($fonts !== [] && ! in_array($fontFamily, $fonts, true)) {
                 throw new \InvalidArgumentException('Invalid font family.');
@@ -51,17 +60,16 @@ final class ThemePreferencesValidator
         }
 
         if (array_key_exists('wallpaper', $preferences) && is_array($preferences['wallpaper'])) {
+            if (! ChatifyAppearanceConfig::isEnabled('chat_background')) {
+                throw new \InvalidArgumentException('Wallpaper selection is disabled.');
+            }
+
             $validated['wallpaper'] = self::validateWallpaper($preferences['wallpaper'], $patterns);
         }
 
         return $validated;
     }
 
-    /**
-     * @param  array<string, mixed>  $wallpaper
-     * @param  list<string>  $patterns
-     * @return array<string, mixed>
-     */
     private static function validateWallpaper(array $wallpaper, array $patterns): array
     {
         $validated = [];
@@ -99,7 +107,7 @@ final class ThemePreferencesValidator
 
     private static function validateHexColor(string $color): string
     {
-        $allowed = config('chatify.colors', []);
+        $allowed = ChatifyAppearanceConfig::colorValues();
         $normalized = strtolower($color);
 
         if (in_array($normalized, array_map('strtolower', $allowed), true)) {

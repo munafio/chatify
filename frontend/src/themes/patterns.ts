@@ -1,23 +1,33 @@
-import type { PatternId } from './types'
-import bubblesUrl from '../assets/wallpapers/bubbles.svg?url'
-import circuitBoardUrl from '../assets/wallpapers/circuit-board.svg?url'
-import glamorousUrl from '../assets/wallpapers/glamorous.svg?url'
-import hideoutUrl from '../assets/wallpapers/hideout.svg?url'
+export const PATTERN_TILE_SIZE = '120px'
 
-export interface ChatPattern {
-  id: PatternId
+export interface WallpaperPattern {
+  id: string
   name: string
   url: string
-  tileSize: string
 }
 
-export const CHAT_PATTERNS: ChatPattern[] = [
-  { id: 'bubbles', name: 'Bubbles', url: bubblesUrl, tileSize: '100px' },
-  { id: 'circuit-board', name: 'Circuit', url: circuitBoardUrl, tileSize: '180px' },
-  { id: 'glamorous', name: 'Glamorous', url: glamorousUrl, tileSize: '120px' },
-  { id: 'hideout', name: 'Hideout', url: hideoutUrl, tileSize: '80px' },
-]
+let patterns: WallpaperPattern[] = []
 
-export function getPatternById(id: PatternId): ChatPattern {
-  return CHAT_PATTERNS.find((pattern) => pattern.id === id) ?? CHAT_PATTERNS[0]
+export function setWallpaperPatterns(list: WallpaperPattern[]): void {
+  patterns = list
+}
+
+export function wallpaperPatterns(): WallpaperPattern[] {
+  return patterns
+}
+
+export function defaultPatternId(): string {
+  return patterns[0]?.id ?? 'bubbles'
+}
+
+export function sanitizePatternId(id: string | undefined): string {
+  if (id && patterns.some((pattern) => pattern.id === id)) {
+    return id
+  }
+
+  return defaultPatternId()
+}
+
+export function getPatternById(id: string): WallpaperPattern | null {
+  return patterns.find((pattern) => pattern.id === id) ?? patterns[0] ?? null
 }

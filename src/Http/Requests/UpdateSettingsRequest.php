@@ -42,9 +42,6 @@ class UpdateSettingsRequest extends FormRequest
         });
     }
 
-    /**
-     * @return array<string, mixed>
-     */
     public function validatedSettingsAttributes(): array
     {
         $validated = [];

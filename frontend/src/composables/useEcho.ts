@@ -69,14 +69,23 @@ export function useEcho(config: BootConfig) {
 export function subscribeToUserInbox(
   echo: Echo<'pusher'> | null,
   userId: number | string,
-  handler: (payload: unknown) => void,
+  handlers: {
+    onInboxUpdated?: (payload: unknown) => void
+    onGroupMembershipRevoked?: (payload: unknown) => void
+  },
 ) {
   if (!echo) {
     return () => {}
   }
 
   const channel = echo.private(`chatify.user.${userId}`)
-  channel.listen('.InboxUpdated', handler)
+
+  if (handlers.onInboxUpdated) {
+    channel.listen('.InboxUpdated', handlers.onInboxUpdated)
+  }
+  if (handlers.onGroupMembershipRevoked) {
+    channel.listen('.GroupMembershipRevoked', handlers.onGroupMembershipRevoked)
+  }
 
   return () => {
     echo.leave(`chatify.user.${userId}`)

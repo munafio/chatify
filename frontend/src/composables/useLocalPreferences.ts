@@ -1,11 +1,21 @@
-import { getFontById } from '../themes/fonts'
-import { getPatternById } from '../themes/patterns'
-import { applyAccentToTokens, getThemeById, isThemeId, resolvePatternTint } from '../themes/presets'
+import { getFontById, sanitizeFontId } from '../themes/fonts'
+import {
+  applyAccentToTokens,
+  defaultThemeId,
+  getThemeById,
+  isThemeId,
+  resolvePatternTint,
+  sanitizeThemeId,
+} from '../themes/presets'
+import {
+  defaultPatternId,
+  getPatternById,
+  PATTERN_TILE_SIZE,
+  sanitizePatternId,
+} from '../themes/patterns'
 import type {
   ChatifyThemePreferences,
-  PatternId,
   ResolvedTheme,
-  ThemeId,
   ThemeTokenSet,
   WallpaperPreferences,
 } from '../themes/types'
@@ -16,7 +26,7 @@ const STORAGE_KEY = 'chatify.preferences'
 export function defaultWallpaper(): WallpaperPreferences {
   return {
     kind: 'none',
-    patternId: 'bubbles',
+    patternId: defaultPatternId(),
     imageUrl: null,
     blurEnabled: false,
     blurAmount: 50,
@@ -25,9 +35,9 @@ export function defaultWallpaper(): WallpaperPreferences {
 
 export function defaultPreferences(defaultColor = '#25d366'): ChatifyThemePreferences {
   return {
-    themeId: 'classic',
+    themeId: defaultThemeId(),
     accentColor: defaultColor,
-    fontFamily: 'system',
+    fontFamily: sanitizeFontId('system'),
     wallpaper: defaultWallpaper(),
   }
 }
@@ -93,8 +103,13 @@ function applyWallpaperVars(preferences: ChatifyThemePreferences, patternTintCol
 
   if (wallpaper.kind === 'pattern') {
     const pattern = getPatternById(wallpaper.patternId)
-    setCssVar('--chatify-chat-bg-pattern-url', `url("${pattern.url}")`)
-    setCssVar('--chatify-chat-bg-pattern-size', pattern.tileSize)
+    if (pattern) {
+      setCssVar('--chatify-chat-bg-pattern-url', `url("${pattern.url}")`)
+      setCssVar('--chatify-chat-bg-pattern-size', PATTERN_TILE_SIZE)
+    } else {
+      removeCssVar('--chatify-chat-bg-pattern-url')
+      removeCssVar('--chatify-chat-bg-pattern-size')
+    }
     removeCssVar('--chatify-chat-bg-image-url')
   } else if (wallpaper.kind === 'image' && wallpaper.imageUrl) {
     removeCssVar('--chatify-chat-bg-pattern-url')
@@ -139,7 +154,7 @@ function migrateLegacy(raw: Record<string, unknown>, defaultColor?: string): Cha
     return {
       themeId: raw.themeId,
       accentColor: typeof raw.accentColor === 'string' ? raw.accentColor : base.accentColor,
-      fontFamily: typeof raw.fontFamily === 'string' ? raw.fontFamily : base.fontFamily,
+      fontFamily: typeof raw.fontFamily === 'string' ? sanitizeFontId(raw.fontFamily) : base.fontFamily,
       wallpaper: normalizeWallpaper(wallpaperRaw, base.wallpaper),
     }
   }
@@ -150,11 +165,11 @@ function migrateLegacy(raw: Record<string, unknown>, defaultColor?: string): Cha
       ? raw.accentColor
       : (raw.accent as { color?: string } | undefined)?.color
 
-  let themeId: ThemeId = base.themeId
+  let themeId = base.themeId
   if (typeof raw.presetId === 'string' && isThemeId(raw.presetId)) {
     themeId = raw.presetId
   } else if (raw.darkMode === true) {
-    themeId = 'night'
+    themeId = sanitizeThemeId('night')
   }
 
   const chatBgRaw = (raw.chatBackground ?? raw.wallpaper) as Record<string, unknown> | undefined
@@ -163,7 +178,7 @@ function migrateLegacy(raw: Record<string, unknown>, defaultColor?: string): Cha
   return {
     themeId,
     accentColor: legacyColor ?? getThemeById(themeId).defaultAccent,
-    fontFamily: typeof raw.fontFamily === 'string' ? raw.fontFamily : base.fontFamily,
+    fontFamily: typeof raw.fontFamily === 'string' ? sanitizeFontId(raw.fontFamily) : base.fontFamily,
     wallpaper,
   }
 }
@@ -177,9 +192,13 @@ function normalizeWallpaper(
   }
 
   const kind = input.kind ?? fallback.kind
+  const patternId = typeof input.patternId === 'string'
+    ? sanitizePatternId(input.patternId)
+    : fallback.patternId
+
   return {
     kind: kind === 'pattern' || kind === 'image' ? kind : 'none',
-    patternId: (input.patternId ?? fallback.patternId) as PatternId,
+    patternId,
     imageUrl: typeof input.imageUrl === 'string' ? input.imageUrl : null,
     blurEnabled: typeof input.blurEnabled === 'boolean' ? input.blurEnabled : fallback.blurEnabled,
     blurAmount: clampBlurAmount(input.blurAmount, fallback.blurAmount),
@@ -207,14 +226,14 @@ function normalizeWallpaperFromLegacy(
   if (type === 'image') {
     return normalizeWallpaper({
       kind: 'image',
-      patternId: (input.patternId as PatternId) ?? fallback.patternId,
+      patternId: typeof input.patternId === 'string' ? input.patternId : fallback.patternId,
       imageUrl: typeof input.imageUrl === 'string' ? input.imageUrl : null,
     }, fallback)
   }
 
   return normalizeWallpaper({
     kind: 'pattern',
-    patternId: (input.patternId as PatternId) ?? fallback.patternId,
+    patternId: typeof input.patternId === 'string' ? input.patternId : fallback.patternId,
     imageUrl: null,
   }, fallback)
 }
@@ -229,9 +248,9 @@ export function normalizePreferences(
   }
 
   return {
-    themeId: input.themeId && isThemeId(input.themeId) ? input.themeId : base.themeId,
+    themeId: input.themeId && isThemeId(input.themeId) ? input.themeId : sanitizeThemeId(base.themeId),
     accentColor: input.accentColor ?? base.accentColor,
-    fontFamily: input.fontFamily ?? base.fontFamily,
+    fontFamily: sanitizeFontId(input.fontFamily ?? base.fontFamily),
     wallpaper: normalizeWallpaper(input.wallpaper, base.wallpaper),
   }
 }

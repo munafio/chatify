@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ChatifyConversation } from '../../types'
 import { conversationAvatar, conversationDisplayName } from '../../utils/format'
+import { memberCountLabel } from '../../utils/group'
 import { useUiStore } from '../../stores/ui'
 
 defineProps<{
@@ -16,7 +17,7 @@ const uiStore = useUiStore()
 
 function openInfo(conversation: ChatifyConversation) {
   if (conversation.attributes.conversation_type === 'group') {
-    uiStore.openModal('groupInfo', { conversationId: conversation.id })
+    uiStore.openModal('groupInfo', { conversationId: conversation.id, view: 'main', membersMode: 'browse' })
   } else {
     uiStore.openModal('contactInfo', { user: conversation.relationships.other_user })
   }
@@ -39,11 +40,11 @@ function openInfo(conversation: ChatifyConversation) {
 
     <button
       type="button"
-      class="chatify:flex chatify:min-w-0 chatify:flex-1 chatify:items-center chatify:gap-3 chatify:text-left"
+      class="chatify:flex chatify:min-w-0 chatify:flex-1 chatify:cursor-pointer chatify:items-center chatify:gap-3 chatify:text-left"
       @click="openInfo(conversation)"
     >
       <img
-        v-if="conversation.attributes.conversation_type === 'direct' && conversationAvatar(conversation)"
+        v-if="conversationAvatar(conversation)"
         :src="conversationAvatar(conversation)!"
         :alt="conversationDisplayName(conversation)"
         class="chatify:h-10 chatify:w-10 chatify:rounded-full chatify:object-cover"
@@ -62,12 +63,24 @@ function openInfo(conversation: ChatifyConversation) {
           {{ conversationDisplayName(conversation) }}
         </p>
         <p v-if="conversation.attributes.conversation_type === 'group'" class="chatify:text-xs chatify:text-chatify-muted">
-          {{ conversation.attributes.participant_count }} participants
+          {{ memberCountLabel(conversation.attributes.participant_count) }}
         </p>
         <p v-else class="chatify:text-xs chatify:text-chatify-muted">
           tap for contact info
         </p>
       </div>
+    </button>
+
+    <button
+      v-if="conversation.attributes.conversation_type === 'group'"
+      type="button"
+      class="chatify:rounded-full chatify:p-2 chatify:hover:bg-chatify-border"
+      aria-label="Search conversation"
+      @click="uiStore.openMessageSearch()"
+    >
+      <svg class="chatify:h-5 chatify:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
     </button>
   </header>
 </template>

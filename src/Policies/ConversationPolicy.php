@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Chatify\Policies;
 
 use Chatify\Models\Conversation;
-use Chatify\Services\ConversationService;
+use Chatify\Services\ParticipantPermissionService;
 use Illuminate\Database\Eloquent\Model;
 
 final class ConversationPolicy
 {
     public function __construct(
-        private readonly ConversationService $conversationService,
+        private readonly ParticipantPermissionService $permissionService,
     ) {}
 
     public function view(Model $user, Conversation $conversation): bool
@@ -33,12 +33,22 @@ final class ConversationPolicy
     {
         return $conversation->isGroup()
             && $this->isParticipant($user, $conversation)
-            && $this->conversationService->isOwner($conversation, (int) $user->getKey());
+            && $this->permissionService->hasPermission(
+                $conversation,
+                (int) $user->getKey(),
+                ParticipantPermissionService::PERMISSION_EDIT_INFO,
+            );
     }
 
     public function addParticipants(Model $user, Conversation $conversation): bool
     {
-        return $this->updateGroup($user, $conversation);
+        return $conversation->isGroup()
+            && $this->isParticipant($user, $conversation)
+            && $this->permissionService->hasPermission(
+                $conversation,
+                (int) $user->getKey(),
+                ParticipantPermissionService::PERMISSION_ADD_MEMBERS,
+            );
     }
 
     public function removeParticipant(Model $user, Conversation $conversation, int $targetUserId): bool
@@ -53,7 +63,28 @@ final class ConversationPolicy
             return true;
         }
 
-        return $this->conversationService->isOwner($conversation, $userId);
+        return $this->permissionService->hasPermission(
+            $conversation,
+            $userId,
+            ParticipantPermissionService::PERMISSION_REMOVE_MEMBERS,
+        );
+    }
+
+    public function manageParticipantRole(Model $user, Conversation $conversation): bool
+    {
+        return $conversation->isGroup()
+            && $this->isParticipant($user, $conversation)
+            && $this->permissionService->hasPermission(
+                $conversation,
+                (int) $user->getKey(),
+                ParticipantPermissionService::PERMISSION_MANAGE_ADMINS,
+            );
+    }
+
+    public function transferOwnership(Model $user, Conversation $conversation): bool
+    {
+        return $conversation->isGroup()
+            && $this->permissionService->canTransferOwnership($conversation, (int) $user->getKey());
     }
 
     public function leave(Model $user, Conversation $conversation): bool
@@ -68,7 +99,7 @@ final class ConversationPolicy
         }
 
         if ($conversation->isGroup()) {
-            return $this->conversationService->isOwner($conversation, (int) $user->getKey());
+            return $this->permissionService->canDeleteGroup($conversation, (int) $user->getKey());
         }
 
         return true;
@@ -76,6 +107,6 @@ final class ConversationPolicy
 
     private function isParticipant(Model $user, Conversation $conversation): bool
     {
-        return $this->conversationService->getParticipant($conversation, (int) $user->getKey()) !== null;
+        return $this->permissionService->getParticipant($conversation, (int) $user->getKey()) !== null;
     }
 }

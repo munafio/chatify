@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Chatify\Models;
 
+use Chatify\Services\AttachmentService;
 use Chatify\Support\ChatifyModel;
 use Chatify\Support\ChatifyModels;
 use Chatify\Traits\HasUuid;
@@ -26,6 +27,8 @@ class Conversation extends ChatifyModel
         'id',
         'type',
         'name',
+        'description',
+        'avatar',
         'created_by',
     ];
 
@@ -64,7 +67,7 @@ class Conversation extends ChatifyModel
             config('chatify.tables.participants', 'ch_conversation_participants'),
             'conversation_id',
             'user_id'
-        )->withPivot(['last_read_at', 'id'])->withTimestamps();
+        )->withPivot(['last_read_at', 'id', 'role', 'permissions'])->withTimestamps();
     }
 
     public function scopeDirect(Builder $query): Builder
@@ -90,5 +93,16 @@ class Conversation extends ChatifyModel
     public function isGroup(): bool
     {
         return $this->type === self::TYPE_GROUP;
+    }
+
+    public function avatarUrl(): ?string
+    {
+        if ($this->avatar === null || $this->avatar === '') {
+            return null;
+        }
+
+        $folder = config('chatify.groups.avatar_folder', 'groups-avatar');
+
+        return app(AttachmentService::class)->storage()->url($folder.'/'.basename($this->avatar));
     }
 }

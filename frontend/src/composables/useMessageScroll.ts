@@ -1,6 +1,6 @@
 import { nextTick, onBeforeUnmount, ref, watch, type Ref } from 'vue'
 
-const NEAR_BOTTOM_THRESHOLD = 80
+const NEAR_BOTTOM_THRESHOLD = 120
 
 export function useMessageScroll(
   containerRef: Ref<HTMLElement | null>,
@@ -12,6 +12,7 @@ export function useMessageScroll(
   const isNearBottom = ref(true)
   const unseenCount = ref(0)
   let loadingOlderGuard = false
+  let boundEl: HTMLElement | null = null
 
   function scrollToBottom(behavior: ScrollBehavior = 'auto') {
     const el = containerRef.value
@@ -31,8 +32,9 @@ export function useMessageScroll(
     }
 
     const distance = el.scrollHeight - el.scrollTop - el.clientHeight
-    isNearBottom.value = distance <= NEAR_BOTTOM_THRESHOLD
-    if (isNearBottom.value) {
+    const near = distance <= NEAR_BOTTOM_THRESHOLD
+    isNearBottom.value = near
+    if (near) {
       unseenCount.value = 0
     }
   }
@@ -56,9 +58,17 @@ export function useMessageScroll(
   }
 
   function notifyNewMessage(isOwn: boolean) {
-    if (isOwn || isNearBottom.value || options.pendingScrollToBottom.value) {
+    updateNearBottom()
+
+    if (isOwn) {
       options.pendingScrollToBottom.value = false
-      void nextTick(() => scrollToBottom(isOwn ? 'smooth' : 'auto'))
+      void nextTick(() => scrollToBottom('smooth'))
+      return
+    }
+
+    if (isNearBottom.value) {
+      options.pendingScrollToBottom.value = false
+      void nextTick(() => scrollToBottom('auto'))
       return
     }
 
@@ -68,16 +78,21 @@ export function useMessageScroll(
   watch(
     () => options.pendingScrollToBottom.value,
     (shouldScroll) => {
-      if (shouldScroll) {
-        options.pendingScrollToBottom.value = false
-        void nextTick(() => scrollToBottom('smooth'))
+      if (!shouldScroll) {
+        return
       }
+
+      options.pendingScrollToBottom.value = false
+      void nextTick(() => scrollToBottom('smooth'))
     },
   )
 
-  onBeforeUnmount(() => {
-    containerRef.value?.removeEventListener('scroll', onScroll)
-  })
+  function unbind() {
+    if (boundEl) {
+      boundEl.removeEventListener('scroll', onScroll)
+      boundEl = null
+    }
+  }
 
   function bind() {
     const el = containerRef.value
@@ -85,10 +100,33 @@ export function useMessageScroll(
       return
     }
 
-    el.removeEventListener('scroll', onScroll)
+    if (boundEl === el) {
+      updateNearBottom()
+      return
+    }
+
+    unbind()
+    boundEl = el
     el.addEventListener('scroll', onScroll, { passive: true })
     updateNearBottom()
   }
+
+  watch(
+    containerRef,
+    async (el) => {
+      if (el) {
+        await nextTick()
+        bind()
+      } else {
+        unbind()
+      }
+    },
+    { flush: 'post' },
+  )
+
+  onBeforeUnmount(() => {
+    unbind()
+  })
 
   return {
     isNearBottom,

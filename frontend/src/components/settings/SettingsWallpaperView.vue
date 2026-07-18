@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { storeToRefs } from 'pinia'
-import { CHAT_PATTERNS } from '../../themes/patterns'
-import type { PatternId } from '../../themes/types'
+import { PATTERN_TILE_SIZE } from '../../themes/patterns'
 import { useConfigStore } from '../../stores/config'
 
 const configStore = useConfigStore()
-const { preferences, pendingWallpaperPreview } = storeToRefs(configStore)
+const { preferences, pendingWallpaperPreview, wallpaperPatterns } = storeToRefs(configStore)
 
 const fileInput = ref<HTMLInputElement | null>(null)
 
@@ -21,7 +20,7 @@ function selectNone() {
   configStore.setWallpaper({ kind: 'none' })
 }
 
-function selectPattern(patternId: PatternId) {
+function selectPattern(patternId: string) {
   configStore.setWallpaper({ kind: 'pattern', patternId })
 }
 
@@ -75,7 +74,7 @@ const previewUrl = (url: string) => `url("${url}")`
       </button>
 
       <button
-        v-for="pattern in CHAT_PATTERNS"
+        v-for="pattern in wallpaperPatterns"
         :key="pattern.id"
         type="button"
         class="chatify:relative chatify:h-24 chatify:overflow-hidden chatify:rounded-xl chatify:border chatify:transition"
@@ -91,8 +90,8 @@ const previewUrl = (url: string) => `url("${url}")`
             backgroundColor: 'var(--chatify-color-chatify-muted)',
             maskImage: previewUrl(pattern.url),
             WebkitMaskImage: previewUrl(pattern.url),
-            maskSize: pattern.tileSize,
-            WebkitMaskSize: pattern.tileSize,
+            maskSize: PATTERN_TILE_SIZE,
+            WebkitMaskSize: PATTERN_TILE_SIZE,
             maskRepeat: 'repeat',
             WebkitMaskRepeat: 'repeat',
           }"

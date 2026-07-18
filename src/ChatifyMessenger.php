@@ -11,9 +11,6 @@ use Chatify\Models\Message;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 
-/**
- * @deprecated Use Actions and Services directly.
- */
 class ChatifyMessenger
 {
     public function findOrCreateDirect(Model $userA, Model $userB): Conversation

@@ -1,7 +1,5 @@
 import type { ChatifyMessage, ChatifyUser, MessageAttachment, MessageReplyPreview } from '../types'
 
-export type MessageLocalStatus = 'sending' | 'failed'
-
 export interface OutboundMessageDraft {
   conversationId: string
   body: string
@@ -16,11 +14,24 @@ export function isPendingMessageId(id: string): boolean {
   return id.startsWith('pending-')
 }
 
+function resolveAttachmentType(file: File): MessageAttachment['type'] {
+  if (file.type.startsWith('image/')) {
+    return 'image'
+  }
+  if (file.type.startsWith('audio/')) {
+    return 'audio'
+  }
+  if (file.type.startsWith('video/')) {
+    return 'video'
+  }
+  return 'file'
+}
+
 function fileToAttachment(file: File, url: string): MessageAttachment {
   return {
     filename: file.name,
     original_name: file.name,
-    type: file.type.startsWith('image/') ? 'image' : 'file',
+    type: resolveAttachmentType(file),
     url,
   }
 }

@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace Chatify;
 
+use Chatify\Console\BuildCommand;
 use Chatify\Console\InstallCommand;
 use Chatify\Console\PublishCommand;
 use Chatify\Contracts\RecipientResolver;
 use Chatify\Models\Conversation;
 use Chatify\Models\Message;
-use Chatify\Models\UserSetting;
 use Chatify\Policies\ConversationPolicy;
 use Chatify\Policies\MessagePolicy;
-use Chatify\Policies\UserSettingPolicy;
 use Chatify\Services\DefaultRecipientResolver;
 use Chatify\Support\ChatifyModels;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -47,6 +46,7 @@ class ChatifyServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->commands([
+                BuildCommand::class,
                 InstallCommand::class,
                 PublishCommand::class,
             ]);
@@ -58,7 +58,6 @@ class ChatifyServiceProvider extends ServiceProvider
     {
         Gate::policy(ChatifyModels::conversationClass(), ConversationPolicy::class);
         Gate::policy(ChatifyModels::messageClass(), MessagePolicy::class);
-        Gate::policy(ChatifyModels::userSettingClass(), UserSettingPolicy::class);
     }
 
     protected function registerRateLimiters(): void
@@ -81,7 +80,6 @@ class ChatifyServiceProvider extends ServiceProvider
                 abort(401);
             }
 
-            /** @var Conversation|null $conversation */
             $conversation = ChatifyModels::conversationClass()::query()
                 ->forUser((int) $user->getKey())
                 ->where('id', $value)
@@ -104,7 +102,6 @@ class ChatifyServiceProvider extends ServiceProvider
             $participantTable = config('chatify.tables.participants', 'ch_conversation_participants');
             $messageTable = config('chatify.tables.messages', 'ch_messages');
 
-            /** @var Message|null $message */
             $message = ChatifyModels::messageClass()::query()
                 ->where("{$messageTable}.id", $value)
                 ->whereIn('conversation_id', function ($query) use ($participantTable, $user) {
@@ -148,6 +145,8 @@ class ChatifyServiceProvider extends ServiceProvider
             __DIR__.'/database/migrations/2024_01_01_000001_create_chatify_v2_tables.php' => database_path('migrations/2024_01_01_000001_create_chatify_v2_tables.php'),
             __DIR__.'/database/migrations/2024_01_01_000002_add_theme_preferences_to_user_settings.php' => database_path('migrations/2024_01_01_000002_add_theme_preferences_to_user_settings.php'),
             __DIR__.'/database/migrations/2024_01_01_000003_extend_messages_for_actions.php' => database_path('migrations/2024_01_01_000003_extend_messages_for_actions.php'),
+            __DIR__.'/database/migrations/2024_01_01_000004_extend_groups_for_management.php' => database_path('migrations/2024_01_01_000004_extend_groups_for_management.php'),
+            __DIR__.'/database/migrations/2024_01_01_000005_add_system_messages.php' => database_path('migrations/2024_01_01_000005_add_system_messages.php'),
         ], 'chatify-migrations');
 
         $this->publishes([
@@ -157,6 +156,10 @@ class ChatifyServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../dist' => public_path('vendor/chatify'),
         ], 'chatify-assets');
+
+        $this->publishes([
+            __DIR__.'/../resources/patterns' => public_path('vendor/chatify/patterns'),
+        ], 'chatify-patterns');
 
         $this->publishes([
             __DIR__.'/../frontend' => resource_path('vendor/chatify/frontend'),

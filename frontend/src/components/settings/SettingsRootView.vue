@@ -14,7 +14,7 @@ defineEmits<{
 }>()
 
 const configStore = useConfigStore()
-const { preferences } = storeToRefs(configStore)
+const { preferences, themesEnabled, fontsEnabled, wallpaperEnabled } = storeToRefs(configStore)
 
 const themeLabel = computed(() => getThemeById(preferences.value.themeId).name)
 const fontLabel = computed(() => getFontById(preferences.value.fontFamily).label)
@@ -29,7 +29,7 @@ const wallpaperLabel = computed(() => {
     return 'Custom photo'
   }
 
-  return getPatternById(wallpaper.patternId).name
+  return getPatternById(wallpaper.patternId)?.name ?? 'Pattern'
 })
 </script>
 
@@ -38,9 +38,27 @@ const wallpaperLabel = computed(() => {
     <SettingsProfileHeader />
 
     <SettingsGroup>
-      <SettingsRow label="Themes" :value="themeLabel" chevron @click="$emit('navigate', 'themes')" />
-      <SettingsRow label="Font" :value="fontLabel" chevron @click="$emit('navigate', 'font')" />
-      <SettingsRow label="Wallpaper" :value="wallpaperLabel" chevron @click="$emit('navigate', 'wallpaper')" />
+      <SettingsRow
+        v-if="themesEnabled"
+        label="Themes"
+        :value="themeLabel"
+        chevron
+        @click="$emit('navigate', 'themes')"
+      />
+      <SettingsRow
+        v-if="fontsEnabled"
+        label="Font"
+        :value="fontLabel"
+        chevron
+        @click="$emit('navigate', 'font')"
+      />
+      <SettingsRow
+        v-if="wallpaperEnabled"
+        label="Wallpaper"
+        :value="wallpaperLabel"
+        chevron
+        @click="$emit('navigate', 'wallpaper')"
+      />
     </SettingsGroup>
   </div>
 </template>

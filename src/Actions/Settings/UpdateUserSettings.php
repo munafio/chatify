@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Chatify\Actions\Settings;
 
-use Chatify\Events\UserPresenceChanged;
 use Chatify\Models\UserSetting;
 use Chatify\Services\UserSettingsService;
 use Illuminate\Database\Eloquent\Model;
@@ -22,12 +21,6 @@ final class UpdateUserSettings
         ?UploadedFile $avatar = null,
         ?UploadedFile $chatBackground = null,
     ): UserSetting {
-        $settings = $this->userSettingsService->update($user, $attributes, $avatar, $chatBackground);
-
-        if (array_key_exists('active_status', $attributes)) {
-            UserPresenceChanged::dispatch($user, (bool) $settings->active_status);
-        }
-
-        return $settings;
+        return $this->userSettingsService->update($user, $attributes, $avatar, $chatBackground);
     }
 }

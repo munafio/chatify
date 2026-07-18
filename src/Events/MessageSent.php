@@ -21,7 +21,7 @@ class MessageSent implements ShouldBroadcastNow
     public function __construct(
         public Message $message,
     ) {
-        $this->message->loadMissing(['sender', 'conversation.participants']);
+        $this->message->loadMissing(['sender', 'conversation.participants', 'forwardedFrom.sender']);
     }
 
     public function broadcastOn(): array

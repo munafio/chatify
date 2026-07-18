@@ -4,9 +4,37 @@ export interface ChatifyUser {
   attributes: {
     name: string
     avatar: string
-    active_status: boolean
     email?: string | null
   }
+}
+
+export type GroupMemberRole = 'owner' | 'admin' | 'moderator' | 'member'
+
+export type GroupPermissionKey = 'edit_info' | 'add_members' | 'remove_members' | 'manage_admins'
+
+export interface GroupMembership {
+  role: GroupMemberRole
+  permissions: Partial<Record<GroupPermissionKey, boolean>> | null
+  is_full_admin: boolean
+}
+
+export interface ChatifyParticipant {
+  type: 'participant'
+  id: number | string
+  attributes: {
+    role: GroupMemberRole
+    permissions: Partial<Record<GroupPermissionKey, boolean>> | null
+    is_full_admin: boolean
+    is_you: boolean
+  }
+  relationships: {
+    user: ChatifyUser | null
+  }
+}
+
+export interface GroupCreatedBy {
+  id: number | string
+  name: string
 }
 
 export interface MessageAttachment {
@@ -16,10 +44,32 @@ export interface MessageAttachment {
   url: string
 }
 
+export interface SharedAttachment {
+  type: 'attachment'
+  attributes: {
+    kind: 'media' | 'doc' | 'link' | string
+    filename: string | null
+    url: string | null
+    original_name: string | null
+    mime: string | null
+    snippet: string | null
+    message_id: string | null
+    created_at: string | null
+  }
+}
+
 export interface MessageReplyPreview {
   id: string
   body: string | null
   sender_name: string
+}
+
+export interface LinkPreview {
+  url: string
+  title?: string | null
+  description?: string | null
+  image?: string | null
+  site_name?: string | null
 }
 
 export interface ChatifyMessage {
@@ -27,13 +77,21 @@ export interface ChatifyMessage {
   id: string
   attributes: {
     conversation_id: string
+    kind?: 'user' | 'system'
+    system_event?: {
+      event: 'participant_added' | 'participant_removed' | 'participant_left'
+      actor_user_id: number | string
+      target_user_ids: Array<number | string>
+    } | null
     body: string | null
     attachment: MessageAttachment | null
     attachments?: MessageAttachment[]
     read: boolean
     edited_at?: string | null
     reply_to?: MessageReplyPreview | null
+    forwarded_from?: MessageReplyPreview | null
     local_status?: 'sending' | 'failed' | null
+    upload_progress?: number | null
     created_at: string | null
     updated_at: string | null
   }
@@ -53,14 +111,19 @@ export interface ChatifyConversation {
   attributes: {
     conversation_type: 'direct' | 'group'
     name: string | null
+    description?: string | null
+    avatar_url?: string | null
     unread_count: number
     participant_count?: number
     is_owner?: boolean
+    my_membership?: GroupMembership | null
+    created_by?: GroupCreatedBy | null
     created_at: string | null
     updated_at: string | null
   }
   relationships: {
-    participants: ChatifyUser[]
+    participants: ChatifyUser[] | ChatifyParticipant[]
+    participants_preview?: ChatifyParticipant[] | null
     last_message: ChatifyMessage | null
     other_user: ChatifyUser | null
   }
@@ -77,7 +140,6 @@ export interface UserSettings {
     theme_preferences: Record<string, unknown> | null
     chat_background: string | null
     chat_background_url: string | null
-    active_status: boolean
   }
 }
 
@@ -102,6 +164,20 @@ export interface AttachmentsConfig {
   allowedFiles: string[]
 }
 
+export interface WallpaperPatternBoot {
+  id: string
+  name: string
+  url: string
+}
+
+export interface AppearanceFeatures {
+  giphy: boolean
+  colors: boolean
+  themes: boolean
+  fonts: boolean
+  wallpaper: boolean
+}
+
 export interface BootConfig {
   user: ChatifyUser
   apiBase: string
@@ -111,9 +187,17 @@ export interface BootConfig {
   appName?: string
   debug: boolean
   groupsEnabled: boolean
+  features?: AppearanceFeatures
   colors: string[]
+  themes?: string[]
+  fonts?: string[]
+  wallpaperPatterns?: WallpaperPatternBoot[]
   preferences?: BootPreferences
   attachments: AttachmentsConfig
+  giphy?: {
+    enabled: boolean
+    apiKey: string | null
+  }
   broadcast: BroadcastConfig
 }
 
@@ -130,6 +214,7 @@ export interface PaginatedResponse<T> {
     last_page?: number
     per_page?: number
     total?: number
+    total_all?: number
   }
 }
 
@@ -146,6 +231,10 @@ export type ModalName =
   | 'forwardMessage'
   | null
 
+export type GroupInfoView = 'main' | 'members' | 'media'
+
+export type GroupMembersMode = 'browse' | 'add'
+
 export interface MessageDeletedPayload {
   id: string
   conversation_id: string
@@ -159,8 +248,18 @@ export interface ConversationReadPayload {
 
 export interface GroupParticipantsChangedPayload {
   conversation_id: string
+  change_type?: 'participant_added' | 'participant_removed' | 'participant_left' | string | null
+  actor_user_id?: number | string | null
+  target_user_ids?: Array<number | string>
   participant_count: number
-  participants: ChatifyUser[]
+  participants?: ChatifyUser[]
+  participants_preview?: ChatifyParticipant[]
+}
+
+export interface GroupMembershipRevokedPayload {
+  conversation_id: string
+  user_id: number | string
+  reason: 'removed' | 'left'
 }
 
 export interface UserTypingPayload {
@@ -169,6 +268,34 @@ export interface UserTypingPayload {
   is_typing: boolean
 }
 
+export interface MessageClusterEntry {
+  message: ChatifyMessage
+  showSenderName?: boolean
+  clusterSpacing?: 'tight' | 'normal'
+}
+
+export type MessageThreadEntry =
+  | {
+      kind: 'message'
+      key: string
+      message: ChatifyMessage
+      showAvatar?: boolean
+      showSenderName?: boolean
+      clusterSpacing?: 'tight' | 'normal'
+    }
+  | {
+      kind: 'cluster'
+      key: string
+      senderId: string
+      entries: MessageClusterEntry[]
+    }
+
 export type MessageListItem =
   | { kind: 'date'; key: string; label: string }
-  | { kind: 'message'; key: string; message: ChatifyMessage }
+  | MessageThreadEntry
+  | {
+      kind: 'day'
+      key: string
+      label: string
+      items: MessageThreadEntry[]
+    }

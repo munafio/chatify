@@ -72,22 +72,15 @@ async function openFavorite(userId: number | string) {
         class="chatify-list-item chatify:flex chatify:w-full chatify:items-center chatify:gap-3 chatify:px-4 chatify:py-3 chatify:text-left"
         @click="openFavorite(user.id)"
       >
-        <div class="chatify:relative chatify:h-10 chatify:w-10 chatify:shrink-0">
+        <div class="chatify:h-10 chatify:w-10 chatify:shrink-0">
           <img
             :src="user.attributes.avatar"
             :alt="user.attributes.name"
             class="chatify:h-full chatify:w-full chatify:rounded-full chatify:object-cover"
           />
-          <span
-            v-if="user.attributes.active_status"
-            class="chatify:absolute chatify:bottom-0 chatify:right-0 chatify:h-2.5 chatify:w-2.5 chatify:rounded-full chatify:bg-green-500 chatify:ring-2 chatify:ring-chatify-sidebar"
-          />
         </div>
         <div class="chatify:min-w-0 chatify:flex-1">
           <p class="chatify:truncate chatify:text-sm chatify:font-medium chatify:text-chatify-text">{{ user.attributes.name }}</p>
-          <p class="chatify:text-xs chatify:text-chatify-muted">
-            {{ user.attributes.active_status ? 'Online' : 'Offline' }}
-          </p>
         </div>
       </button>
     </div>

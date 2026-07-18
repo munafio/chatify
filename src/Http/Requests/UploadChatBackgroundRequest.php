@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Chatify\Http\Requests;
 
+use Chatify\Support\ChatifyAppearanceConfig;
 use Chatify\Support\ValidatesUploadedFiles;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -13,7 +14,7 @@ class UploadChatBackgroundRequest extends FormRequest
 
     public function authorize(): bool
     {
-        return $this->user() !== null;
+        return $this->user() !== null && ChatifyAppearanceConfig::isEnabled('chat_background');
     }
 
     public function rules(): array

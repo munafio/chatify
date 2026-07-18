@@ -7,6 +7,7 @@ export const useUiStore = defineStore('ui', () => {
   const modalContext = ref<Record<string, unknown>>({})
   const showThreadOnMobile = ref(false)
   const composerDraft = ref('')
+  const messageSearchOpen = ref(false)
 
   function openModal(name: Exclude<ModalName, null>, context: Record<string, unknown> = {}) {
     activeModal.value = name
@@ -16,6 +17,14 @@ export const useUiStore = defineStore('ui', () => {
   function closeModal() {
     activeModal.value = null
     modalContext.value = {}
+  }
+
+  function openMessageSearch() {
+    messageSearchOpen.value = true
+  }
+
+  function closeMessageSearch() {
+    messageSearchOpen.value = false
   }
 
   function showThread() {
@@ -35,8 +44,11 @@ export const useUiStore = defineStore('ui', () => {
     modalContext,
     showThreadOnMobile,
     composerDraft,
+    messageSearchOpen,
     openModal,
     closeModal,
+    openMessageSearch,
+    closeMessageSearch,
     showThread,
     hideThread,
     setComposerDraft,

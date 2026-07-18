@@ -9,7 +9,6 @@ use Chatify\Services\AttachmentService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/** @mixin UserSetting */
 class UserSettingsResource extends JsonResource
 {
     public function toArray(Request $request): array
@@ -29,7 +28,6 @@ class UserSettingsResource extends JsonResource
                 'theme_preferences' => $this->theme_preferences,
                 'chat_background' => $this->chat_background,
                 'chat_background_url' => $attachments->chatBackgroundUrl($this->chat_background),
-                'active_status' => $this->active_status,
             ],
         ];
     }
