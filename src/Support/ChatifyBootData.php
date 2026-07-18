@@ -6,6 +6,7 @@ namespace Chatify\Support;
 
 use Chatify\Http\Resources\UserResource;
 use Chatify\Services\AttachmentService;
+use Chatify\Services\BlockService;
 use Chatify\Services\UserSettingsService;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
@@ -19,9 +20,12 @@ final class ChatifyBootData
         $broadcast = config('chatify.frontend.broadcast', []);
         $settings = app(UserSettingsService::class)->forUser($user);
         $attachments = app(AttachmentService::class);
+        $blockService = app(BlockService::class);
 
         return [
             'user' => (new UserResource($user))->resolve($request),
+            'messaging_blocked_user_ids' => $blockService->blockedUserIdsFor($user),
+            'default_avatar_url' => $blockService->defaultAvatarUrl(),
             'apiBase' => url('/'.trim(config('chatify.api.prefix', 'api/chatify/v1'), '/')),
             'broadcastAuthUrl' => url('/'.trim(config('chatify.api.prefix', 'api/chatify/v1'), '/').'/broadcasting/auth'),
             'csrfToken' => csrf_token(),
@@ -38,6 +42,7 @@ final class ChatifyBootData
                 'dark_mode' => (bool) $settings->dark_mode,
                 'theme_preferences' => $settings->theme_preferences,
                 'chat_background_url' => $attachments->chatBackgroundUrl($settings->chat_background),
+                'show_online_status' => (bool) $settings->active_status,
             ],
             'attachments' => [
                 'maxUploadSize' => (int) config('chatify.attachments.max_upload_size', 150),
@@ -57,6 +62,25 @@ final class ChatifyBootData
                 'wsHost' => $broadcast['wsHost'] ?? null,
                 'wsPort' => (int) ($broadcast['wsPort'] ?? 443),
                 'forceTLS' => (bool) ($broadcast['forceTLS'] ?? true),
+            ],
+            'sounds' => [
+                'enabled' => (bool) config('chatify.sounds.enabled', true),
+                'incomingMessage' => [
+                    'enabled' => (bool) config('chatify.sounds.incoming_message.enabled', true),
+                    'url' => config('chatify.sounds.incoming_message.url'),
+                ],
+                'outgoingMessage' => [
+                    'enabled' => (bool) config('chatify.sounds.outgoing_message.enabled', true),
+                    'url' => config('chatify.sounds.outgoing_message.url'),
+                ],
+                'typing' => [
+                    'enabled' => (bool) config('chatify.sounds.typing.enabled', false),
+                    'url' => config('chatify.sounds.typing.url'),
+                ],
+            ],
+            'savedMessages' => [
+                'enabled' => (bool) config('chatify.saved_messages.enabled', true),
+                'title' => config('chatify.saved_messages.title', 'Saved Messages'),
             ],
         ];
     }

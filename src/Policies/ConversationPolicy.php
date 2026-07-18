@@ -94,6 +94,10 @@ final class ConversationPolicy
 
     public function delete(Model $user, Conversation $conversation): bool
     {
+        if ($conversation->isSaved()) {
+            return false;
+        }
+
         if (! $this->isParticipant($user, $conversation)) {
             return false;
         }
@@ -103,6 +107,20 @@ final class ConversationPolicy
         }
 
         return true;
+    }
+
+    public function hide(Model $user, Conversation $conversation): bool
+    {
+        if ($conversation->isSaved()) {
+            return false;
+        }
+
+        return $this->isParticipant($user, $conversation);
+    }
+
+    public function clear(Model $user, Conversation $conversation): bool
+    {
+        return $conversation->isSaved() && $this->isParticipant($user, $conversation);
     }
 
     private function isParticipant(Model $user, Conversation $conversation): bool

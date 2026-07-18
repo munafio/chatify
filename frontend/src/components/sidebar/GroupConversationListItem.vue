@@ -5,6 +5,8 @@ import { conversationDisplayName, formatRelativeTime, truncate } from '../../uti
 defineProps<{
   conversation: ChatifyConversation
   active: boolean
+  pinned?: boolean
+  draggable?: boolean
 }>()
 
 defineEmits<{
@@ -29,12 +31,40 @@ defineEmits<{
 
     <div class="chatify:min-w-0 chatify:flex-1">
       <div class="chatify:flex chatify:items-center chatify:justify-between chatify:gap-2">
-        <p class="chatify:truncate chatify:text-sm chatify:font-medium">
-          {{ conversationDisplayName(conversation) }}
-        </p>
-        <span class="chatify:shrink-0 chatify:text-xs chatify:text-chatify-muted">
-          {{ formatRelativeTime(conversation.relationships.last_message?.attributes.created_at) }}
-        </span>
+        <div class="chatify:flex chatify:min-w-0 chatify:items-center chatify:gap-1.5">
+          <p class="chatify:truncate chatify:text-sm chatify:font-medium">
+            {{ conversationDisplayName(conversation) }}
+          </p>
+          <svg
+            v-if="pinned"
+            class="chatify:h-3.5 chatify:w-3.5 chatify:shrink-0 chatify:text-chatify-muted"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+            aria-label="Pinned"
+          >
+            <path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z" />
+          </svg>
+        </div>
+        <div class="chatify:flex chatify:shrink-0 chatify:items-center chatify:gap-1">
+          <div
+            v-if="draggable"
+            class="chatify-conversation-drag-handle chatify:flex chatify:h-6 chatify:w-5 chatify:cursor-grab chatify:items-center chatify:justify-center chatify:rounded chatify:text-chatify-muted chatify:opacity-60 hover:chatify:opacity-100"
+            aria-label="Drag to reorder"
+            @click.stop
+          >
+            <svg class="chatify:h-4 chatify:w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="9" cy="7" r="1.5" />
+              <circle cx="15" cy="7" r="1.5" />
+              <circle cx="9" cy="12" r="1.5" />
+              <circle cx="15" cy="12" r="1.5" />
+              <circle cx="9" cy="17" r="1.5" />
+              <circle cx="15" cy="17" r="1.5" />
+            </svg>
+          </div>
+          <span class="chatify:text-xs chatify:text-chatify-muted">
+            {{ formatRelativeTime(conversation.relationships.last_message?.attributes.created_at) }}
+          </span>
+        </div>
       </div>
       <div class="chatify:flex chatify:items-center chatify:justify-between chatify:gap-2">
         <p class="chatify:truncate chatify:text-xs chatify:text-chatify-muted">

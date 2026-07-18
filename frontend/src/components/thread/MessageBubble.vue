@@ -3,8 +3,10 @@ import { computed, ref } from 'vue'
 import type { ChatifyMessage } from '../../types'
 import { formatMessageTime } from '../../utils/format'
 import { isPendingMessageId } from '../../utils/outboundMessage'
+import { copyPlainText } from '../../utils/copyText'
 import { bubbleTextClass } from '../../themes/utils'
 import { useImageLightbox } from '../../composables/useImageLightbox'
+import { useToastStore } from '../../stores/toast'
 import MessageAlbumBubble from './MessageAlbumBubble.vue'
 import MessageActionsMenu from './MessageActionsMenu.vue'
 import MessageBody from './MessageBody.vue'
@@ -33,10 +35,13 @@ const emit = defineEmits<{
 }>()
 
 const { show } = useImageLightbox()
+const toastStore = useToastStore()
+const actionsMenuRef = ref<InstanceType<typeof MessageActionsMenu> | null>(null)
 
 const localStatus = computed(() => props.message.attributes.local_status ?? null)
 const isPending = computed(() => isPendingMessageId(props.message.id))
 const showActions = computed(() => !isPending.value && localStatus.value !== 'sending')
+const hasCopyableText = computed(() => Boolean(props.message.attributes.body?.trim()))
 const spacingClass = computed(() =>
   props.clusterSpacing === 'tight' ? 'chatify:mt-0.5' : 'chatify:mt-2',
 )
@@ -81,6 +86,29 @@ function openSingleImage() {
     show([attachment], 0)
   }
 }
+
+function onContextMenu(event: MouseEvent) {
+  event.preventDefault()
+
+  if (!showActions.value) {
+    return
+  }
+
+  actionsMenuRef.value?.openAt(event.clientX, event.clientY)
+}
+
+async function onCopyText() {
+  const body = props.message.attributes.body
+  if (!body?.trim()) {
+    return
+  }
+
+  const copied = await copyPlainText(body)
+  toastStore.show({
+    message: copied ? 'Copied to clipboard' : 'Unable to copy text',
+    icon: copied ? 'success' : 'error',
+  })
+}
 </script>
 
 <template>
@@ -91,15 +119,19 @@ function openSingleImage() {
     <div
       class="chatify:group chatify:flex chatify:w-full chatify:items-end chatify:gap-1"
       :class="isOwn ? 'chatify:justify-end' : 'chatify:justify-start'"
+      @contextmenu="onContextMenu"
     >
       <MessageActionsMenu
         v-if="isOwn && showActions"
+        ref="actionsMenuRef"
         :is-own="isOwn"
+        :has-copyable-text="hasCopyableText"
         @edit="emit('edit')"
         @remove-for-me="emit('removeForMe')"
         @remove-for-all="emit('removeForAll')"
         @reply="emit('reply')"
         @forward="emit('forward')"
+        @copy="onCopyText"
       />
 
       <div
@@ -255,12 +287,15 @@ function openSingleImage() {
 
       <MessageActionsMenu
         v-if="!isOwn && showActions"
+        ref="actionsMenuRef"
         :is-own="isOwn"
+        :has-copyable-text="hasCopyableText"
         @edit="emit('edit')"
         @remove-for-me="emit('removeForMe')"
         @remove-for-all="emit('removeForAll')"
         @reply="emit('reply')"
         @forward="emit('forward')"
+        @copy="onCopyText"
       />
     </div>
 

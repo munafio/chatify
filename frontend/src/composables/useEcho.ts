@@ -72,6 +72,8 @@ export function subscribeToUserInbox(
   handlers: {
     onInboxUpdated?: (payload: unknown) => void
     onGroupMembershipRevoked?: (payload: unknown) => void
+    onUserPresenceChanged?: (payload: unknown) => void
+    onUserBlockChanged?: (payload: unknown) => void
   },
 ) {
   if (!echo) {
@@ -85,6 +87,12 @@ export function subscribeToUserInbox(
   }
   if (handlers.onGroupMembershipRevoked) {
     channel.listen('.GroupMembershipRevoked', handlers.onGroupMembershipRevoked)
+  }
+  if (handlers.onUserPresenceChanged) {
+    channel.listen('.UserPresenceChanged', handlers.onUserPresenceChanged)
+  }
+  if (handlers.onUserBlockChanged) {
+    channel.listen('.UserBlockChanged', handlers.onUserBlockChanged)
   }
 
   return () => {
@@ -134,13 +142,65 @@ export function subscribeToConversation(
   }
 }
 
+function getPusherConnection(echo: Echo<'pusher'> | null) {
+  const connector = (echo as Echo<'pusher'> & { connector?: { pusher?: { connection: { bind: Function; unbind: Function; state?: string } } } }).connector
+  return connector?.pusher?.connection ?? null
+}
+
+export function bindEchoConnectionState(
+  echo: Echo<'pusher'> | null,
+  onStateChange: (state: { previous: string; current: string }) => void,
+) {
+  const connection = getPusherConnection(echo)
+
+  if (!connection) {
+    return () => {}
+  }
+
+  const handler = (state: { previous: string; current: string }) => {
+    onStateChange(state)
+  }
+
+  connection.bind('state_change', handler)
+
+  if (connection.state) {
+    onStateChange({ previous: connection.state, current: connection.state })
+  }
+
+  return () => {
+    connection.unbind('state_change', handler)
+  }
+}
+
+export function bindEchoDisconnect(echo: Echo<'pusher'> | null, onDisconnect: () => void) {
+  const connection = getPusherConnection(echo)
+
+  if (!connection) {
+    return () => {}
+  }
+
+  const handler = (state: { previous: string; current: string }) => {
+    const wasConnected = state.previous === 'connected'
+    const isDisconnected = ['disconnected', 'unavailable', 'failed'].includes(state.current)
+
+    if (wasConnected && isDisconnected) {
+      onDisconnect()
+    }
+  }
+
+  connection.bind('state_change', handler)
+
+  return () => {
+    connection.unbind('state_change', handler)
+  }
+}
+
 export function bindEchoReconnect(echo: Echo<'pusher'> | null, onReconnect: () => void) {
   if (!echo) {
     return () => {}
   }
 
-  const connector = (echo as Echo<'pusher'> & { connector?: { pusher?: { connection: { bind: Function; unbind: Function } } } }).connector
-  const connection = connector?.pusher?.connection
+  const connection = getPusherConnection(echo)
 
   if (!connection) {
     return () => {}

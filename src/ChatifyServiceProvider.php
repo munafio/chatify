@@ -162,6 +162,10 @@ class ChatifyServiceProvider extends ServiceProvider
         ], 'chatify-patterns');
 
         $this->publishes([
+            __DIR__.'/../resources/sounds' => public_path('vendor/chatify/sounds'),
+        ], 'chatify-sounds');
+
+        $this->publishes([
             __DIR__.'/../frontend' => resource_path('vendor/chatify/frontend'),
         ], 'chatify-frontend');
 

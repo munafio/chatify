@@ -16,6 +16,10 @@ use Illuminate\Support\Str;
 
 final class MessageService
 {
+    public function __construct(
+        private readonly BlockService $blockService,
+    ) {}
+
     public function send(Conversation $conversation, Model $sender, SendMessageData $data): Message
     {
         $message = ChatifyModels::messageClass()::query()->create([
@@ -68,6 +72,16 @@ final class MessageService
                     ->where('user_id', $viewerId)
                     ->whereNotNull('hidden_at');
             });
+
+            $viewer = ChatifyModels::userClass()::query()->find($viewerId);
+
+            if ($viewer !== null) {
+                $blockedIds = $this->blockService->blockedUserIdsFor($viewer);
+
+                if ($blockedIds !== []) {
+                    $query->whereNotIn('user_id', $blockedIds);
+                }
+            }
         }
 
         return $query;
@@ -131,8 +145,19 @@ final class MessageService
         $message->delete();
     }
 
+    public function deleteAllForConversation(Conversation $conversation): void
+    {
+        ChatifyModels::messageClass()::query()
+            ->forConversation($conversation->id)
+            ->delete();
+    }
+
     public function unreadCount(Conversation $conversation, int $userId): int
     {
+        if ($conversation->isSaved()) {
+            return 0;
+        }
+
         $participant = $conversation->participants()->where('user_id', $userId)->first();
 
         $query = ChatifyModels::messageClass()::query()

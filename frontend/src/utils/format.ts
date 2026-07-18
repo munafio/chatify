@@ -1,5 +1,6 @@
-import type { ChatifyConversation } from '../types'
+import type { ChatifyConversation, ChatifyUser } from '../types'
 import { isParticipantRecord, participantUser } from './group'
+import { displayUserAvatar, displayUserName } from './userDisplay'
 
 export function formatRelativeTime(iso: string | null | undefined): string {
   if (!iso) {
@@ -72,18 +73,47 @@ export function truncate(text: string, max = 48): string {
 }
 
 export function conversationDisplayName(
-  conversation: { attributes: { conversation_type: string; name: string | null }; relationships: { other_user: { attributes: { name: string } } | null } },
+  conversation: {
+    attributes: {
+      conversation_type: string
+      name: string | null
+      saved_title?: string | null
+      is_saved?: boolean
+    }
+    relationships: { other_user: ChatifyUser | null }
+  },
+  fallbackSavedTitle = 'Saved Messages',
 ): string {
+  if (conversation.attributes.conversation_type === 'saved' || conversation.attributes.is_saved) {
+    return conversation.attributes.saved_title ?? conversation.attributes.name ?? fallbackSavedTitle
+  }
+
   if (conversation.attributes.conversation_type === 'group') {
     return conversation.attributes.name ?? 'Group'
   }
 
-  return conversation.relationships.other_user?.attributes.name ?? 'Unknown'
+  return displayUserName(conversation.relationships.other_user)
 }
 
-export function conversationAvatar(conversation: ChatifyConversation): string | null {
+export function isSavedConversation(conversation: Pick<ChatifyConversation, 'attributes'>): boolean {
+  return conversation.attributes.conversation_type === 'saved' || Boolean(conversation.attributes.is_saved)
+}
+
+export function conversationAvatar(
+  conversation: ChatifyConversation,
+  defaultAvatarUrl = '',
+): string | null {
+  if (isSavedConversation(conversation)) {
+    return null
+  }
+
   if (conversation.attributes.conversation_type === 'direct') {
-    return conversation.relationships.other_user?.attributes.avatar ?? null
+    const otherUser = conversation.relationships.other_user
+    if (!otherUser) {
+      return null
+    }
+
+    return displayUserAvatar(otherUser, defaultAvatarUrl) || null
   }
 
   if (conversation.attributes.avatar_url) {

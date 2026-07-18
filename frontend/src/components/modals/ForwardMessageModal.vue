@@ -4,14 +4,20 @@ import { storeToRefs } from 'pinia'
 import { useConversationsStore } from '../../stores/conversations'
 import { useMessagesStore } from '../../stores/messages'
 import { useUiStore } from '../../stores/ui'
+import { useContactsStore } from '../../stores/contacts'
+import { useConfigStore } from '../../stores/config'
+import { conversationAvatar, conversationDisplayName } from '../../utils/format'
 import BaseModal from './BaseModal.vue'
 
 const uiStore = useUiStore()
 const conversationsStore = useConversationsStore()
 const messagesStore = useMessagesStore()
+const contactsStore = useContactsStore()
+const configStore = useConfigStore()
 const { activeModal } = storeToRefs(uiStore)
 const { forwardMessage } = storeToRefs(messagesStore)
 const { filteredItems } = storeToRefs(conversationsStore)
+const { defaultAvatarUrl } = storeToRefs(configStore)
 
 const search = ref('')
 const forwarding = ref(false)
@@ -24,14 +30,20 @@ const targets = computed(() => {
     if (conversation.id === conversationsStore.activeId) {
       return false
     }
+
+    if (
+      conversation.attributes.conversation_type === 'direct'
+      && conversation.relationships.other_user
+      && contactsStore.isBlockedByMe(conversation.relationships.other_user.id)
+    ) {
+      return false
+    }
+
     if (!q) {
       return true
     }
-    const name =
-      conversation.attributes.conversation_type === 'group'
-        ? conversation.attributes.name ?? ''
-        : conversation.relationships.other_user?.attributes.name ?? ''
-    return name.toLowerCase().includes(q)
+
+    return conversationDisplayName(conversation).toLowerCase().includes(q)
   })
 })
 
@@ -43,17 +55,11 @@ watch(open, (isOpen) => {
 })
 
 function displayName(conversation: (typeof filteredItems.value)[number]) {
-  if (conversation.attributes.conversation_type === 'group') {
-    return conversation.attributes.name ?? 'Group'
-  }
-  return conversation.relationships.other_user?.attributes.name ?? 'Chat'
+  return conversationDisplayName(conversation)
 }
 
 function avatar(conversation: (typeof filteredItems.value)[number]) {
-  if (conversation.attributes.conversation_type === 'group') {
-    return null
-  }
-  return conversation.relationships.other_user?.attributes.avatar ?? null
+  return conversationAvatar(conversation, defaultAvatarUrl.value)
 }
 
 async function forwardTo(conversationId: string) {

@@ -4,22 +4,31 @@ import { storeToRefs } from 'pinia'
 import { useContactsStore } from '../../stores/contacts'
 import { useConversationsStore } from '../../stores/conversations'
 import { useUiStore } from '../../stores/ui'
+import { useConfigStore } from '../../stores/config'
+import { displayUserAvatar, displayUserName } from '../../utils/userDisplay'
+import EmptyState from '../states/EmptyState.vue'
 
 const contactsStore = useContactsStore()
 const conversationsStore = useConversationsStore()
 const uiStore = useUiStore()
-const { favorites } = storeToRefs(contactsStore)
+const configStore = useConfigStore()
+const { favorites, favoritesLoadFailed } = storeToRefs(contactsStore)
 
 const search = ref('')
 
+const visibleFavorites = computed(() =>
+  favorites.value.filter((user) => !contactsStore.isBlockedByMe(user.id)),
+)
+
 const filteredFavorites = computed(() => {
   const q = search.value.trim().toLowerCase()
+  const source = visibleFavorites.value
   if (!q) {
-    return favorites.value
+    return source
   }
 
-  return favorites.value.filter((user) => {
-    const name = user.attributes.name.toLowerCase()
+  return source.filter((user) => {
+    const name = displayUserName(user).toLowerCase()
     const email = user.attributes.email?.toLowerCase() ?? ''
     return name.includes(q) || email.includes(q)
   })
@@ -42,8 +51,23 @@ async function openFavorite(userId: number | string) {
       />
     </div>
 
+    <EmptyState
+      v-if="favoritesLoadFailed"
+      class="chatify:flex-1"
+      title="Unable to load favorites"
+      description="We couldn't load your favorite contacts right now. Please check your connection and try again."
+    >
+      <button
+        type="button"
+        class="chatify:mt-2 chatify:rounded-lg chatify:bg-chatify-primary chatify:px-4 chatify:py-2 chatify:text-sm chatify:text-white"
+        @click="contactsStore.fetchFavorites()"
+      >
+        Try again
+      </button>
+    </EmptyState>
+
     <div
-      v-if="favorites.length === 0"
+      v-else-if="visibleFavorites.length === 0"
       class="chatify:flex chatify:flex-1 chatify:flex-col chatify:items-center chatify:justify-center chatify:gap-3 chatify:p-8 chatify:text-center"
     >
       <div class="chatify:flex chatify:h-16 chatify:w-16 chatify:items-center chatify:justify-center chatify:rounded-full chatify:bg-amber-100 chatify:text-amber-500">
@@ -74,13 +98,13 @@ async function openFavorite(userId: number | string) {
       >
         <div class="chatify:h-10 chatify:w-10 chatify:shrink-0">
           <img
-            :src="user.attributes.avatar"
-            :alt="user.attributes.name"
+            :src="displayUserAvatar(user, configStore.defaultAvatarUrl)"
+            :alt="displayUserName(user)"
             class="chatify:h-full chatify:w-full chatify:rounded-full chatify:object-cover"
           />
         </div>
         <div class="chatify:min-w-0 chatify:flex-1">
-          <p class="chatify:truncate chatify:text-sm chatify:font-medium chatify:text-chatify-text">{{ user.attributes.name }}</p>
+          <p class="chatify:truncate chatify:text-sm chatify:font-medium chatify:text-chatify-text">{{ displayUserName(user) }}</p>
         </div>
       </button>
     </div>

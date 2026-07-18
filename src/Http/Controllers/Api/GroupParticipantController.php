@@ -37,6 +37,7 @@ class GroupParticipantController extends Controller
             $conversation,
             (int) $request->integer('per_page', 20),
             $request->string('search')->toString() ?: null,
+            $request->user(),
         );
 
         return ParticipantResource::collection($participants)->response();

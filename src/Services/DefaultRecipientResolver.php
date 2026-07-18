@@ -9,12 +9,16 @@ use Illuminate\Database\Eloquent\Model;
 
 final class DefaultRecipientResolver implements RecipientResolver
 {
+    public function __construct(
+        private readonly BlockService $blockService,
+    ) {}
+
     public function canMessage(Model $sender, Model $recipient): bool
     {
         if ($sender->getKey() === $recipient->getKey()) {
             return false;
         }
 
-        return true;
+        return ! $this->blockService->eitherBlocked($sender, $recipient);
     }
 }

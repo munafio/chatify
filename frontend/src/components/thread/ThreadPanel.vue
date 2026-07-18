@@ -63,6 +63,7 @@ onMounted(async () => {
     <div
       ref="threadContainerRef"
       class="chatify:relative chatify:flex chatify:min-h-0 chatify:flex-1 chatify:flex-col"
+      @contextmenu.prevent
     >
       <ThreadHeaderSkeleton v-if="!activeConversation" />
       <ThreadHeader

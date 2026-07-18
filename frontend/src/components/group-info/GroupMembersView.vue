@@ -6,6 +6,7 @@ import { useInfiniteScroll } from '../../composables/useInfiniteScroll'
 import { useConfigStore } from '../../stores/config'
 import { useContactsStore } from '../../stores/contacts'
 import { memberRoleBadgeClass, memberRoleLabel, participantUser } from '../../utils/group'
+import { displayUserAvatar, displayUserName } from '../../utils/userDisplay'
 import { mergeById } from '../../utils/mergeById'
 import EmptyState from '../states/EmptyState.vue'
 import GroupMembersSkeleton from '../skeletons/GroupMembersSkeleton.vue'
@@ -221,7 +222,12 @@ function memberDisplayName(participant: ChatifyParticipant): string {
   if (participant.attributes.is_you) {
     return 'You'
   }
-  return participantUser(participant)?.attributes.name ?? 'Member'
+
+  return displayUserName(participantUser(participant))
+}
+
+function memberAvatar(participant: ChatifyParticipant): string {
+  return displayUserAvatar(participantUser(participant), configStore.defaultAvatarUrl)
 }
 
 function canShowMemberMenu(participant: ChatifyParticipant): boolean {
@@ -308,7 +314,7 @@ function onMemberMenuSelect(participant: ChatifyParticipant, id: string) {
             class="chatify-list-item chatify:flex chatify:items-center chatify:gap-3 chatify:rounded-lg chatify:px-2 chatify:py-3"
           >
             <img
-              :src="participantUser(participant)?.attributes.avatar"
+              :src="memberAvatar(participant)"
               :alt="memberDisplayName(participant)"
               class="chatify:h-10 chatify:w-10 chatify:rounded-full chatify:object-cover"
             />
@@ -355,9 +361,9 @@ function onMemberMenuSelect(participant: ChatifyParticipant, id: string) {
             class="chatify-list-item chatify:flex chatify:items-center chatify:justify-between chatify:gap-3 chatify:rounded-lg chatify:px-2 chatify:py-3"
           >
             <div class="chatify:flex chatify:min-w-0 chatify:items-center chatify:gap-3">
-              <img :src="user.attributes.avatar" :alt="user.attributes.name" class="chatify:h-10 chatify:w-10 chatify:rounded-full chatify:object-cover" />
+              <img :src="displayUserAvatar(user, configStore.defaultAvatarUrl)" :alt="displayUserName(user)" class="chatify:h-10 chatify:w-10 chatify:rounded-full chatify:object-cover" />
               <div>
-                <p class="chatify:text-sm chatify:font-medium">{{ user.attributes.name }}</p>
+                <p class="chatify:text-sm chatify:font-medium">{{ displayUserName(user) }}</p>
                 <p v-if="isAlreadyMember(user.id) && !isAddedFlash(user.id)" class="chatify:text-xs chatify:text-chatify-muted">
                   Already a member
                 </p>

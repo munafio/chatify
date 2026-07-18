@@ -59,7 +59,7 @@ return new class extends Migration
             $table->string('avatar')->default('avatar.png');
             $table->boolean('dark_mode')->default(false);
             $table->string('messenger_color')->nullable();
-            $table->boolean('active_status')->default(false);
+            $table->boolean('active_status')->default(true);
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();

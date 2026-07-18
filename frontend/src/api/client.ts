@@ -73,8 +73,24 @@ export function createChatifyApi(client: ApiClient) {
       return client.delete(`/conversations/${id}`)
     },
 
+    hideConversation(id: string) {
+      return client.post(`/conversations/${id}/hide`)
+    },
+
+    clearConversation(id: string) {
+      return client.post<SingleResponse<ChatifyConversation>>(`/conversations/${id}/clear`)
+    },
+
     markConversationRead(id: string) {
       return client.post(`/conversations/${id}/read`)
+    },
+
+    pinConversation(id: string, pinned: boolean) {
+      return client.patch<SingleResponse<ChatifyConversation>>(`/conversations/${id}/pin`, { pinned })
+    },
+
+    updatePinOrder(conversationIds: string[]) {
+      return client.put('/conversations/pin-order', { conversation_ids: conversationIds })
     },
 
     sendTyping(conversationId: string, isTyping: boolean) {
@@ -190,6 +206,7 @@ export function createChatifyApi(client: ApiClient) {
 
     patchSettings(payload: {
       dark_mode?: boolean
+      active_status?: boolean
       reset_avatar?: boolean
       theme_preferences?: Record<string, unknown>
     }) {
@@ -208,6 +225,26 @@ export function createChatifyApi(client: ApiClient) {
 
     toggleFavorite(userId: number | string) {
       return client.post(`/favorites/${userId}`)
+    },
+
+    getBlockedUsers() {
+      return client.get<PaginatedResponse<ChatifyUser>>('/blocks')
+    },
+
+    blockUser(userId: number | string) {
+      return client.post(`/blocks/${userId}`)
+    },
+
+    unblockUser(userId: number | string) {
+      return client.delete(`/blocks/${userId}`)
+    },
+
+    sendPresenceHeartbeat() {
+      return client.post<{ data: { online: boolean } }>('/presence/heartbeat')
+    },
+
+    sendPresenceOffline() {
+      return client.post<{ data: { online: boolean } }>('/presence/offline')
     },
 
     getAttachments(

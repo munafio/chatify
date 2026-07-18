@@ -25,6 +25,7 @@ final class UserSettingsService
                 'avatar' => config('chatify.user_avatar.default', 'avatar.png'),
                 'dark_mode' => false,
                 'messenger_color' => ChatifyAppearanceConfig::defaultColor(),
+                'active_status' => true,
             ]
         );
 
@@ -57,6 +58,14 @@ final class UserSettingsService
 
         if (array_key_exists('dark_mode', $attributes)) {
             $settings->dark_mode = (bool) $attributes['dark_mode'];
+        }
+
+        if (array_key_exists('active_status', $attributes)) {
+            $settings->active_status = (bool) $attributes['active_status'];
+
+            if (! $settings->active_status) {
+                app(PresenceService::class)->markOffline($user);
+            }
         }
 
         if (array_key_exists('messenger_color', $attributes)) {

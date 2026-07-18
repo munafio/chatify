@@ -16,11 +16,17 @@ use Illuminate\Validation\ValidationException;
 
 final class ConversationService
 {
+    public function __construct(
+        private readonly BlockService $blockService,
+    ) {}
+
     public function findOrCreateDirect(Model $userA, Model $userB): Conversation
     {
         $existing = $this->findDirectBetween($userA, $userB);
 
         if ($existing !== null) {
+            $this->unhideForUser($existing, (int) $userA->getKey());
+
             return $existing;
         }
 
@@ -228,6 +234,7 @@ final class ConversationService
         Conversation $conversation,
         int $perPage = 20,
         ?string $search = null,
+        ?Model $viewer = null,
     ): LengthAwarePaginator {
         $userModel = ChatifyModels::userClass();
         $userTable = (new $userModel)->getTable();
@@ -240,6 +247,14 @@ final class ConversationService
             ->orderByRaw("CASE {$participantTable}.role WHEN 'owner' THEN 0 WHEN 'admin' THEN 1 WHEN 'moderator' THEN 2 ELSE 3 END")
             ->orderBy("{$userTable}.name");
 
+        if ($viewer !== null) {
+            $blockedByMe = $this->blockService->blockedByMeIdsFor($viewer);
+
+            if ($blockedByMe !== []) {
+                $query->whereNotIn("{$participantTable}.user_id", $blockedByMe);
+            }
+        }
+
         if ($search !== null && $search !== '') {
             $query->where("{$userTable}.name", 'like', '%'.$search.'%');
         }
@@ -247,15 +262,26 @@ final class ConversationService
         return $query->paginate($perPage);
     }
 
-    public function participantsPreview(Conversation $conversation, ?int $limit = null): \Illuminate\Support\Collection
-    {
+    public function participantsPreview(
+        Conversation $conversation,
+        ?int $limit = null,
+        ?Model $viewer = null,
+    ): \Illuminate\Support\Collection {
         $limit ??= (int) config('chatify.groups.preview_members', 6);
 
-        return $conversation->participants()
+        $query = $conversation->participants()
             ->with('user')
-            ->orderByRaw("CASE role WHEN 'owner' THEN 0 WHEN 'admin' THEN 1 WHEN 'moderator' THEN 2 ELSE 3 END")
-            ->limit($limit)
-            ->get();
+            ->orderByRaw("CASE role WHEN 'owner' THEN 0 WHEN 'admin' THEN 1 WHEN 'moderator' THEN 2 ELSE 3 END");
+
+        if ($viewer !== null) {
+            $blockedByMe = $this->blockService->blockedByMeIdsFor($viewer);
+
+            if ($blockedByMe !== []) {
+                $query->whereNotIn('user_id', $blockedByMe);
+            }
+        }
+
+        return $query->limit($limit)->get();
     }
 
     public function leaveGroup(Conversation $conversation, Model $user): void
@@ -271,6 +297,56 @@ final class ConversationService
         }
 
         $this->removeParticipant($conversation, $userId);
+    }
+
+    public function findSavedForUser(Model $user): ?Conversation
+    {
+        if (! config('chatify.saved_messages.enabled', true)) {
+            return null;
+        }
+
+        $userId = (int) $user->getKey();
+
+        return ChatifyModels::conversationClass()::query()
+            ->saved()
+            ->where('created_by', $userId)
+            ->whereHas('participants', fn (Builder $q) => $q->where('user_id', $userId))
+            ->first();
+    }
+
+    public function findOrCreateSavedForUser(Model $user): Conversation
+    {
+        $existing = $this->findSavedForUser($user);
+
+        if ($existing !== null) {
+            $this->unhideForUser($existing, (int) $user->getKey());
+
+            return $existing;
+        }
+
+        return DB::transaction(function () use ($user): Conversation {
+            $again = $this->findSavedForUser($user);
+
+            if ($again !== null) {
+                return $again;
+            }
+
+            $conversation = ChatifyModels::conversationClass()::query()->create([
+                'id' => (string) Str::uuid(),
+                'type' => Conversation::TYPE_SAVED,
+                'name' => config('chatify.saved_messages.title', 'Saved Messages'),
+                'created_by' => $user->getKey(),
+            ]);
+
+            ChatifyModels::participantClass()::query()->create([
+                'id' => (string) Str::uuid(),
+                'conversation_id' => $conversation->id,
+                'user_id' => $user->getKey(),
+                'role' => ConversationParticipant::ROLE_MEMBER,
+            ]);
+
+            return $conversation->load('participants');
+        });
     }
 
     public function findDirectBetween(Model $userA, Model $userB): ?Conversation
@@ -300,6 +376,35 @@ final class ConversationService
     public function delete(Conversation $conversation): void
     {
         $conversation->delete();
+    }
+
+    public function hideForUser(Conversation $conversation, int $userId): void
+    {
+        $participant = $this->getParticipant($conversation, $userId);
+
+        if ($participant === null) {
+            abort(403);
+        }
+
+        $participant->forceFill(['hidden_at' => now()])->save();
+    }
+
+    public function unhideForUser(Conversation $conversation, int $userId): void
+    {
+        $participant = $this->getParticipant($conversation, $userId);
+
+        if ($participant === null || $participant->hidden_at === null) {
+            return;
+        }
+
+        $participant->forceFill(['hidden_at' => null])->save();
+    }
+
+    public function unhideForAllParticipants(Conversation $conversation): void
+    {
+        $conversation->participants()
+            ->whereNotNull('hidden_at')
+            ->update(['hidden_at' => null]);
     }
 
     private function assertIsGroup(Conversation $conversation): void

@@ -8,10 +8,13 @@ import {
   revokeBlobUrls,
   type OutboundMessageDraft,
 } from '../utils/outboundMessage'
+import { filterMessagesFromBlockedSenders, isBlockedSender } from '../utils/blockMessaging'
+import { playChatSound } from '../composables/useChatSounds'
 import { useConfigStore } from './config'
+import { useContactsStore } from './contacts'
 import { useConversationsStore } from './conversations'
 
-export interface QueueOutboundPayload {
+interface QueueOutboundPayload {
   conversationId: string
   body: string
   attachment?: File
@@ -39,6 +42,7 @@ export const useMessagesStore = defineStore('messages', () => {
   const outboundAbortControllers = new Map<string, AbortController>()
 
   const configStore = useConfigStore()
+  const contactsStore = useContactsStore()
   const conversationsStore = useConversationsStore()
 
   function ensureBucket(conversationId: string): ConversationMessages {
@@ -207,6 +211,7 @@ export const useMessagesStore = defineStore('messages', () => {
       removeMessage(draft.conversationId, tempId)
       upsertMessage(draft.conversationId, data.data)
       pendingScrollToBottom.value = true
+      playChatSound('outgoingMessage')
     } catch (error) {
       outboundAbortControllers.delete(tempId)
       if (error instanceof CanceledError || (error as { name?: string })?.name === 'CanceledError') {
@@ -296,10 +301,20 @@ export const useMessagesStore = defineStore('messages', () => {
         after: !reset && oldestId ? oldestId : undefined,
       })
 
-      const incoming = data.data.reverse()
+      const incoming = filterMessagesFromBlockedSenders(
+        data.data.reverse(),
+        (userId) => contactsStore.isMessagingBlocked(userId),
+        configStore.user?.id,
+      )
       const existingIds = new Set(bucket.items.map((item) => item.id))
       const merged = [...incoming.filter((item) => !existingIds.has(item.id)), ...bucket.items]
-      bucket.items = sortMessages(merged)
+      bucket.items = sortMessages(
+        filterMessagesFromBlockedSenders(
+          merged,
+          (userId) => contactsStore.isMessagingBlocked(userId),
+          configStore.user?.id,
+        ),
+      )
 
       bucket.hasMore = Boolean(
         data.meta?.current_page &&
@@ -347,6 +362,7 @@ export const useMessagesStore = defineStore('messages', () => {
     upsertMessage(conversationId, data.data)
     replyToMessage.value = null
     pendingScrollToBottom.value = true
+    playChatSound('outgoingMessage')
     return data.data
   }
 
@@ -405,8 +421,13 @@ export const useMessagesStore = defineStore('messages', () => {
     }
 
     const userId = configStore.user?.id
+    const senderId = payload.relationships.sender.data.id
 
-    if (userId && String(payload.relationships.sender.data.id) === String(userId)) {
+    if (userId && String(senderId) !== String(userId) && isBlockedSender(senderId, contactsStore.isMessagingBlocked)) {
+      return
+    }
+
+    if (userId && String(senderId) === String(userId)) {
       replacePendingWithServer(conversationId, payload)
       return
     }
@@ -452,6 +473,32 @@ export const useMessagesStore = defineStore('messages', () => {
     delete byConversation.value[conversationId]
   }
 
+  function syncBlockFilters(refetchActive = false) {
+    const viewerId = configStore.user?.id
+    if (!viewerId) {
+      return
+    }
+
+    const next: Record<string, ConversationMessages> = {}
+
+    for (const [conversationId, bucket] of Object.entries(byConversation.value)) {
+      next[conversationId] = {
+        ...bucket,
+        items: filterMessagesFromBlockedSenders(
+          bucket.items,
+          (userId) => contactsStore.isMessagingBlocked(userId),
+          viewerId,
+        ),
+      }
+    }
+
+    byConversation.value = next
+
+    if (refetchActive && conversationsStore.activeId) {
+      void fetchMessages(conversationsStore.activeId, true)
+    }
+  }
+
   return {
     byConversation,
     replyToMessage,
@@ -482,5 +529,6 @@ export const useMessagesStore = defineStore('messages', () => {
     consumeScrollToBottomFlag,
     requestScrollToBottom,
     clearConversation,
+    syncBlockFilters,
   }
 })

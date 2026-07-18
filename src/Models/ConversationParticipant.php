@@ -30,6 +30,9 @@ class ConversationParticipant extends ChatifyModel
         'role',
         'permissions',
         'last_read_at',
+        'is_pinned',
+        'pin_order',
+        'hidden_at',
     ];
 
     protected function casts(): array
@@ -37,6 +40,9 @@ class ConversationParticipant extends ChatifyModel
         return [
             'permissions' => 'array',
             'last_read_at' => 'datetime',
+            'is_pinned' => 'boolean',
+            'pin_order' => 'integer',
+            'hidden_at' => 'datetime',
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
         ];

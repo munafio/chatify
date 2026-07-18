@@ -4,6 +4,7 @@ import { storeToRefs } from 'pinia'
 import { THREAD_ROOT_KEY } from '../../constants/dom'
 import ChatBackground from './ChatBackground.vue'
 import { useConfigStore } from '../../stores/config'
+import { useContactsStore } from '../../stores/contacts'
 import { useConversationsStore } from '../../stores/conversations'
 import { useMessagesStore } from '../../stores/messages'
 import { useTypingStore } from '../../stores/typing'
@@ -11,7 +12,9 @@ import { useConfirmStore } from '../../stores/confirm'
 import { useUiStore } from '../../stores/ui'
 import { useMessageScroll } from '../../composables/useMessageScroll'
 import { buildMessageListItems } from '../../utils/groupMessageClusters'
+import { filterMessagesFromBlockedSenders } from '../../utils/blockMessaging'
 import { isParticipantRecord, participantUser } from '../../utils/group'
+import { displayUserAvatar, displayUserName } from '../../utils/userDisplay'
 import { isPendingMessageId } from '../../utils/outboundMessage'
 import { jumpToMessage } from '../../utils/jumpToMessage'
 import { formatSystemMessage, isSystemMessage } from '../../utils/systemMessage'
@@ -31,8 +34,10 @@ const configStore = useConfigStore()
 const conversationsStore = useConversationsStore()
 const messagesStore = useMessagesStore()
 const typingStore = useTypingStore()
+const contactsStore = useContactsStore()
 const confirmStore = useConfirmStore()
 const uiStore = useUiStore()
+const { messagingBlockedUserIds } = storeToRefs(contactsStore)
 
 const { activeConversation, activeId } = storeToRefs(conversationsStore)
 const {
@@ -54,16 +59,16 @@ const participantMap = computed(() => {
   activeConversation.value?.relationships.participants.forEach((item) => {
     const user = isParticipantRecord(item) ? participantUser(item) : item
     if (user) {
-      names.set(String(user.id), user.attributes.name)
-      avatars.set(String(user.id), user.attributes.avatar)
+      names.set(String(user.id), displayUserName(user))
+      avatars.set(String(user.id), displayUserAvatar(user, configStore.defaultAvatarUrl))
     }
   })
 
   activeConversation.value?.relationships.participants_preview?.forEach((item) => {
     const user = participantUser(item)
     if (user) {
-      names.set(String(user.id), user.attributes.name)
-      avatars.set(String(user.id), user.attributes.avatar)
+      names.set(String(user.id), displayUserName(user))
+      avatars.set(String(user.id), displayUserAvatar(user, configStore.defaultAvatarUrl))
     }
   })
 
@@ -74,19 +79,32 @@ const isGroup = computed(
   () => activeConversation.value?.attributes.conversation_type === 'group',
 )
 
+const visibleMessages = computed(() => {
+  messagingBlockedUserIds.value
+
+  return filterMessagesFromBlockedSenders(
+    activeMessages.value,
+    (userId) => contactsStore.isMessagingBlocked(userId),
+    configStore.user?.id,
+  )
+})
+
 const daySections = computed(() =>
-  buildMessageListItems(activeMessages.value, configStore.user?.id, isGroup.value).filter(
+  buildMessageListItems(visibleMessages.value, configStore.user?.id, isGroup.value).filter(
     (item): item is Extract<typeof item, { kind: 'day' }> => item.kind === 'day',
   ),
 )
 
 const typingUsers = computed(() => {
+  messagingBlockedUserIds.value
+
   if (!activeId.value) {
     return []
   }
 
   return typingStore
     .typingUserIds(activeId.value, configStore.user?.id)
+    .filter((userId) => !contactsStore.isMessagingBlocked(userId))
     .map((userId) => ({
       id: userId,
       name: participantMap.value.names.get(userId),
@@ -94,12 +112,7 @@ const typingUsers = computed(() => {
     }))
 })
 
-const isAnyoneTyping = computed(() => {
-  if (!activeId.value) {
-    return false
-  }
-  return typingStore.typingUserIds(activeId.value, configStore.user?.id).length > 0
-})
+const isAnyoneTyping = computed(() => typingUsers.value.length > 0)
 
 const { unseenCount, scrollToBottom, notifyNewMessage, bind, isNearBottom } = useMessageScroll(
   scrollContainer,
@@ -260,7 +273,7 @@ onMounted(async () => {
     </div>
 
     <EmptyState
-      v-else-if="activeMessages.length === 0 && !activeError"
+      v-else-if="visibleMessages.length === 0 && activeMessages.length === 0 && !activeError"
       title="No messages yet"
       description="Send a message to start the conversation."
       class="chatify:relative chatify:z-10 chatify:flex-1"
@@ -270,6 +283,7 @@ onMounted(async () => {
       <ul
         ref="scrollContainer"
         class="chatify:relative chatify:z-10 chatify:flex chatify:flex-1 chatify:flex-col chatify:overflow-y-auto chatify:px-4 chatify:py-4 chatify:pb-24"
+        @contextmenu.prevent
       >
         <MessageOlderSkeleton v-if="activeLoadingOlder" />
 

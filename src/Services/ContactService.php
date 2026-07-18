@@ -15,10 +15,16 @@ final class ContactService
 {
     public function __construct(
         private readonly MessageService $messageService,
+        private readonly BlockService $blockService,
+        private readonly ConversationService $conversationService,
     ) {}
 
     public function paginatedForUser(Model $user, int $perPage = 30): LengthAwarePaginator
     {
+        if (config('chatify.saved_messages.enabled', true)) {
+            $this->conversationService->findOrCreateSavedForUser($user);
+        }
+
         $userId = (int) $user->getKey();
         $conversationTable = config('chatify.tables.conversations', 'ch_conversations');
         $participantTable = config('chatify.tables.participants', 'ch_conversation_participants');
@@ -30,16 +36,24 @@ final class ContactService
             ->groupBy('conversation_id');
 
         return ChatifyModels::conversationClass()::query()
-            ->select("{$conversationTable}.*", 'latest.last_message_at')
+            ->select(
+                "{$conversationTable}.*",
+                'latest.last_message_at',
+                "{$participantTable}.is_pinned",
+                "{$participantTable}.pin_order",
+            )
+            ->join($participantTable, function ($join) use ($conversationTable, $participantTable, $userId) {
+                $join->on("{$conversationTable}.id", '=', "{$participantTable}.conversation_id")
+                    ->where("{$participantTable}.user_id", '=', $userId)
+                    ->whereNull("{$participantTable}.hidden_at");
+            })
             ->leftJoinSub($latestMessages, 'latest', function ($join) use ($conversationTable) {
                 $join->on("{$conversationTable}.id", '=', 'latest.conversation_id');
             })
-            ->whereIn("{$conversationTable}.id", function ($query) use ($participantTable, $userId) {
-                $query->select('conversation_id')
-                    ->from($participantTable)
-                    ->where('user_id', $userId);
-            })
             ->with(['participants.user', 'messages' => fn ($q) => $q->latest()->limit(1)])
+            ->orderByRaw("CASE WHEN {$conversationTable}.type = ? THEN 0 ELSE 1 END", [Conversation::TYPE_SAVED])
+            ->orderByDesc("{$participantTable}.is_pinned")
+            ->orderBy("{$participantTable}.pin_order")
             ->orderByDesc(DB::raw("COALESCE(latest.last_message_at, {$conversationTable}.created_at)"))
             ->paginate($perPage);
     }
@@ -48,9 +62,11 @@ final class ContactService
     {
         $userClass = ChatifyModels::userClass();
         $term = addcslashes(trim($query), '%_\\');
+        $blockedIds = $this->blockService->blockedUserIdsFor($authUser);
 
         return $userClass::query()
             ->where('id', '!=', $authUser->getKey())
+            ->when($blockedIds !== [], fn (Builder $query) => $query->whereNotIn('id', $blockedIds))
             ->where(function (Builder $query) use ($term): void {
                 $query->where('name', 'LIKE', '%'.$term.'%')
                     ->orWhere('email', 'LIKE', '%'.$term.'%');
@@ -61,6 +77,10 @@ final class ContactService
 
     public function otherParticipant(Conversation $conversation, int $userId): ?Model
     {
+        if ($conversation->isSaved()) {
+            return null;
+        }
+
         $participant = $conversation->participants()
             ->where('user_id', '!=', $userId)
             ->with('user')

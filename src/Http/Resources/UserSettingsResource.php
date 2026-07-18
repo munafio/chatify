@@ -28,6 +28,7 @@ class UserSettingsResource extends JsonResource
                 'theme_preferences' => $this->theme_preferences,
                 'chat_background' => $this->chat_background,
                 'chat_background_url' => $attachments->chatBackgroundUrl($this->chat_background),
+                'active_status' => (bool) $this->active_status,
             ],
         ];
     }

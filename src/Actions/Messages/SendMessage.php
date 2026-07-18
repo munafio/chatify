@@ -89,6 +89,8 @@ final class SendMessage
             )
         );
 
+        $this->conversationService->unhideForAllParticipants($conversation);
+
         MessageSent::dispatch($message);
         $this->inboxBroadcastService->broadcastForConversation($conversation->fresh(['participants']), $message);
 

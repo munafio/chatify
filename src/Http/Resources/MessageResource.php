@@ -6,7 +6,9 @@ namespace Chatify\Http\Resources;
 
 use Chatify\Models\Message;
 use Chatify\Services\AttachmentService;
+use Chatify\Services\BlockService;
 use Chatify\Services\ConversationService;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -62,7 +64,7 @@ class MessageResource extends JsonResource
             $replyTo = [
                 'id' => $this->replyTo->id,
                 'body' => $this->replyTo->body,
-                'sender_name' => $this->replyTo->sender?->name ?? 'User',
+                'sender_name' => $this->maskedSenderName($this->replyTo->sender, $viewer),
             ];
         }
 
@@ -73,7 +75,7 @@ class MessageResource extends JsonResource
                 $forwardedFrom = [
                     'id' => $this->forwardedFrom->id,
                     'body' => $this->forwardedFrom->body,
-                    'sender_name' => $this->forwardedFrom->sender?->name ?? 'User',
+                    'sender_name' => $this->maskedSenderName($this->forwardedFrom->sender, $viewer),
                 ];
             } else {
                 $forwardedFrom = [
@@ -110,5 +112,22 @@ class MessageResource extends JsonResource
                 ],
             ],
         ];
+    }
+
+    private function maskedSenderName(?Model $sender, ?Model $viewer): string
+    {
+        if ($sender === null) {
+            return 'User';
+        }
+
+        if ($viewer === null) {
+            return $sender->name;
+        }
+
+        $blockService = app(BlockService::class);
+
+        return $blockService->shouldRevealIdentity($viewer, $sender)
+            ? $sender->name
+            : BlockService::HIDDEN_USER_NAME;
     }
 }

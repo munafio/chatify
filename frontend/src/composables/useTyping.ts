@@ -1,10 +1,14 @@
 import { onBeforeUnmount, ref } from 'vue'
 import { useConfigStore } from '../stores/config'
+import { useContactsStore } from '../stores/contacts'
+import { useConversationsStore } from '../stores/conversations'
 
 const TYPING_STOP_MS = 1800
 
 export function useTyping(conversationId: () => string | null) {
   const configStore = useConfigStore()
+  const contactsStore = useContactsStore()
+  const conversationsStore = useConversationsStore()
   const stopTimer = ref<number | null>(null)
   const isTyping = ref(false)
 
@@ -15,9 +19,30 @@ export function useTyping(conversationId: () => string | null) {
     }
   }
 
+  function canSendTyping(): boolean {
+    const id = conversationId()
+    if (!id) {
+      return false
+    }
+
+    const conversation = conversationsStore.activeConversation
+    if (!conversation || conversation.id !== id) {
+      return true
+    }
+
+    if (conversation.attributes.conversation_type === 'direct') {
+      const otherUser = conversation.relationships.other_user
+      if (otherUser && contactsStore.isMessagingBlocked(otherUser.id)) {
+        return false
+      }
+    }
+
+    return true
+  }
+
   async function sendTypingState(next: boolean) {
     const id = conversationId()
-    if (!id || !configStore.api) {
+    if (!id || !configStore.api || !canSendTyping()) {
       return
     }
 
@@ -28,6 +53,10 @@ export function useTyping(conversationId: () => string | null) {
   }
 
   function notifyTyping() {
+    if (!canSendTyping()) {
+      return
+    }
+
     if (!isTyping.value) {
       isTyping.value = true
       void sendTypingState(true)

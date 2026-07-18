@@ -38,8 +38,15 @@ final class FavoriteService
 
     public function listForUser(Model $user): Collection
     {
+        $blockedByMe = ChatifyModels::blockClass()::query()
+            ->where('blocker_id', $user->getKey())
+            ->pluck('blocked_user_id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+
         return ChatifyModels::favoriteClass()::query()
             ->where('user_id', $user->getKey())
+            ->when($blockedByMe !== [], fn ($query) => $query->whereNotIn('favorite_user_id', $blockedByMe))
             ->with('favoriteUser')
             ->get();
     }

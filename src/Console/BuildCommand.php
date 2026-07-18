@@ -64,6 +64,11 @@ class BuildCommand extends Command
             '--force' => true,
         ]);
 
+        $this->call('vendor:publish', [
+            '--tag' => 'chatify-sounds',
+            '--force' => true,
+        ]);
+
         $this->newLine();
         $this->info('Chatify assets published.');
         $this->line('  → '.public_path('vendor/chatify'));

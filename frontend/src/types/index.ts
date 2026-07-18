@@ -5,6 +5,10 @@ export interface ChatifyUser {
     name: string
     avatar: string
     email?: string | null
+    is_online?: boolean
+    is_blocked_by_me?: boolean
+    is_blocked_by_them?: boolean
+    is_identity_hidden?: boolean
   }
 }
 
@@ -109,11 +113,15 @@ export interface ChatifyConversation {
   type: 'conversation'
   id: string
   attributes: {
-    conversation_type: 'direct' | 'group'
+    conversation_type: 'direct' | 'group' | 'saved'
     name: string | null
     description?: string | null
     avatar_url?: string | null
+    is_saved?: boolean
+    saved_title?: string | null
     unread_count: number
+    is_pinned?: boolean
+    pin_order?: number | null
     participant_count?: number
     is_owner?: boolean
     my_membership?: GroupMembership | null
@@ -140,6 +148,7 @@ export interface UserSettings {
     theme_preferences: Record<string, unknown> | null
     chat_background: string | null
     chat_background_url: string | null
+    active_status?: boolean
   }
 }
 
@@ -147,6 +156,7 @@ export interface BootPreferences {
   dark_mode: boolean
   theme_preferences: Record<string, unknown> | null
   chat_background_url: string | null
+  show_online_status?: boolean
 }
 
 export interface BroadcastConfig {
@@ -178,6 +188,23 @@ export interface AppearanceFeatures {
   wallpaper: boolean
 }
 
+export interface SoundEventConfig {
+  enabled: boolean
+  url: string | null
+}
+
+export interface SoundsConfig {
+  enabled: boolean
+  incomingMessage: SoundEventConfig
+  outgoingMessage: SoundEventConfig
+  typing: SoundEventConfig
+}
+
+export interface SavedMessagesConfig {
+  enabled: boolean
+  title: string
+}
+
 export interface BootConfig {
   user: ChatifyUser
   apiBase: string
@@ -199,6 +226,10 @@ export interface BootConfig {
     apiKey: string | null
   }
   broadcast: BroadcastConfig
+  messaging_blocked_user_ids?: Array<number | string>
+  default_avatar_url?: string
+  sounds?: SoundsConfig
+  savedMessages?: SavedMessagesConfig
 }
 
 export interface PaginatedResponse<T> {
@@ -266,6 +297,18 @@ export interface UserTypingPayload {
   conversation_id: string
   user_id: number | string
   is_typing: boolean
+}
+
+export interface UserPresenceChangedPayload {
+  user_id: number | string
+  is_online: boolean
+}
+
+export interface UserBlockChangedPayload {
+  blocker_id: number | string
+  blocked_user_id: number | string
+  blocked: boolean
+  messaging_blocked_user_ids: Array<number | string>
 }
 
 export interface MessageClusterEntry {

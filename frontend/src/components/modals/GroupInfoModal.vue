@@ -8,6 +8,7 @@ import { useConfirmStore } from '../../stores/confirm'
 import { useConversationsStore } from '../../stores/conversations'
 import { useUiStore } from '../../stores/ui'
 import { memberCountLabel, participantUser } from '../../utils/group'
+import { displayUserName } from '../../utils/userDisplay'
 import BaseModal from './BaseModal.vue'
 import SettingsNavShell from '../settings/SettingsNavShell.vue'
 import GroupAdminPermissionsSheet from '../group-info/GroupAdminPermissionsSheet.vue'
@@ -186,7 +187,7 @@ async function addMember(userId: number | string) {
 }
 
 function memberName(participant: ChatifyParticipant): string {
-  return participantUser(participant)?.attributes.name ?? 'Member'
+  return displayUserName(participantUser(participant))
 }
 
 async function removeMember(participant: ChatifyParticipant) {

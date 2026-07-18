@@ -6,6 +6,8 @@ namespace Chatify\Http\Controllers\Api;
 
 use Chatify\Events\UserTyping;
 use Chatify\Models\Conversation;
+use Chatify\Services\BlockService;
+use Chatify\Services\ContactService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -15,13 +17,25 @@ class TypingController extends Controller
 {
     use AuthorizesRequests;
 
-    public function store(Conversation $conversation, Request $request): JsonResponse
-    {
+    public function store(
+        Conversation $conversation,
+        Request $request,
+        BlockService $blockService,
+        ContactService $contactService,
+    ): JsonResponse {
         $this->authorize('view', $conversation);
 
         $validated = $request->validate([
             'is_typing' => ['required', 'boolean'],
         ]);
+
+        if ($conversation->isDirect()) {
+            $other = $contactService->otherParticipant($conversation, (int) $request->user()->getKey());
+
+            if ($other !== null && $blockService->eitherBlocked($request->user(), $other)) {
+                return response()->json(['data' => ['typing' => false]]);
+            }
+        }
 
         UserTyping::dispatch(
             $conversation->id,

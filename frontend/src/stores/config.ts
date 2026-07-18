@@ -69,6 +69,14 @@ export const useConfigStore = defineStore('config', () => {
     )
   })
 
+  const defaultAvatarUrl = computed(() => boot.value?.default_avatar_url ?? boot.value?.user.attributes.avatar ?? '')
+
+  const soundsEnabled = computed(() => boot.value?.sounds?.enabled ?? false)
+  const savedMessagesTitle = computed(() => boot.value?.savedMessages?.title ?? 'Saved Messages')
+  const savedMessagesEnabled = computed(() => boot.value?.savedMessages?.enabled ?? false)
+
+  const showOnlineStatus = ref(true)
+
   function revokeActiveAvatarPreview() {
     if (activeAvatarPreviewUrl) {
       URL.revokeObjectURL(activeAvatarPreviewUrl)
@@ -91,6 +99,7 @@ export const useConfigStore = defineStore('config', () => {
     savedPreferences.value = hydratePreferencesFromBoot(config)
     draftPreferences.value = clonePreferences(savedPreferences.value)
     savedAvatarUrl.value = config.user?.attributes.avatar ?? null
+    showOnlineStatus.value = config.preferences?.show_online_status ?? true
     savePreferences(savedPreferences.value)
     applyThemeColors(config, savedPreferences.value)
   }
@@ -299,6 +308,16 @@ export const useConfigStore = defineStore('config', () => {
     previewDraft()
   }
 
+  async function setShowOnlineStatus(enabled: boolean) {
+    showOnlineStatus.value = enabled
+
+    if (!api.value) {
+      return
+    }
+
+    await api.value.patchSettings({ active_status: enabled })
+  }
+
   return {
     boot,
     api,
@@ -327,6 +346,11 @@ export const useConfigStore = defineStore('config', () => {
     attachments,
     debug,
     broadcastEnabled,
+    showOnlineStatus,
+    defaultAvatarUrl,
+    soundsEnabled,
+    savedMessagesTitle,
+    savedMessagesEnabled,
     init,
     updateDraft,
     setTheme,
@@ -343,5 +367,6 @@ export const useConfigStore = defineStore('config', () => {
     commitSaved,
     beginDraftSession,
     previewDraft,
+    setShowOnlineStatus,
   }
 })

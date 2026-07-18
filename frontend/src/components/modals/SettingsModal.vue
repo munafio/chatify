@@ -7,13 +7,14 @@ import SettingsRootView from '../settings/SettingsRootView.vue'
 import SettingsThemesView from '../settings/SettingsThemesView.vue'
 import SettingsFontView from '../settings/SettingsFontView.vue'
 import SettingsWallpaperView from '../settings/SettingsWallpaperView.vue'
+import SettingsBlockedContactsView from '../settings/SettingsBlockedContactsView.vue'
 import { clonePreferences } from '../../composables/useBootConfig'
 import type { ChatifyThemePreferences } from '../../themes/types'
 import { useConfigStore } from '../../stores/config'
 import { useSettingsStore } from '../../stores/settings'
 import { useUiStore } from '../../stores/ui'
 
-type SettingsScreen = 'root' | 'themes' | 'font' | 'wallpaper'
+type SettingsScreen = 'root' | 'themes' | 'font' | 'wallpaper' | 'blocked'
 
 const uiStore = useUiStore()
 const configStore = useConfigStore()
@@ -34,7 +35,10 @@ const titles: Record<SettingsScreen, string> = {
   themes: 'Themes',
   font: 'Choose font family',
   wallpaper: 'Wallpaper',
+  blocked: 'Blocked contacts',
 }
+
+const screensWithFooter = new Set<SettingsScreen>(['themes', 'font', 'wallpaper'])
 
 watch(open, (isOpen) => {
   if (isOpen) {
@@ -108,7 +112,7 @@ async function saveChanges() {
     <SettingsNavShell
       :title="titles[screen]"
       :show-back="screen !== 'root'"
-      :show-footer="screen !== 'root'"
+      :show-footer="screensWithFooter.has(screen)"
       @back="goBack"
       @close="closeModal"
       @cancel="cancelChanges"
@@ -120,6 +124,7 @@ async function saveChanges() {
           <SettingsThemesView v-else-if="screen === 'themes'" />
           <SettingsFontView v-else-if="screen === 'font'" />
           <SettingsWallpaperView v-else-if="screen === 'wallpaper'" />
+          <SettingsBlockedContactsView v-else-if="screen === 'blocked'" />
         </div>
       </Transition>
 

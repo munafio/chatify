@@ -8,13 +8,16 @@ import { getThemeById } from '../../themes/presets'
 import { getFontById } from '../../themes/fonts'
 import { getPatternById } from '../../themes/patterns'
 import { useConfigStore } from '../../stores/config'
+import { useContactsStore } from '../../stores/contacts'
 
 defineEmits<{
-  navigate: [screen: 'themes' | 'font' | 'wallpaper']
+  navigate: [screen: 'themes' | 'font' | 'wallpaper' | 'blocked']
 }>()
 
 const configStore = useConfigStore()
-const { preferences, themesEnabled, fontsEnabled, wallpaperEnabled } = storeToRefs(configStore)
+const contactsStore = useContactsStore()
+const { preferences, themesEnabled, fontsEnabled, wallpaperEnabled, showOnlineStatus } = storeToRefs(configStore)
+const { blockedUsers } = storeToRefs(contactsStore)
 
 const themeLabel = computed(() => getThemeById(preferences.value.themeId).name)
 const fontLabel = computed(() => getFontById(preferences.value.fontFamily).label)
@@ -31,6 +34,19 @@ const wallpaperLabel = computed(() => {
 
   return getPatternById(wallpaper.patternId)?.name ?? 'Pattern'
 })
+
+const blockedContactsLabel = computed(() => {
+  const count = blockedUsers.value.length
+  if (count === 0) {
+    return 'None'
+  }
+
+  return count === 1 ? '1 contact' : `${count} contacts`
+})
+
+async function toggleOnlineStatus() {
+  await configStore.setShowOnlineStatus(!showOnlineStatus.value)
+}
 </script>
 
 <template>
@@ -38,6 +54,13 @@ const wallpaperLabel = computed(() => {
     <SettingsProfileHeader />
 
     <SettingsGroup>
+      <SettingsRow
+        label="Show online status"
+        :value="showOnlineStatus ? 'On' : 'Off'"
+        toggle
+        :toggle-on="showOnlineStatus"
+        @toggle="toggleOnlineStatus"
+      />
       <SettingsRow
         v-if="themesEnabled"
         label="Themes"
@@ -58,6 +81,12 @@ const wallpaperLabel = computed(() => {
         :value="wallpaperLabel"
         chevron
         @click="$emit('navigate', 'wallpaper')"
+      />
+      <SettingsRow
+        label="Blocked contacts"
+        :value="blockedContactsLabel"
+        chevron
+        @click="$emit('navigate', 'blocked')"
       />
     </SettingsGroup>
   </div>

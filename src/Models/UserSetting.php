@@ -26,6 +26,10 @@ class UserSetting extends ChatifyModel
         'active_status',
     ];
 
+    protected $attributes = [
+        'active_status' => true,
+    ];
+
     protected function casts(): array
     {
         return [

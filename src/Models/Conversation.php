@@ -21,6 +21,8 @@ class Conversation extends ChatifyModel
 
     public const TYPE_GROUP = 'group';
 
+    public const TYPE_SAVED = 'saved';
+
     protected $table = 'ch_conversations';
 
     protected $fillable = [
@@ -80,6 +82,11 @@ class Conversation extends ChatifyModel
         return $query->where('type', self::TYPE_GROUP);
     }
 
+    public function scopeSaved(Builder $query): Builder
+    {
+        return $query->where('type', self::TYPE_SAVED);
+    }
+
     public function scopeForUser(Builder $query, int $userId): Builder
     {
         return $query->whereHas('participants', fn (Builder $q) => $q->where('user_id', $userId));
@@ -93,6 +100,11 @@ class Conversation extends ChatifyModel
     public function isGroup(): bool
     {
         return $this->type === self::TYPE_GROUP;
+    }
+
+    public function isSaved(): bool
+    {
+        return $this->type === self::TYPE_SAVED;
     }
 
     public function avatarUrl(): ?string

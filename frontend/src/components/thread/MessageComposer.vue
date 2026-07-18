@@ -5,6 +5,9 @@ import { useTyping } from '../../composables/useTyping'
 import { useVoiceRecorder } from '../../composables/useVoiceRecorder'
 import { stopAllVoicePlayback } from '../../utils/voicePlayback'
 import { useConfigStore } from '../../stores/config'
+import { useConfirmStore } from '../../stores/confirm'
+import { useContactsStore } from '../../stores/contacts'
+import { useConversationsStore } from '../../stores/conversations'
 import { useMessagesStore } from '../../stores/messages'
 import ComposerAttachMenu from './ComposerAttachMenu.vue'
 import StickerPicker from './StickerPicker.vue'
@@ -16,6 +19,9 @@ const props = defineProps<{
 
 const messagesStore = useMessagesStore()
 const configStore = useConfigStore()
+const conversationsStore = useConversationsStore()
+const contactsStore = useContactsStore()
+const confirmStore = useConfirmStore()
 const giphyEnabled = computed(() => configStore.giphyEnabled)
 const { replyToMessage, editingMessage } = storeToRefs(messagesStore)
 
@@ -69,6 +75,44 @@ const modeLabel = computed(() => {
 
 const hasContent = computed(() => Boolean(body.value.trim()) || attachments.value.length > 0)
 const showSendButton = computed(() => hasContent.value || Boolean(editingMessage.value))
+
+const otherUser = computed(() => conversationsStore.activeConversation?.relationships.other_user ?? null)
+
+const blockedByMe = computed(() => {
+  const conversation = conversationsStore.activeConversation
+
+  return Boolean(
+    conversation?.attributes.conversation_type === 'direct'
+    && otherUser.value
+    && contactsStore.isBlockedByMe(otherUser.value.id),
+  )
+})
+
+const isMessagingBlockedDirect = computed(() => {
+  const conversation = conversationsStore.activeConversation
+
+  return Boolean(
+    conversation?.attributes.conversation_type === 'direct'
+    && otherUser.value
+    && contactsStore.isMessagingBlocked(otherUser.value.id),
+  )
+})
+
+async function unblockContact() {
+  if (!otherUser.value) {
+    return
+  }
+
+  const confirmed = await confirmStore.confirm({
+    title: `Unblock ${otherUser.value.attributes.name}?`,
+    message: 'They will be able to message you again and appear in search results.',
+    confirmLabel: 'Unblock',
+  })
+
+  if (confirmed) {
+    await contactsStore.unblockUser(otherUser.value.id)
+  }
+}
 const imagePreviews = computed(() =>
   attachments.value.flatMap((file, attachmentIndex) => {
     if (!file.type.startsWith('image/')) {
@@ -340,7 +384,27 @@ defineExpose({
 
 <template>
   <div class="chatify-composer-floating">
-    <div v-if="hasComposerExtras && !isRecording" class="chatify-composer-floating-extras">
+    <div
+      v-if="isMessagingBlockedDirect"
+      class="chatify-composer-blocked-banner"
+    >
+      <p v-if="blockedByMe">
+        You blocked this contact.
+      </p>
+      <p v-else>
+        You can't message this contact.
+      </p>
+      <button
+        v-if="blockedByMe"
+        type="button"
+        class="chatify-composer-blocked-action"
+        @click="unblockContact"
+      >
+        Unblock
+      </button>
+    </div>
+
+    <div v-else-if="hasComposerExtras && !isRecording" class="chatify-composer-floating-extras">
       <div
         v-if="modeLabel"
         class="chatify-composer-mode-banner"
@@ -389,7 +453,7 @@ defineExpose({
     />
 
     <div
-      v-else
+      v-else-if="!isMessagingBlockedDirect"
       class="chatify-composer-floating-pill"
       :class="isMultiline ? 'chatify-composer-floating-pill-expanded' : ''"
     >

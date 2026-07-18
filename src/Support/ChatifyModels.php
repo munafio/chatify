@@ -33,6 +33,11 @@ final class ChatifyModels
         return (string) config('chatify.models.favorite');
     }
 
+    public static function blockClass(): string
+    {
+        return (string) config('chatify.models.block');
+    }
+
     public static function userSettingClass(): string
     {
         return (string) config('chatify.models.user_setting');

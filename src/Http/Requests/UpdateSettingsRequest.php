@@ -22,6 +22,7 @@ class UpdateSettingsRequest extends FormRequest
         return [
             'avatar' => ['nullable', 'file', 'max:'.$maxKb, 'mimes:'.implode(',', $mimes)],
             'dark_mode' => ['sometimes', 'boolean'],
+            'active_status' => ['sometimes', 'boolean'],
             'reset_avatar' => ['sometimes', 'boolean'],
             'theme_preferences' => ['sometimes', 'array'],
         ];
@@ -48,6 +49,10 @@ class UpdateSettingsRequest extends FormRequest
 
         if ($this->has('dark_mode')) {
             $validated['dark_mode'] = (bool) $this->boolean('dark_mode');
+        }
+
+        if ($this->has('active_status')) {
+            $validated['active_status'] = (bool) $this->boolean('active_status');
         }
 
         if ($this->has('theme_preferences')) {

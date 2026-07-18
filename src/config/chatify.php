@@ -13,6 +13,7 @@ return [
         'message' => Chatify\Models\Message::class,
         'participant' => Chatify\Models\ConversationParticipant::class,
         'favorite' => Chatify\Models\Favorite::class,
+        'block' => Chatify\Models\UserBlock::class,
         'user_setting' => Chatify\Models\UserSetting::class,
     ],
 
@@ -21,6 +22,7 @@ return [
         'participants' => 'ch_conversation_participants',
         'messages' => 'ch_messages',
         'favorites' => 'ch_favorites',
+        'blocks' => 'ch_user_blocks',
         'user_settings' => 'ch_user_settings',
     ],
 
@@ -150,5 +152,26 @@ return [
         'max_description_length' => 500,
         'avatar_folder' => 'groups-avatar',
         'preview_members' => 6,
+    ],
+
+    'sounds' => [
+        'enabled' => env('CHATIFY_SOUNDS_ENABLED', true),
+        'incoming_message' => [
+            'enabled' => env('CHATIFY_SOUND_INCOMING_ENABLED', true),
+            'url' => env('CHATIFY_SOUND_INCOMING', '/vendor/chatify/sounds/incoming.wav'),
+        ],
+        'outgoing_message' => [
+            'enabled' => env('CHATIFY_SOUND_OUTGOING_ENABLED', true),
+            'url' => env('CHATIFY_SOUND_OUTGOING', '/vendor/chatify/sounds/outgoing.wav'),
+        ],
+        'typing' => [
+            'enabled' => env('CHATIFY_SOUND_TYPING_ENABLED', false),
+            'url' => env('CHATIFY_SOUND_TYPING', '/vendor/chatify/sounds/typing.wav'),
+        ],
+    ],
+
+    'saved_messages' => [
+        'enabled' => env('CHATIFY_SAVED_MESSAGES_ENABLED', true),
+        'title' => env('CHATIFY_SAVED_MESSAGES_TITLE', 'Saved Messages'),
     ],
 ];

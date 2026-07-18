@@ -1,18 +1,25 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useConfigStore } from '../../stores/config'
+import { useConnectionStore } from '../../stores/connection'
 import { useConversationsStore } from '../../stores/conversations'
 import { useUiStore } from '../../stores/ui'
+import { sidebarSubtitleLabel } from '../../utils/connectionLabel'
 import ConversationList from './ConversationList.vue'
 import ConversationSearch from './ConversationSearch.vue'
 import FavoriteContactsList from './FavoriteContactsList.vue'
 import UserAvatar from '../ui/UserAvatar.vue'
 
 const configStore = useConfigStore()
+const connectionStore = useConnectionStore()
 const uiStore = useUiStore()
 const conversationsStore = useConversationsStore()
 const { user, groupsEnabled } = storeToRefs(configStore)
 const { sidebarTab } = storeToRefs(conversationsStore)
+const { uiState } = storeToRefs(connectionStore)
+
+const sidebarSubtitle = computed(() => sidebarSubtitleLabel(uiState.value))
 </script>
 
 <template>
@@ -21,7 +28,12 @@ const { sidebarTab } = storeToRefs(conversationsStore)
       <UserAvatar v-if="user" size="sm" :alt="user.attributes.name" />
       <div class="chatify:min-w-0 chatify:flex-1">
         <p class="chatify:truncate chatify:text-sm chatify:font-semibold">{{ user?.attributes.name }}</p>
-        <p class="chatify:text-xs chatify:text-chatify-muted">Messenger</p>
+        <p
+          class="chatify:text-xs chatify:text-chatify-muted"
+          :class="{ 'chatify:animate-pulse': uiState !== 'online' }"
+        >
+          {{ sidebarSubtitle }}
+        </p>
       </div>
       <button
         type="button"

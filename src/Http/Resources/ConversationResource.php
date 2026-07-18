@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Chatify\Http\Resources;
 
 use Chatify\Models\Conversation;
+use Chatify\Services\BlockService;
 use Chatify\Services\ContactService;
 use Chatify\Services\ConversationService;
 use Chatify\Services\MessageService;
@@ -19,11 +20,15 @@ class ConversationResource extends JsonResource
         $user = $request->user();
         $unread = 0;
         $otherUser = null;
+        $participant = null;
         $conversationService = app(ConversationService::class);
         $permissionService = app(ParticipantPermissionService::class);
 
         if ($user !== null) {
-            $unread = app(MessageService::class)->unreadCount($this->resource, (int) $user->getKey());
+            $unread = $this->isSaved()
+                ? 0
+                : app(MessageService::class)->unreadCount($this->resource, (int) $user->getKey());
+            $participant = $this->participants->firstWhere('user_id', $user->getKey());
 
             if ($this->isDirect()) {
                 $other = app(ContactService::class)->otherParticipant($this->resource, (int) $user->getKey());
@@ -37,6 +42,8 @@ class ConversationResource extends JsonResource
             'conversation_type' => $this->type,
             'name' => $this->name,
             'unread_count' => $unread,
+            'is_pinned' => (bool) ($participant?->is_pinned ?? false),
+            'pin_order' => $participant?->pin_order,
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
         ];
@@ -58,9 +65,18 @@ class ConversationResource extends JsonResource
             $attributes['avatar_url'] = $this->avatarUrl();
 
             if ($this->relationLoaded('creator') && $this->creator !== null) {
+                $creatorName = $this->creator->name;
+
+                if ($user !== null) {
+                    $blockService = app(BlockService::class);
+                    $creatorName = $blockService->shouldRevealIdentity($user, $this->creator)
+                        ? $this->creator->name
+                        : BlockService::HIDDEN_USER_NAME;
+                }
+
                 $attributes['created_by'] = [
                     'id' => $this->creator->getKey(),
-                    'name' => $this->creator->name,
+                    'name' => $creatorName,
                 ];
             }
 
@@ -70,8 +86,14 @@ class ConversationResource extends JsonResource
                 $attributes['my_membership'] = $permissionService->membership($this->resource, $userId);
             }
 
-            $preview = $conversationService->participantsPreview($this->resource);
+            $preview = $conversationService->participantsPreview($this->resource, null, $user);
             $relationships['participants_preview'] = ParticipantResource::collection($preview);
+        }
+
+        if ($this->isSaved()) {
+            $attributes['is_saved'] = true;
+            $attributes['saved_title'] = config('chatify.saved_messages.title', 'Saved Messages');
+            $attributes['name'] = $attributes['saved_title'];
         }
 
         return [

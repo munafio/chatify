@@ -398,6 +398,160 @@ body.chatify-dark {
   color: var(--chatify-color-chatify-danger);
 }
 
+.chatify-context-menu {
+  position: fixed;
+  z-index: 70;
+  min-width: 8rem;
+  overflow: hidden;
+  padding: 0.25rem;
+  border-radius: 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--chatify-color-chatify-text) 8%, var(--chatify-color-chatify-bubble-in));
+  background-color: var(--chatify-color-chatify-panel);
+  box-shadow:
+    0 4px 6px -1px rgb(0 0 0 / 12%),
+    0 10px 24px -4px rgb(0 0 0 / 18%);
+  transform-origin: var(--chatify-context-menu-origin-x, top) var(--chatify-context-menu-origin-y, left);
+}
+
+.chatify-context-menu-item {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  border-radius: 0.375rem;
+  padding: 0.375rem 0.5rem;
+  text-align: left;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: var(--chatify-color-chatify-text);
+  transition:
+    background-color 120ms ease,
+    color 120ms ease;
+}
+
+.chatify-context-menu-item:hover:not(:disabled) {
+  background-color: color-mix(in srgb, var(--chatify-color-chatify-text) 6%, var(--chatify-color-chatify-sidebar));
+}
+
+.chatify-context-menu-item:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.chatify-context-menu-item-danger {
+  color: var(--chatify-color-chatify-danger);
+}
+
+.chatify-context-menu-item-danger:hover:not(:disabled) {
+  background-color: color-mix(in srgb, var(--chatify-color-chatify-danger) 10%, var(--chatify-color-chatify-panel));
+}
+
+.chatify-context-menu-separator {
+  margin: 0.25rem -0.25rem;
+  height: 1px;
+  background-color: color-mix(in srgb, var(--chatify-color-chatify-text) 8%, var(--chatify-color-chatify-bubble-in));
+}
+
+.chatify-context-menu-enter-active,
+.chatify-context-menu-leave-active {
+  transition:
+    opacity 140ms ease,
+    transform 140ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.chatify-context-menu-enter-from,
+.chatify-context-menu-leave-to {
+  opacity: 0;
+  transform: scale(0.96);
+}
+
+.chatify-context-menu-enter-to,
+.chatify-context-menu-leave-from {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.chatify-presence-dot {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  height: 0.75rem;
+  width: 0.75rem;
+  border-radius: 999px;
+  border: 2px solid var(--chatify-color-chatify-panel);
+  background-color: #22c55e;
+}
+
+.chatify-presence-dot-lg {
+  height: 1rem;
+  width: 1rem;
+  border-width: 2px;
+}
+
+.chatify-settings-toggle {
+  position: relative;
+  display: inline-flex;
+  height: 1.5rem;
+  width: 2.75rem;
+  align-items: center;
+  border-radius: 999px;
+  background-color: color-mix(in srgb, var(--chatify-color-chatify-text) 18%, var(--chatify-color-chatify-sidebar));
+  transition: background-color 160ms ease;
+}
+
+.chatify-settings-toggle-on {
+  background-color: var(--chatify-color-chatify-primary);
+}
+
+.chatify-settings-toggle-thumb {
+  position: absolute;
+  left: 0.125rem;
+  height: 1.25rem;
+  width: 1.25rem;
+  border-radius: 999px;
+  background-color: #fff;
+  transition: transform 160ms ease;
+}
+
+.chatify-settings-toggle-on .chatify-settings-toggle-thumb {
+  transform: translateX(1.25rem);
+}
+
+.chatify-composer-blocked-banner {
+  margin-bottom: 0.5rem;
+  border-radius: 0.75rem;
+  background-color: color-mix(in srgb, var(--chatify-color-chatify-danger) 10%, var(--chatify-color-chatify-panel));
+  padding: 0.625rem 0.875rem;
+  text-align: center;
+  font-size: 0.8125rem;
+  color: var(--chatify-color-chatify-muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.chatify-composer-blocked-action {
+  border-radius: 0.5rem;
+  border: 1px solid var(--chatify-color-chatify-border);
+  background: var(--chatify-color-chatify-panel);
+  padding: 0.375rem 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--chatify-color-chatify-primary);
+}
+
+.chatify-composer-blocked-action:hover {
+  background: var(--chatify-color-chatify-sidebar);
+}
+
+.chatify-conversation-drag-handle {
+  touch-action: none;
+}
+
+.chatify-conversation-drag-handle:active {
+  cursor: grabbing;
+}
+
 @keyframes chatify-avatar-pulse {
   0%,
   100% {
