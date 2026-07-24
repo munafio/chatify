@@ -38,6 +38,7 @@ jobs:
           php-version: ${{ matrix.php }}
           extensions: sqlite3
           coverage: none
+          tools: composer:v2
 
       - name: Install Composer dependencies
         run: composer install --prefer-stable --no-interaction --no-progress
