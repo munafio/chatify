@@ -36,12 +36,13 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: dom, json, libxml, mbstring, sqlite3, tokenizer, xml, xmlwriter, zip
+          extensions: dom, json, libxml, mbstring, pdo_sqlite, tokenizer, xml, xmlwriter, zip
           coverage: none
-          tools: composer:2
 
       - name: Install Composer dependencies
-        run: composer install --no-interaction --no-progress --prefer-dist --ansi
+        uses: ramsey/composer-install@v3
+        with:
+          composer-options: '--prefer-dist --no-progress --no-interaction'
 
       - name: Run PHPUnit
         run: composer test
