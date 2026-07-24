@@ -46,5 +46,10 @@
     "test": "phpunit",
     "test:frontend": "cd frontend && npm run test",
     "build:frontend": "cd frontend && npm run build"
+  },
+  "config": {
+    "platform": {
+      "php": "8.2.0"
+    }
   }
 }
