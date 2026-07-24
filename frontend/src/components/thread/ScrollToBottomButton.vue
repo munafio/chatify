@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useChatifyI18n } from '../../composables/useChatifyI18n'
+
 defineProps<{
   count: number
 }>()
@@ -6,13 +8,15 @@ defineProps<{
 defineEmits<{
   click: []
 }>()
+
+const { t } = useChatifyI18n()
 </script>
 
 <template>
   <button
     type="button"
     class="chatify-scroll-bottom-btn"
-    aria-label="Scroll to latest messages"
+    :aria-label="t('ui.thread.scroll.to_latest')"
     @click="$emit('click')"
   >
     <span

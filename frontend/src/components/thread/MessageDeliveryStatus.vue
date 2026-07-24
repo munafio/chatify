@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useChatifyI18n } from '../../composables/useChatifyI18n'
 import MessageStatusTicks from './MessageStatusTicks.vue'
 
 defineProps<{
@@ -6,14 +7,16 @@ defineProps<{
   read: boolean
   isOwn: boolean
 }>()
+
+const { t } = useChatifyI18n()
 </script>
 
 <template>
   <span
     v-if="status === 'sending'"
     class="chatify-message-status-sending"
-    title="Sending…"
-    aria-label="Sending"
+    :title="t('ui.thread.delivery.sending')"
+    :aria-label="t('ui.thread.delivery.sending_aria')"
   >
     <svg class="chatify:h-3.5 chatify:w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <circle cx="12" cy="12" r="9" stroke-width="2" />

@@ -2,17 +2,19 @@
 import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useConfirmStore } from '../../stores/confirm'
+import { useChatifyI18n } from '../../composables/useChatifyI18n'
 import BaseModal from '../modals/BaseModal.vue'
 
 const confirmStore = useConfirmStore()
+const { t } = useChatifyI18n()
 const { options } = storeToRefs(confirmStore)
 
 const open = computed(() => options.value !== null)
 
-const title = computed(() => options.value?.title ?? 'Confirm')
+const title = computed(() => options.value?.title ?? t('ui.confirm.default_title'))
 const message = computed(() => options.value?.message ?? '')
-const confirmLabel = computed(() => options.value?.confirmLabel ?? 'Confirm')
-const cancelLabel = computed(() => options.value?.cancelLabel ?? 'Cancel')
+const confirmLabel = computed(() => options.value?.confirmLabel ?? t('ui.common.confirm'))
+const cancelLabel = computed(() => options.value?.cancelLabel ?? t('ui.common.cancel'))
 const isDanger = computed(() => options.value?.variant === 'danger')
 
 function cancel() {

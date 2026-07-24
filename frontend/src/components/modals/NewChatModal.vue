@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useDebouncedWatch } from '../../composables/useDebouncedFn'
+import { useChatifyI18n } from '../../composables/useChatifyI18n'
 import { useContactsStore } from '../../stores/contacts'
 import { useConversationsStore } from '../../stores/conversations'
 import { useUiStore } from '../../stores/ui'
@@ -10,6 +11,7 @@ import BaseModal from './BaseModal.vue'
 const uiStore = useUiStore()
 const contactsStore = useContactsStore()
 const conversationsStore = useConversationsStore()
+const { t } = useChatifyI18n()
 const { activeModal } = storeToRefs(uiStore)
 
 const search = ref('')
@@ -41,7 +43,7 @@ async function startChat(userId: number | string) {
 <template>
   <BaseModal
     :open="open"
-    title="New chat"
+    :title="t('ui.modals.new_chat.title')"
     size="md"
     @close="uiStore.closeModal()"
   >
@@ -49,12 +51,12 @@ async function startChat(userId: number | string) {
       <input
         v-model="search"
         type="search"
-        placeholder="Search by name or email"
+        :placeholder="t('ui.modals.new_chat.placeholder')"
         class="chatify:w-full chatify:rounded-lg chatify:border chatify:border-chatify-border chatify:px-3 chatify:py-2 chatify:text-sm chatify:focus:outline-none chatify:focus:ring-2 chatify:focus:ring-chatify-primary"
       />
 
       <p v-if="contactsStore.searching" class="chatify:text-sm chatify:text-chatify-muted">
-        Searching...
+        {{ $t('ui.modals.new_chat.searching') }}
       </p>
 
       <p v-else-if="contactsStore.searchError" class="chatify:text-sm chatify:text-chatify-danger">
@@ -65,11 +67,11 @@ async function startChat(userId: number | string) {
         v-else-if="search.trim() && contactsStore.searchResults.length === 0"
         class="chatify:text-sm chatify:text-chatify-muted"
       >
-        No contacts found.
+        {{ $t('ui.modals.new_chat.no_contacts') }}
       </p>
 
       <p v-else-if="!search.trim()" class="chatify:text-sm chatify:text-chatify-muted">
-        Type to find people to message.
+        {{ $t('ui.modals.new_chat.hint') }}
       </p>
 
       <ul
@@ -98,7 +100,7 @@ async function startChat(userId: number | string) {
             :disabled="starting"
             @click="startChat(user.id)"
           >
-            Chat
+            {{ $t('ui.modals.new_chat.chat') }}
           </button>
         </li>
       </ul>

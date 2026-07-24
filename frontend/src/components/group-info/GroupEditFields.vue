@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { nextTick, onBeforeUnmount, ref, watch } from 'vue'
+import { useChatifyI18n } from '../../composables/useChatifyI18n'
 
 const props = defineProps<{
   name: string
@@ -20,6 +21,7 @@ const nameInput = ref<HTMLInputElement | null>(null)
 const descriptionInput = ref<HTMLTextAreaElement | null>(null)
 const nameEditTrigger = ref<HTMLButtonElement | null>(null)
 const descriptionEditTrigger = ref<HTMLButtonElement | null>(null)
+const { t } = useChatifyI18n()
 
 watch(
   () => props.name,
@@ -152,13 +154,13 @@ function onDescriptionKeydown(event: KeyboardEvent) {
         @keydown="onNameKeydown"
       />
       <template v-else>
-        <h3 class="chatify:text-base chatify:font-semibold">{{ name || 'Group' }}</h3>
+        <h3 class="chatify:text-base chatify:font-semibold">{{ name || t('ui.format.group_label') }}</h3>
         <button
           v-if="editable"
           ref="nameEditTrigger"
           type="button"
           class="chatify:rounded-full chatify:p-1 chatify:text-chatify-muted chatify:transition chatify:hover:bg-chatify-sidebar"
-          aria-label="Edit group name"
+          :aria-label="t('ui.group.info.edit_name')"
           @click="editingName = true"
         >
           <svg class="chatify:h-4 chatify:w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -175,7 +177,7 @@ function onDescriptionKeydown(event: KeyboardEvent) {
         v-model="descriptionDraft"
         rows="2"
         class="chatify-field-underline chatify:max-w-sm chatify:resize-none chatify:text-center chatify:text-sm"
-        placeholder="Add group description"
+        :placeholder="t('ui.group.info.description_placeholder')"
         @keydown="onDescriptionKeydown"
       />
       <template v-else>
@@ -187,7 +189,7 @@ function onDescriptionKeydown(event: KeyboardEvent) {
           :class="description ? 'chatify:text-chatify-text' : 'chatify:text-chatify-primary'"
           @click="editingDescription = true"
         >
-          {{ description || 'Add group description' }}
+          {{ description || t('ui.group.info.description_placeholder') }}
         </button>
         <p v-else-if="description" class="chatify:text-sm chatify:text-chatify-muted">{{ description }}</p>
       </template>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import type { GroupPermissionKey } from '../../types'
+import { useChatifyI18n } from '../../composables/useChatifyI18n'
 import BaseModal from '../modals/BaseModal.vue'
 import SettingsGroup from '../settings/SettingsGroup.vue'
 
@@ -16,6 +17,8 @@ const emit = defineEmits<{
   close: []
   save: [payload: { role: 'admin' | 'moderator' | 'member'; permissions: Partial<Record<GroupPermissionKey, boolean>> | null }]
 }>()
+
+const { t } = useChatifyI18n()
 
 const mode = ref<RoleMode>('member')
 const permissions = ref<Partial<Record<GroupPermissionKey, boolean>>>({
@@ -66,25 +69,25 @@ function togglePermission(key: GroupPermissionKey) {
   }
 }
 
-const roleOptions: { id: RoleMode; label: string; show?: boolean }[] = [
-  { id: 'full', label: 'Full group admin', show: true },
-  { id: 'limited', label: 'Limited admin', show: true },
-  { id: 'moderator', label: 'Moderator', show: true },
-  { id: 'member', label: 'Member', show: true },
-]
+const roleOptions = computed(() => [
+  { id: 'full' as RoleMode, label: t('ui.group.roles.full_admin'), show: true },
+  { id: 'limited' as RoleMode, label: t('ui.group.roles.limited_admin'), show: true },
+  { id: 'moderator' as RoleMode, label: t('ui.group.roles.moderator'), show: true },
+  { id: 'member' as RoleMode, label: t('ui.group.roles.member'), show: true },
+])
 
-const permissionOptions: { key: GroupPermissionKey; label: string }[] = [
-  { key: 'edit_info', label: 'Edit group info' },
-  { key: 'add_members', label: 'Add members' },
-  { key: 'remove_members', label: 'Remove members' },
-  { key: 'manage_admins', label: 'Manage admins' },
-]
+const permissionOptions = computed(() => [
+  { key: 'edit_info' as GroupPermissionKey, label: t('ui.group.roles.permissions.edit_info') },
+  { key: 'add_members' as GroupPermissionKey, label: t('ui.group.roles.permissions.add_members') },
+  { key: 'remove_members' as GroupPermissionKey, label: t('ui.group.roles.permissions.remove_members') },
+  { key: 'manage_admins' as GroupPermissionKey, label: t('ui.group.roles.permissions.manage_admins') },
+])
 </script>
 
 <template>
   <BaseModal
     :open="open"
-    title="Member role"
+    :title="t('ui.group.roles.sheet_title')"
     size="md"
     bare
     panel-class="chatify-role-modal"
@@ -99,7 +102,7 @@ const permissionOptions: { key: GroupPermissionKey; label: string }[] = [
           :key="option.id"
           v-show="option.id !== 'full' || canPromoteFullAdmin"
           type="button"
-          class="chatify-settings-row chatify-list-item chatify:flex chatify:w-full chatify:items-center chatify:justify-between chatify:px-4 chatify:py-3 chatify:text-left"
+          class="chatify-settings-row chatify-list-item chatify:flex chatify:w-full chatify:items-center chatify:justify-between chatify:px-4 chatify:py-3 chatify:text-start"
           @click="mode = option.id"
         >
           <span class="chatify:text-sm">{{ option.label }}</span>
@@ -120,7 +123,7 @@ const permissionOptions: { key: GroupPermissionKey; label: string }[] = [
           v-for="option in permissionOptions"
           :key="option.key"
           type="button"
-          class="chatify-settings-row chatify-list-item chatify:flex chatify:w-full chatify:items-center chatify:justify-between chatify:px-4 chatify:py-3 chatify:text-left"
+          class="chatify-settings-row chatify-list-item chatify:flex chatify:w-full chatify:items-center chatify:justify-between chatify:px-4 chatify:py-3 chatify:text-start"
           @click="togglePermission(option.key)"
         >
           <span class="chatify:text-sm">{{ option.label }}</span>
@@ -135,10 +138,10 @@ const permissionOptions: { key: GroupPermissionKey; label: string }[] = [
 
       <div class="chatify-confirm-footer">
         <button type="button" class="chatify-btn-ghost" @click="emit('close')">
-          Cancel
+          {{ $t('ui.common.cancel') }}
         </button>
         <button type="button" class="chatify-btn-ghost-primary" @click="submit">
-          Save
+          {{ $t('ui.common.save') }}
         </button>
       </div>
     </div>

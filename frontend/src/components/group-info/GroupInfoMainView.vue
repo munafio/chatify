@@ -5,6 +5,7 @@ import { memberCountLabel, formatGroupCreatedFooter, memberRoleBadgeClass, membe
 import { useImageLightbox } from '../../composables/useImageLightbox'
 import GroupAvatar from './GroupAvatar.vue'
 import GroupEditFields from './GroupEditFields.vue'
+import { useChatifyI18n } from '../../composables/useChatifyI18n'
 
 const props = defineProps<{
   conversation: ChatifyConversation
@@ -31,6 +32,7 @@ const emit = defineEmits<{
 }>()
 
 const { show } = useImageLightbox()
+const { t } = useChatifyI18n()
 
 function isImageItem(item: SharedAttachment): boolean {
   const mime = item.attributes.mime ?? ''
@@ -67,9 +69,9 @@ function openPreview(item: SharedAttachment) {
 
 function memberDisplayName(participant: ChatifyParticipant): string {
   if (participant.attributes.is_you) {
-    return 'You'
+    return t('ui.user.you')
   }
-  return participantUser(participant)?.attributes.name ?? 'Member'
+  return participantUser(participant)?.attributes.name ?? t('system_messages.member')
 }
 </script>
 
@@ -77,7 +79,7 @@ function memberDisplayName(participant: ChatifyParticipant): string {
   <div class="chatify:space-y-4 chatify:pb-2">
     <GroupAvatar
       :src="conversation.attributes.avatar_url"
-      :name="conversation.attributes.name ?? 'Group'"
+      :name="conversation.attributes.name ?? t('ui.format.group_label')"
       :editable="canEditInfo"
       :uploading="avatarUploading"
       :upload-progress="avatarUploadProgress"
@@ -93,7 +95,7 @@ function memberDisplayName(participant: ChatifyParticipant): string {
     />
 
     <p class="chatify:text-center chatify:text-sm chatify:text-chatify-muted">
-      Group · <span class="chatify:text-chatify-primary">{{ memberCountLabel(conversation.attributes.participant_count) }}</span>
+      {{ $t('ui.format.group_label') }} · <span class="chatify:text-chatify-primary">{{ memberCountLabel(conversation.attributes.participant_count) }}</span>
     </p>
 
     <div class="chatify:flex chatify:justify-center chatify:gap-6">
@@ -108,7 +110,7 @@ function memberDisplayName(participant: ChatifyParticipant): string {
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
           </svg>
         </span>
-        <span class="chatify:text-xs">Add members</span>
+        <span class="chatify:text-xs">{{ $t('ui.group.info.add_members') }}</span>
       </button>
       <button type="button" class="chatify:flex chatify:flex-col chatify:items-center chatify:gap-1" @click="emit('openSearch')">
         <span class="chatify:flex chatify:h-12 chatify:w-12 chatify:items-center chatify:justify-center chatify:rounded-full chatify:bg-chatify-sidebar">
@@ -116,14 +118,14 @@ function memberDisplayName(participant: ChatifyParticipant): string {
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </span>
-        <span class="chatify:text-xs">Search</span>
+        <span class="chatify:text-xs">{{ $t('ui.group.info.search') }}</span>
       </button>
     </div>
 
     <div class="chatify:space-y-2">
       <button
         type="button"
-        class="chatify-list-item chatify:flex chatify:w-full chatify:items-center chatify:justify-between chatify:rounded-lg chatify:px-3 chatify:py-2.5 chatify:text-left"
+        class="chatify-list-item chatify:flex chatify:w-full chatify:items-center chatify:justify-between chatify:rounded-lg chatify:px-3 chatify:py-2.5 chatify:text-start"
         :class="'chatify:bg-chatify-sidebar'"
         @click="emit('openMedia')"
       >
@@ -131,7 +133,7 @@ function memberDisplayName(participant: ChatifyParticipant): string {
           <svg class="chatify:h-5 chatify:w-5 chatify:text-chatify-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
-          Media, links and docs
+          {{ $t('ui.group.info.media_links_docs') }}
         </span>
         <span class="chatify:text-sm chatify:text-chatify-muted">{{ mediaTotal }}</span>
       </button>
@@ -162,7 +164,7 @@ function memberDisplayName(participant: ChatifyParticipant): string {
         <button
           type="button"
           class="chatify:rounded-full chatify:p-1.5 chatify:text-chatify-muted chatify:transition chatify:hover:bg-chatify-sidebar"
-          aria-label="Search members"
+          :aria-label="t('ui.group.info.search_members')"
           @click="emit('openMembers', 'browse')"
         >
           <svg class="chatify:h-4 chatify:w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -199,7 +201,7 @@ function memberDisplayName(participant: ChatifyParticipant): string {
         class="chatify:px-2 chatify:py-1 chatify:text-xs chatify:text-chatify-primary"
         @click="emit('openMembers', 'browse')"
       >
-        View all
+        {{ $t('ui.group.info.view_all') }}
       </button>
     </div>
 
@@ -213,7 +215,7 @@ function memberDisplayName(participant: ChatifyParticipant): string {
         <svg class="chatify:h-5 chatify:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
         </svg>
-        Leave group
+        {{ $t('ui.group.info.leave_group') }}
       </button>
       <button
         v-if="canDeleteGroup"
@@ -224,7 +226,7 @@ function memberDisplayName(participant: ChatifyParticipant): string {
         <svg class="chatify:h-5 chatify:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
         </svg>
-        Delete group
+        {{ $t('ui.group.info.delete_group') }}
       </button>
     </div>
 

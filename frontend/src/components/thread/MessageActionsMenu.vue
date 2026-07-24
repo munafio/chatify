@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, ref } from 'vue'
+import { useChatifyI18n } from '../../composables/useChatifyI18n'
 import ContextMenu from '../ui/ContextMenu.vue'
 import {
   buildMessageActionItems,
@@ -9,6 +10,7 @@ import {
 const props = defineProps<{
   isOwn: boolean
   hasCopyableText: boolean
+  isSavedConversation?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -20,6 +22,7 @@ const emit = defineEmits<{
   copy: []
 }>()
 
+const { t } = useChatifyI18n()
 const open = ref(false)
 const menuX = ref(0)
 const menuY = ref(0)
@@ -30,6 +33,7 @@ const items = computed(() =>
   buildMessageActionItems({
     isOwn: props.isOwn,
     hasCopyableText: props.hasCopyableText,
+    isSavedConversation: props.isSavedConversation,
   }),
 )
 
@@ -102,7 +106,7 @@ defineExpose({ openAt, close })
       type="button"
       class="chatify-message-actions-trigger chatify:flex chatify:h-7 chatify:w-7 chatify:items-center chatify:justify-center chatify:rounded-full chatify:text-chatify-muted chatify:opacity-0 chatify:transition chatify:group-hover:opacity-100"
       :class="open ? 'chatify:opacity-100' : ''"
-      aria-label="Message actions"
+      :aria-label="t('ui.thread.bubble.message_actions')"
       aria-haspopup="menu"
       :aria-expanded="open"
       @click.stop="toggle"

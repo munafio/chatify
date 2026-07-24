@@ -18,12 +18,14 @@ import GroupMembersView from '../group-info/GroupMembersView.vue'
 import GroupInfoMainSkeleton from '../skeletons/GroupInfoMainSkeleton.vue'
 import GroupMembersSkeleton from '../skeletons/GroupMembersSkeleton.vue'
 import GroupMediaSkeleton from '../skeletons/GroupMediaSkeleton.vue'
+import { useChatifyI18n } from '../../composables/useChatifyI18n'
 
 const uiStore = useUiStore()
 const configStore = useConfigStore()
 const confirmStore = useConfirmStore()
 const conversationsStore = useConversationsStore()
 const { activeModal, modalContext } = storeToRefs(uiStore)
+const { t } = useChatifyI18n()
 
 const conversation = ref<ChatifyConversation | null>(null)
 const mediaPreview = ref<SharedAttachment[]>([])
@@ -56,14 +58,14 @@ const membersPreview = computed(() => conversation.value?.relationships.particip
 const modalTitle = computed(() => {
   if (view.value === 'members') {
     if (membersMode.value === 'add') {
-      return 'Add members'
+      return t('ui.group.info.add_members')
     }
     return memberCountLabel(conversation.value?.attributes.participant_count)
   }
   if (view.value === 'media') {
-    return 'Media, links and docs'
+    return t('ui.group.info.media_links_docs')
   }
-  return 'Group info'
+  return t('ui.modals.group_info.title')
 })
 
 const transitionKey = computed(() => {
@@ -197,9 +199,9 @@ async function removeMember(participant: ChatifyParticipant) {
 
   const name = memberName(participant)
   const confirmed = await confirmStore.confirm({
-    title: `Remove ${name}?`,
-    message: "They won't be able to see new messages in this group.",
-    confirmLabel: 'Remove',
+    title: t('ui.confirm.remove_member.title', { name }),
+    message: t('ui.confirm.remove_member.message'),
+    confirmLabel: t('ui.confirm.remove_member.confirm'),
     variant: 'danger',
   })
 
@@ -222,9 +224,9 @@ async function leaveGroup() {
   }
 
   const confirmed = await confirmStore.confirm({
-    title: 'Leave this group?',
-    message: "You won't receive new messages from this group.",
-    confirmLabel: 'Leave group',
+    title: t('ui.confirm.leave_group.title'),
+    message: t('ui.confirm.leave_group.message'),
+    confirmLabel: t('ui.confirm.leave_group.confirm'),
     variant: 'danger',
   })
 
@@ -244,9 +246,9 @@ async function deleteGroup() {
   }
 
   const confirmed = await confirmStore.confirm({
-    title: 'Delete group?',
-    message: 'This permanently deletes the group for everyone.',
-    confirmLabel: 'Delete group',
+    title: t('ui.confirm.delete_group.title'),
+    message: t('ui.confirm.delete_group.message'),
+    confirmLabel: t('ui.confirm.delete_group.confirm'),
     variant: 'danger',
   })
 
@@ -270,9 +272,9 @@ async function openTransfer(participant: ChatifyParticipant) {
   const name = memberName(participant)
 
   const confirmed = await confirmStore.confirm({
-    title: 'Transfer ownership?',
-    message: `Make ${name} the group owner. You will become a full admin and lose delete and ownership transfer powers.`,
-    confirmLabel: 'Transfer',
+    title: t('ui.confirm.transfer_ownership.title'),
+    message: t('ui.confirm.transfer_ownership.message', { name }),
+    confirmLabel: t('ui.confirm.transfer_ownership.confirm'),
     variant: 'danger',
   })
 
@@ -310,7 +312,7 @@ async function saveMemberRole(payload: {
 <template>
   <BaseModal
     :open="open"
-    title="Group info"
+    :title="t('ui.modals.group_info.title')"
     size="md"
     bare
     panel-class="chatify-settings-modal"
@@ -382,7 +384,7 @@ async function saveMemberRole(payload: {
 
     <GroupAdminPermissionsSheet
       :open="adminSheetOpen"
-      :member-name="selectedParticipant ? memberName(selectedParticipant) : 'Member'"
+      :member-name="selectedParticipant ? memberName(selectedParticipant) : t('system_messages.member')"
       :can-promote-full-admin="permissions.isOwner.value"
       @close="adminSheetOpen = false"
       @save="saveMemberRole"

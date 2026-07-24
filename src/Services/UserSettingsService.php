@@ -48,7 +48,7 @@ final class UserSettingsService
 
         if ($chatBackground !== null) {
             if (! ChatifyAppearanceConfig::isEnabled('chat_background')) {
-                throw new \InvalidArgumentException('Wallpaper upload is disabled.');
+                throw new \InvalidArgumentException(__('chatify::chatify.errors.wallpaper_upload_disabled'));
             }
 
             $this->deleteChatBackgroundIfCustom($settings->chat_background);

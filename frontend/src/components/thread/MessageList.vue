@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject, nextTick, onMounted, ref, watch } from 'vue'
+import { computed, inject, nextTick, onMounted, provide, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { THREAD_ROOT_KEY } from '../../constants/dom'
 import ChatBackground from './ChatBackground.vue'
@@ -29,6 +29,9 @@ import MessageOlderSkeleton from '../skeletons/MessageOlderSkeleton.vue'
 import MessageLoadError from '../states/MessageLoadError.vue'
 import EmptyState from '../states/EmptyState.vue'
 import ImageLightbox from '../ui/ImageLightbox.vue'
+import { useChatifyI18n } from '../../composables/useChatifyI18n'
+import { isSavedConversation } from '../../utils/format'
+import { MESSAGE_SCROLL_PIN_KEY } from '../../constants/dom'
 
 const configStore = useConfigStore()
 const conversationsStore = useConversationsStore()
@@ -37,6 +40,7 @@ const typingStore = useTypingStore()
 const contactsStore = useContactsStore()
 const confirmStore = useConfirmStore()
 const uiStore = useUiStore()
+const { t } = useChatifyI18n()
 const { messagingBlockedUserIds } = storeToRefs(contactsStore)
 
 const { activeConversation, activeId } = storeToRefs(conversationsStore)
@@ -74,6 +78,10 @@ const participantMap = computed(() => {
 
   return { names, avatars }
 })
+
+const isSaved = computed(() =>
+  activeConversation.value ? isSavedConversation(activeConversation.value) : false,
+)
 
 const isGroup = computed(
   () => activeConversation.value?.attributes.conversation_type === 'group',
@@ -127,6 +135,8 @@ const { unseenCount, scrollToBottom, notifyNewMessage, bind, isNearBottom } = us
   },
 )
 
+provide(MESSAGE_SCROLL_PIN_KEY, { isNearBottom, scrollToBottom })
+
 async function retry() {
   if (activeId.value) {
     await messagesStore.fetchMessages(activeId.value, true)
@@ -152,9 +162,9 @@ async function onRemoveForMe(message: (typeof activeMessages.value)[number]) {
 
 async function onRemoveForAll(message: (typeof activeMessages.value)[number]) {
   const confirmed = await confirmStore.confirm({
-    title: 'Remove for everyone?',
-    message: 'This message will be deleted for all participants.',
-    confirmLabel: 'Remove',
+    title: t('ui.confirm.remove_for_everyone.title'),
+    message: t('ui.confirm.remove_for_everyone.message'),
+    confirmLabel: t('ui.confirm.remove_for_everyone.confirm'),
     variant: 'danger',
   })
 
@@ -274,15 +284,15 @@ onMounted(async () => {
 
     <EmptyState
       v-else-if="visibleMessages.length === 0 && activeMessages.length === 0 && !activeError"
-      title="No messages yet"
-      description="Send a message to start the conversation."
+      :title="$t('ui.thread.empty.no_messages_title')"
+      :description="$t('ui.thread.empty.no_messages_description')"
       class="chatify:relative chatify:z-10 chatify:flex-1"
     />
 
     <template v-else>
       <ul
         ref="scrollContainer"
-        class="chatify:relative chatify:z-10 chatify:flex chatify:flex-1 chatify:flex-col chatify:overflow-y-auto chatify:px-4 chatify:py-4 chatify:pb-24"
+        class="chatify:relative chatify:z-10 chatify:flex chatify:flex-1 chatify:flex-col chatify:overflow-y-auto chatify:px-3 chatify:py-4 chatify:pb-24"
         @contextmenu.prevent
       >
         <MessageOlderSkeleton v-if="activeLoadingOlder" />
@@ -301,7 +311,7 @@ onMounted(async () => {
                   <img
                     v-if="participantMap.avatars.get(item.senderId)"
                     :src="participantMap.avatars.get(item.senderId)"
-                    :alt="participantMap.names.get(item.senderId) ?? 'Sender'"
+                    :alt="participantMap.names.get(item.senderId) ?? t('ui.user.sender')"
                     class="chatify-message-cluster-avatar-img"
                   />
                 </div>
@@ -315,6 +325,7 @@ onMounted(async () => {
                       :message="entry.message"
                       :is-own="false"
                       :is-group="isGroup"
+                      :is-saved-conversation="isSaved"
                       :sender-name="participantMap.names.get(item.senderId)"
                       :show-sender-name="entry.showSenderName"
                       :cluster-spacing="entry.clusterSpacing"
@@ -350,6 +361,7 @@ onMounted(async () => {
                 :message="item.message"
                 :is-own="String(item.message.relationships.sender.data.id) === String(configStore.user?.id)"
                 :is-group="isGroup"
+                :is-saved-conversation="isSaved"
                 :sender-name="participantMap.names.get(String(item.message.relationships.sender.data.id))"
                 :show-sender-name="item.showSenderName"
                 :cluster-spacing="item.clusterSpacing"

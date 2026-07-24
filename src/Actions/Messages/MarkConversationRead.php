@@ -22,7 +22,7 @@ final class MarkConversationRead
 
         if ($participant === null) {
             throw ValidationException::withMessages([
-                'conversation' => ['You are not a participant in this conversation.'],
+                'conversation' => [__('chatify::chatify.errors.not_participant')],
             ]);
         }
 

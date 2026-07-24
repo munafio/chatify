@@ -56,7 +56,7 @@ class AttachmentController extends Controller
         $path = $attachmentService->downloadPath($safeName);
 
         if ($path === null) {
-            return response()->json(['message' => 'File not found.'], 404);
+            return response()->json(['message' => __('chatify::chatify.errors.file_not_found')], 404);
         }
 
         $message = \Chatify\Support\ChatifyModels::messageClass()::query()
@@ -64,7 +64,7 @@ class AttachmentController extends Controller
             ->first();
 
         if ($message === null) {
-            return response()->json(['message' => 'File not found.'], 404);
+            return response()->json(['message' => __('chatify::chatify.errors.file_not_found')], 404);
         }
 
         $this->authorize('view', $message);

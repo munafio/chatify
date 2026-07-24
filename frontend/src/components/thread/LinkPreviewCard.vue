@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import type { LinkPreview } from '../../types'
+import { useChatifyI18n } from '../../composables/useChatifyI18n'
 
 defineProps<{
   preview: LinkPreview
 }>()
+
+const { t } = useChatifyI18n()
 </script>
 
 <template>
@@ -11,13 +14,13 @@ defineProps<{
     :href="preview.url"
     target="_blank"
     rel="noopener noreferrer"
-    class="chatify:mt-2 chatify:block chatify:max-w-[20rem] chatify:overflow-hidden chatify:rounded-md chatify:border chatify:border-black/10 chatify:bg-black/5 chatify:no-underline chatify:transition chatify:hover:bg-black/10"
+    class="chatify-link-preview-card"
   >
     <img
       v-if="preview.image"
       :src="preview.image"
-      :alt="preview.title ?? preview.site_name ?? 'Link preview'"
-      class="chatify:max-h-28 chatify:w-full chatify:object-cover"
+      :alt="preview.title ?? preview.site_name ?? t('ui.thread.bubble.link_preview')"
+      class="chatify-link-preview-card-image"
     />
     <div class="chatify:space-y-0.5 chatify:p-2">
       <p

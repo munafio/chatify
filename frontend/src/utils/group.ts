@@ -1,8 +1,11 @@
+import { getBootLocale } from '../i18n/bootLocale'
+import { chatifyT } from '../i18n/nonComponent'
 import type { ChatifyConversation, ChatifyParticipant, GroupMembership, GroupPermissionKey } from '../types'
 
 export function memberCountLabel(count: number | undefined): string {
   const total = count ?? 0
-  return `${total} member${total === 1 ? '' : 's'}`
+  const key = total === 1 ? 'ui.format.member_count' : 'ui.format.member_count_plural'
+  return chatifyT(key, { n: total })
 }
 
 export function participantUser(participant: ChatifyParticipant) {
@@ -12,11 +15,11 @@ export function participantUser(participant: ChatifyParticipant) {
 export function memberRoleLabel(role: string, isFullAdmin = true): string | null {
   switch (role) {
     case 'owner':
-      return 'Owner'
+      return chatifyT('roles.owner')
     case 'admin':
-      return isFullAdmin ? 'Admin' : 'Limited admin'
+      return isFullAdmin ? chatifyT('roles.admin') : chatifyT('roles.limited_admin')
     case 'moderator':
-      return 'Moderator'
+      return chatifyT('roles.moderator')
     case 'member':
       return null
     default:
@@ -67,19 +70,25 @@ export function hasGroupPermission(
 }
 
 export function formatGroupCreatedFooter(conversation: ChatifyConversation): string {
-  const creator = conversation.attributes.created_by?.name ?? 'Unknown'
+  const creator = conversation.attributes.created_by?.name ?? chatifyT('roles.unknown')
   const createdAt = conversation.attributes.created_at
 
   if (!createdAt) {
-    return `Group created by ${creator}`
+    return chatifyT('ui.format.group_created_by', { creator })
   }
 
   const date = new Date(createdAt)
-  return `Group created by ${creator}, on ${date.toLocaleDateString([], {
-    month: 'numeric',
-    day: 'numeric',
-    year: 'numeric',
-  })} at ${date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`
+  const locale = getBootLocale()
+
+  return chatifyT('ui.format.group_created_by_on', {
+    creator,
+    date: date.toLocaleDateString(locale, {
+      month: 'numeric',
+      day: 'numeric',
+      year: 'numeric',
+    }),
+    time: date.toLocaleTimeString(locale, { hour: 'numeric', minute: '2-digit' }),
+  })
 }
 
 export function isParticipantRecord(

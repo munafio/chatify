@@ -11,6 +11,8 @@ import { mergeById } from '../../utils/mergeById'
 import EmptyState from '../states/EmptyState.vue'
 import GroupMembersSkeleton from '../skeletons/GroupMembersSkeleton.vue'
 import DropdownMenu, { type DropdownMenuItem } from '../ui/DropdownMenu.vue'
+import { useChatifyDirection } from '../../composables/useChatifyDirection'
+import { useChatifyI18n } from '../../composables/useChatifyI18n'
 
 const props = defineProps<{
   conversation: ChatifyConversation
@@ -33,6 +35,8 @@ const emit = defineEmits<{
 
 const configStore = useConfigStore()
 const contactsStore = useContactsStore()
+const { t } = useChatifyI18n()
+const { isRtl } = useChatifyDirection()
 
 const search = ref('')
 const searchInput = ref<HTMLInputElement | null>(null)
@@ -220,7 +224,7 @@ async function onAdd(user: ChatifyUser) {
 
 function memberDisplayName(participant: ChatifyParticipant): string {
   if (participant.attributes.is_you) {
-    return 'You'
+    return t('ui.user.you')
   }
 
   return displayUserName(participantUser(participant))
@@ -242,13 +246,13 @@ function memberMenuItems(_participant: ChatifyParticipant): DropdownMenuItem[] {
   const items: DropdownMenuItem[] = []
 
   if (props.canManageAdmins) {
-    items.push({ id: 'role', label: 'Change role' })
+    items.push({ id: 'role', label: t('ui.group.members.change_role') })
   }
   if (props.canTransferOwnership) {
-    items.push({ id: 'transfer', label: 'Transfer ownership' })
+    items.push({ id: 'transfer', label: t('ui.group.members.transfer_ownership') })
   }
   if (props.canRemoveMembers) {
-    items.push({ id: 'remove', label: 'Remove member', danger: true })
+    items.push({ id: 'remove', label: t('ui.group.members.remove_member'), danger: true })
   }
 
   return items
@@ -278,7 +282,7 @@ function onMemberMenuSelect(participant: ChatifyParticipant, id: string) {
         ref="searchInput"
         v-model="search"
         type="search"
-        :placeholder="mode === 'add' ? 'Search contacts' : 'Search members'"
+        :placeholder="mode === 'add' ? t('ui.group.members.search_contacts') : t('ui.group.members.search_members')"
         class="chatify-sidebar-input chatify:w-full chatify:rounded-lg chatify:px-3 chatify:py-2 chatify:text-sm chatify:text-chatify-text"
       />
     </div>
@@ -290,7 +294,7 @@ function onMemberMenuSelect(participant: ChatifyParticipant, id: string) {
         <button
           v-if="canAddMembers"
           type="button"
-          class="chatify-list-item chatify:mb-1 chatify:flex chatify:w-full chatify:items-center chatify:gap-3 chatify:rounded-lg chatify:px-2 chatify:py-3 chatify:text-left"
+          class="chatify-list-item chatify:mb-1 chatify:flex chatify:w-full chatify:items-center chatify:gap-3 chatify:rounded-lg chatify:px-2 chatify:py-3 chatify:text-start"
           @click="emit('addMember')"
         >
           <span class="chatify:flex chatify:h-10 chatify:w-10 chatify:items-center chatify:justify-center chatify:rounded-full chatify:bg-chatify-primary chatify:text-chatify-text">
@@ -298,13 +302,13 @@ function onMemberMenuSelect(participant: ChatifyParticipant, id: string) {
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
             </svg>
           </span>
-          <span class="chatify:text-sm chatify:font-medium">Add member</span>
+          <span class="chatify:text-sm chatify:font-medium">{{ $t('ui.group.members.add_member') }}</span>
         </button>
 
         <EmptyState
           v-if="initialLoaded && members.length === 0"
-          title="No members found"
-          description="Try a different search term."
+          :title="t('ui.group.members.no_members_title')"
+          :description="t('ui.group.members.no_members_description')"
         />
 
         <ul v-else>
@@ -334,7 +338,7 @@ function onMemberMenuSelect(participant: ChatifyParticipant, id: string) {
             <DropdownMenu
               v-if="canShowMemberMenu(participant)"
               :items="memberMenuItems(participant)"
-              align="end"
+              :align="isRtl ? 'start' : 'end'"
               @select="onMemberMenuSelect(participant, $event)"
             />
           </li>
@@ -344,14 +348,14 @@ function onMemberMenuSelect(participant: ChatifyParticipant, id: string) {
       <template v-else>
         <EmptyState
           v-if="!search.trim()"
-          title="Search contacts to add"
-          description="Type a name to find people to add to this group."
+          :title="t('ui.group.members.search_to_add_title')"
+          :description="t('ui.group.members.search_to_add_description')"
         />
 
         <EmptyState
           v-else-if="contactsStore.searchResults.length === 0 && !contactsStore.searching"
-          title="No contacts found"
-          description="Try a different search term."
+          :title="t('ui.group.members.no_contacts_title')"
+          :description="t('ui.group.members.no_contacts_description')"
         />
 
         <ul v-else>
@@ -365,7 +369,7 @@ function onMemberMenuSelect(participant: ChatifyParticipant, id: string) {
               <div>
                 <p class="chatify:text-sm chatify:font-medium">{{ displayUserName(user) }}</p>
                 <p v-if="isAlreadyMember(user.id) && !isAddedFlash(user.id)" class="chatify:text-xs chatify:text-chatify-muted">
-                  Already a member
+                  {{ $t('ui.group.members.already_member') }}
                 </p>
               </div>
             </div>
@@ -373,7 +377,7 @@ function onMemberMenuSelect(participant: ChatifyParticipant, id: string) {
             <span
               v-if="isAddedFlash(user.id)"
               class="chatify-member-added-check"
-              aria-label="Added"
+              :aria-label="t('ui.group.members.added')"
             >
               <svg class="chatify:h-4 chatify:w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
@@ -383,7 +387,7 @@ function onMemberMenuSelect(participant: ChatifyParticipant, id: string) {
               v-else-if="isAdding(user.id)"
               class="chatify:px-3 chatify:py-1 chatify:text-xs chatify:text-chatify-muted"
             >
-              Adding…
+              {{ $t('ui.group.members.adding') }}
             </span>
             <button
               v-else-if="!isAlreadyMember(user.id)"
@@ -391,7 +395,7 @@ function onMemberMenuSelect(participant: ChatifyParticipant, id: string) {
               class="chatify:rounded-lg chatify:bg-chatify-primary chatify:px-3 chatify:py-1 chatify:text-xs chatify:text-white"
               @click="onAdd(user)"
             >
-              Add
+              {{ $t('ui.group.members.add') }}
             </button>
           </li>
         </ul>

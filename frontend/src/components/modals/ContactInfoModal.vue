@@ -8,6 +8,7 @@ import { usePresenceStore } from '../../stores/presence'
 import { useUiStore } from '../../stores/ui'
 import { useConfirmStore } from '../../stores/confirm'
 import { useConfigStore } from '../../stores/config'
+import { useChatifyI18n } from '../../composables/useChatifyI18n'
 import { displayUserAvatar, displayUserName, isIdentityHidden } from '../../utils/userDisplay'
 import BaseModal from './BaseModal.vue'
 
@@ -17,6 +18,7 @@ const conversationsStore = useConversationsStore()
 const presenceStore = usePresenceStore()
 const confirmStore = useConfirmStore()
 const configStore = useConfigStore()
+const { t } = useChatifyI18n()
 const { activeModal, modalContext } = storeToRefs(uiStore)
 const { defaultAvatarUrl } = storeToRefs(configStore)
 
@@ -38,7 +40,7 @@ const onlineLabel = computed(() => {
     return null
   }
 
-  return isOnline.value ? 'Online' : 'Offline'
+  return isOnline.value ? t('ui.presence.online') : t('ui.presence.offline')
 })
 
 async function startChat() {
@@ -68,9 +70,9 @@ async function toggleBlock() {
   }
 
   const confirmed = await confirmStore.confirm({
-    title: `Block ${displayUserName(user.value)}?`,
-    message: 'They will not be able to message you, and you will not see them in search.',
-    confirmLabel: 'Block',
+    title: t('ui.confirm.block.title', { name: displayUserName(user.value) }),
+    message: t('ui.confirm.block.message'),
+    confirmLabel: t('ui.confirm.block.confirm'),
     variant: 'danger',
   })
 
@@ -83,7 +85,7 @@ async function toggleBlock() {
 <template>
   <BaseModal
     :open="open"
-    title="Contact info"
+    :title="t('ui.modals.contact_info.title')"
     @close="uiStore.closeModal()"
   >
     <div v-if="user" class="chatify:flex chatify:flex-col chatify:items-center chatify:gap-4">
@@ -96,7 +98,7 @@ async function toggleBlock() {
         <span
           v-if="isOnline"
           class="chatify-presence-dot chatify-presence-dot-lg"
-          aria-label="Online"
+          :aria-label="$t('ui.presence.online')"
         />
       </div>
       <div class="chatify:text-center">
@@ -112,7 +114,7 @@ async function toggleBlock() {
           :disabled="contactsStore.isMessagingBlocked(user.id)"
           @click="startChat"
         >
-          Message
+          {{ $t('ui.modals.contact_info.message') }}
         </button>
         <div class="chatify:flex chatify:w-full chatify:gap-2">
           <button
@@ -121,7 +123,7 @@ async function toggleBlock() {
             class="chatify:flex-1 chatify:rounded-lg chatify:border chatify:border-chatify-border chatify:py-2 chatify:text-sm"
             @click="toggleFavorite"
           >
-            {{ contactsStore.isFavorite(user.id) ? 'Unfavorite' : 'Favorite' }}
+            {{ contactsStore.isFavorite(user.id) ? $t('ui.actions.conversation.unfavorite') : $t('ui.actions.conversation.favorite') }}
           </button>
           <button
             type="button"
@@ -129,7 +131,7 @@ async function toggleBlock() {
             :class="contactsStore.isBlocked(user.id) ? 'chatify:text-chatify-primary' : 'chatify:text-chatify-danger'"
             @click="toggleBlock"
           >
-            {{ contactsStore.isBlocked(user.id) ? 'Unblock' : 'Block' }}
+            {{ contactsStore.isBlocked(user.id) ? $t('ui.actions.conversation.unblock') : $t('ui.actions.conversation.block') }}
           </button>
         </div>
       </div>

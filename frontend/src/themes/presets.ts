@@ -1,3 +1,4 @@
+import { chatifyT } from '../i18n/nonComponent'
 import type { ChatifyThemePreferences, ThemeId, ThemePreset, ThemeTokenSet } from './types'
 
 const THEME_REGISTRY: ThemePreset[] = [
@@ -69,18 +70,26 @@ const THEME_REGISTRY: ThemePreset[] = [
 
 let allowedThemeIds: string[] | null = null
 
+function withTranslatedName(theme: ThemePreset): ThemePreset {
+  return {
+    ...theme,
+    name: chatifyT(`themes.${theme.id}`),
+  }
+}
+
 export function setAllowedThemes(ids: string[]): void {
   allowedThemeIds = ids
 }
 
 export function themePresets(): ThemePreset[] {
   if (allowedThemeIds === null) {
-    return THEME_REGISTRY
+    return THEME_REGISTRY.map(withTranslatedName)
   }
 
   return allowedThemeIds
     .map((id) => THEME_REGISTRY.find((theme) => theme.id === id))
     .filter((theme): theme is ThemePreset => theme !== undefined)
+    .map(withTranslatedName)
 }
 
 export function defaultThemeId(): string {
@@ -96,7 +105,8 @@ export function sanitizeThemeId(id: string | undefined): string {
 }
 
 export function getThemeById(id: string): ThemePreset {
-  return THEME_REGISTRY.find((theme) => theme.id === id) ?? themePresets()[0] ?? THEME_REGISTRY[0]
+  const theme = THEME_REGISTRY.find((item) => item.id === id) ?? themePresets()[0] ?? THEME_REGISTRY[0]
+  return withTranslatedName(theme)
 }
 
 export function isThemeId(id: string): id is ThemeId {

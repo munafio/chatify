@@ -9,7 +9,12 @@ import { useUiStore } from '../../stores/ui'
 import { groupMessagesByDate } from '../../utils/groupMessageClusters'
 import { highlightQuery } from '../../utils/highlightQuery'
 import { isParticipantRecord, participantUser } from '../../utils/group'
+import { isSavedConversation } from '../../utils/format'
+import { displayUserAvatar, displayUserName } from '../../utils/userDisplay'
+import { jumpToMessage } from '../../utils/jumpToMessage'
+import { useChatifyI18n } from '../../composables/useChatifyI18n'
 import EmptyState from '../states/EmptyState.vue'
+import SearchField from '../ui/SearchField.vue'
 import MessageDateSeparator from './MessageDateSeparator.vue'
 import MessageDeliveryStatus from './MessageDeliveryStatus.vue'
 
@@ -22,29 +27,42 @@ const { activeConversation } = storeToRefs(conversationsStore)
 const query = ref('')
 const results = ref<ChatifyMessage[]>([])
 const loading = ref(false)
-const searchInput = ref<HTMLInputElement | null>(null)
+const searchInput = ref<InstanceType<typeof SearchField> | null>(null)
+const { t } = useChatifyI18n()
 
 const isGroup = computed(() => activeConversation.value?.attributes.conversation_type === 'group')
 
 const participantMap = computed(() => {
   const names = new Map<string, string>()
   const avatars = new Map<string, string>()
+  const conversation = activeConversation.value
 
-  activeConversation.value?.relationships.participants.forEach((item) => {
+  if (configStore.user) {
+    names.set(String(configStore.user.id), configStore.user.attributes.name)
+    avatars.set(String(configStore.user.id), configStore.user.attributes.avatar)
+  }
+
+  conversation?.relationships.participants.forEach((item) => {
     const user = isParticipantRecord(item) ? participantUser(item) : item
     if (user) {
-      names.set(String(user.id), user.attributes.name)
-      avatars.set(String(user.id), user.attributes.avatar)
+      names.set(String(user.id), displayUserName(user))
+      avatars.set(String(user.id), displayUserAvatar(user, configStore.defaultAvatarUrl))
     }
   })
 
-  activeConversation.value?.relationships.participants_preview?.forEach((item) => {
+  conversation?.relationships.participants_preview?.forEach((item) => {
     const user = participantUser(item)
     if (user) {
-      names.set(String(user.id), user.attributes.name)
-      avatars.set(String(user.id), user.attributes.avatar)
+      names.set(String(user.id), displayUserName(user))
+      avatars.set(String(user.id), displayUserAvatar(user, configStore.defaultAvatarUrl))
     }
   })
+
+  const otherUser = conversation?.relationships.other_user
+  if (otherUser) {
+    names.set(String(otherUser.id), displayUserName(otherUser))
+    avatars.set(String(otherUser.id), displayUserAvatar(otherUser, configStore.defaultAvatarUrl))
+  }
 
   return { names, avatars }
 })
@@ -86,18 +104,12 @@ watch(messageSearchOpen, async (open) => {
   results.value = []
 })
 
-function clearQuery() {
-  query.value = ''
-  results.value = []
-  searchInput.value?.focus()
-}
-
 function senderName(message: ChatifyMessage): string {
   const senderId = String(message.relationships.sender.data.id)
   if (String(configStore.user?.id) === senderId) {
-    return 'You'
+    return t('ui.user.you')
   }
-  return participantMap.value.names.get(senderId) ?? 'Member'
+  return participantMap.value.names.get(senderId) ?? t('system_messages.member')
 }
 
 function senderAvatar(message: ChatifyMessage): string | undefined {
@@ -109,13 +121,30 @@ function isOwnMessage(message: ChatifyMessage): boolean {
 }
 
 function messagePreview(message: ChatifyMessage): string {
-  return message.attributes.body || 'Attachment'
+  return message.attributes.body || t('ui.thread.search.preview_attachment')
+}
+
+function showSenderLabel(message: ChatifyMessage): boolean {
+  if (isOwnMessage(message)) {
+    return false
+  }
+
+  if (isGroup.value) {
+    return true
+  }
+
+  const conversation = activeConversation.value
+  if (!conversation || isSavedConversation(conversation)) {
+    return false
+  }
+
+  return conversation.attributes.conversation_type === 'direct'
 }
 
 async function jumpTo(message: ChatifyMessage) {
   uiStore.closeMessageSearch()
   await nextTick()
-  document.querySelector(`[data-message-id="${message.id}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  jumpToMessage(message.id)
 }
 </script>
 
@@ -125,72 +154,37 @@ async function jumpTo(message: ChatifyMessage) {
       <button
         type="button"
         class="chatify:rounded-full chatify:p-1 chatify:text-chatify-text chatify:transition chatify:hover:bg-chatify-sidebar"
-        aria-label="Close search"
+        :aria-label="$t('ui.thread.search.close')"
         @click="uiStore.closeMessageSearch()"
       >
         <svg class="chatify:h-5 chatify:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>
-      <h2 class="chatify:flex-1 chatify:text-sm chatify:font-semibold">Search messages</h2>
+      <h2 class="chatify:flex-1 chatify:text-sm chatify:font-semibold">{{ $t('ui.thread.search.title') }}</h2>
     </header>
 
     <div class="chatify:shrink-0 chatify:border-b chatify:border-chatify-border chatify:px-3 chatify:py-2">
-      <div class="chatify:flex chatify:items-center chatify:gap-2">
-        <button
-          type="button"
-          class="chatify:rounded-full chatify:p-2 chatify:text-chatify-muted chatify:opacity-60"
-          aria-label="Search by date"
-          disabled
-          title="Coming soon"
-        >
-          <svg class="chatify:h-5 chatify:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-        </button>
-
-        <div class="chatify:relative chatify:min-w-0 chatify:flex-1">
-          <svg
-            class="chatify:pointer-events-none chatify:absolute chatify:top-1/2 chatify:left-3 chatify:h-4 chatify:w-4 chatify:-translate-y-1/2 chatify:text-chatify-muted"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          <input
-            ref="searchInput"
-            v-model="query"
-            type="search"
-            placeholder="Search"
-            class="chatify-sidebar-input chatify:w-full chatify:rounded-lg chatify:py-2 chatify:pr-9 chatify:pl-9 chatify:text-sm"
-          />
-          <button
-            v-if="query"
-            type="button"
-            class="chatify:absolute chatify:top-1/2 chatify:right-2 chatify:-translate-y-1/2 chatify:rounded-full chatify:p-1 chatify:text-chatify-muted chatify:hover:bg-chatify-sidebar"
-            aria-label="Clear search"
-            @click="clearQuery"
-          >
-            <svg class="chatify:h-4 chatify:w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-      </div>
+      <SearchField
+        ref="searchInput"
+        v-model="query"
+        :placeholder="t('ui.thread.search.placeholder')"
+        :clear-label="t('ui.thread.search.clear')"
+        input-class="chatify-sidebar-input chatify:rounded-lg chatify:py-2 chatify:text-sm chatify:text-chatify-text"
+      />
     </div>
 
     <div class="chatify:min-h-0 chatify:flex-1 chatify:overflow-y-auto chatify:px-3 chatify:py-2">
       <EmptyState
         v-if="showEmptyPrompt"
-        title="Search for messages in this chat"
-        description="Enter at least 2 characters to search."
+        :title="$t('ui.thread.search.prompt_title')"
+        :description="$t('ui.thread.search.prompt_description')"
       />
 
       <EmptyState
         v-else-if="showNoResults"
-        title="No messages found"
-        description="Try a different search term."
+        :title="$t('ui.thread.search.no_results_title')"
+        :description="$t('ui.thread.search.no_results_description')"
       />
 
       <ul v-else class="chatify:space-y-1">
@@ -212,7 +206,7 @@ async function jumpTo(message: ChatifyMessage) {
               />
               <div class="chatify:min-w-0 chatify:flex-1">
                 <p class="chatify:truncate chatify:text-sm">
-                  <span v-if="isGroup && !isOwnMessage(item.message)" class="chatify:text-chatify-muted">
+                  <span v-if="showSenderLabel(item.message)" class="chatify:text-chatify-muted">
                     {{ senderName(item.message) }}:
                   </span>
                   <span v-html="highlightQuery(messagePreview(item.message), query)" />

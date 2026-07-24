@@ -3,13 +3,16 @@ import { createPinia, setActivePinia } from 'pinia'
 import { useConfigStore } from '../stores/config'
 import { useChatSounds } from './useChatSounds'
 import type { BootConfig } from '../types'
+import { TEST_BOOT_I18N } from '../i18n/bootLocale'
 
 const boot = {
+  ...TEST_BOOT_I18N,
   user: { type: 'user', id: 1, attributes: { name: 'Me', avatar: '' } },
   apiBase: '/api',
   broadcastAuthUrl: '/auth',
   csrfToken: 'token',
   conversationId: null,
+  webBase: '/chatify',
   debug: false,
   groupsEnabled: true,
   colors: [],

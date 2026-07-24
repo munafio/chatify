@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Official Documentation
+    url: https://chatify.munafio.com
+    about: Installation, configuration, and usage guides
+  - name: Discord Community
+    url: https://discord.gg/RaxyKVykYJ
+    about: Ask questions, get help, and receive announcements
+  - name: Security Policy
+    url: https://github.com/munafio/chatify/blob/master/SECURITY.md
+    about: Report vulnerabilities privately — do not use public issues for exploits

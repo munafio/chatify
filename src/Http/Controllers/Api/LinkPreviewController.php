@@ -22,7 +22,7 @@ class LinkPreviewController extends Controller
 
         if (! $this->isAllowedUrl($url)) {
             throw ValidationException::withMessages([
-                'url' => ['Only http and https URLs are allowed.'],
+                'url' => [__('chatify::chatify.errors.only_http_https_urls')],
             ]);
         }
 

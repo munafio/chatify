@@ -35,6 +35,7 @@ class ChatifyServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        $this->loadTranslationsFrom(__DIR__.'/../lang', 'chatify');
         $this->loadViewsFrom(__DIR__.'/views', 'Chatify');
         $this->loadMigrationsFrom(__DIR__.'/database/migrations');
 
@@ -142,11 +143,7 @@ class ChatifyServiceProvider extends ServiceProvider
         ], 'chatify-config');
 
         $this->publishes([
-            __DIR__.'/database/migrations/2024_01_01_000001_create_chatify_v2_tables.php' => database_path('migrations/2024_01_01_000001_create_chatify_v2_tables.php'),
-            __DIR__.'/database/migrations/2024_01_01_000002_add_theme_preferences_to_user_settings.php' => database_path('migrations/2024_01_01_000002_add_theme_preferences_to_user_settings.php'),
-            __DIR__.'/database/migrations/2024_01_01_000003_extend_messages_for_actions.php' => database_path('migrations/2024_01_01_000003_extend_messages_for_actions.php'),
-            __DIR__.'/database/migrations/2024_01_01_000004_extend_groups_for_management.php' => database_path('migrations/2024_01_01_000004_extend_groups_for_management.php'),
-            __DIR__.'/database/migrations/2024_01_01_000005_add_system_messages.php' => database_path('migrations/2024_01_01_000005_add_system_messages.php'),
+            __DIR__.'/database/migrations/2026_07_18_000000_create_chatify_tables.php' => database_path('migrations/2026_07_18_000000_create_chatify_tables.php'),
         ], 'chatify-migrations');
 
         $this->publishes([
@@ -172,5 +169,9 @@ class ChatifyServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/views' => resource_path('views/vendor/chatify'),
         ], 'chatify-views');
+
+        $this->publishes([
+            __DIR__.'/../lang' => lang_path('vendor/chatify'),
+        ], 'chatify-lang');
     }
 }

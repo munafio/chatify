@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
+import { chatifyT } from '../i18n/nonComponent'
 import type { ChatifyConversation } from '../types'
 import { participantUser } from '../utils/group'
 import { sortConversations } from '../utils/sortConversations'
@@ -270,16 +271,19 @@ export const useConversationsStore = defineStore('conversations', () => {
     }
   }
 
-  async function select(id: string) {
+  async function select(id: string): Promise<boolean> {
     activeId.value = id
     if (!configStore.api) {
-      return
+      return true
     }
 
     try {
       const { data } = await configStore.api.getConversation(id)
       upsert(data.data)
+      return true
     } catch {
+      activeId.value = null
+      return false
     }
   }
 
@@ -434,7 +438,7 @@ export const useConversationsStore = defineStore('conversations', () => {
             ...next.attributes,
             created_by: {
               ...next.attributes.created_by,
-              name: 'Unknown User',
+              name: chatifyT('ui.user.unknown_user'),
             },
           },
         }

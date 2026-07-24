@@ -21,7 +21,7 @@ defineEmits<{
       class="chatify:rounded-lg chatify:bg-chatify-primary chatify:px-4 chatify:py-2 chatify:text-sm chatify:text-white"
       @click="$emit('retry')"
     >
-      Try again
+      {{ $t('ui.common.try_again') }}
     </button>
   </div>
 </template>

@@ -6,6 +6,7 @@ import { useMessagesStore } from '../../stores/messages'
 import { useUiStore } from '../../stores/ui'
 import { useContactsStore } from '../../stores/contacts'
 import { useConfigStore } from '../../stores/config'
+import { useChatifyI18n } from '../../composables/useChatifyI18n'
 import { conversationAvatar, conversationDisplayName } from '../../utils/format'
 import BaseModal from './BaseModal.vue'
 
@@ -14,6 +15,7 @@ const conversationsStore = useConversationsStore()
 const messagesStore = useMessagesStore()
 const contactsStore = useContactsStore()
 const configStore = useConfigStore()
+const { t } = useChatifyI18n()
 const { activeModal } = storeToRefs(uiStore)
 const { forwardMessage } = storeToRefs(messagesStore)
 const { filteredItems } = storeToRefs(conversationsStore)
@@ -80,7 +82,7 @@ async function forwardTo(conversationId: string) {
 <template>
   <BaseModal
     :open="open"
-    title="Forward message"
+    :title="t('ui.modals.forward_message.title')"
     size="md"
     @close="uiStore.closeModal()"
   >
@@ -88,12 +90,12 @@ async function forwardTo(conversationId: string) {
       <input
         v-model="search"
         type="search"
-        placeholder="Search conversations"
+        :placeholder="t('ui.modals.forward_message.search_placeholder')"
         class="chatify:w-full chatify:rounded-lg chatify:border chatify:border-chatify-border chatify:px-3 chatify:py-2 chatify:text-sm chatify:focus:outline-none chatify:focus:ring-2 chatify:focus:ring-chatify-primary"
       />
 
       <p v-if="targets.length === 0" class="chatify:text-sm chatify:text-chatify-muted">
-        No conversations available to forward to.
+        {{ $t('ui.modals.forward_message.no_targets') }}
       </p>
 
       <ul
@@ -126,7 +128,7 @@ async function forwardTo(conversationId: string) {
             :disabled="forwarding"
             @click="forwardTo(conversation.id)"
           >
-            Forward
+            {{ $t('ui.modals.forward_message.forward') }}
           </button>
         </li>
       </ul>

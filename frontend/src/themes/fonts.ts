@@ -1,3 +1,5 @@
+import { chatifyT } from '../i18n/nonComponent'
+
 export interface FontOption {
   id: string
   label: string
@@ -27,18 +29,26 @@ const FONT_REGISTRY: FontOption[] = [
 
 let allowedFontIds: string[] | null = null
 
+function withTranslatedLabel(font: FontOption): FontOption {
+  return {
+    ...font,
+    label: chatifyT(`ui.fonts.${font.id}`),
+  }
+}
+
 export function setAllowedFonts(ids: string[]): void {
   allowedFontIds = ids
 }
 
 export function fontOptions(): FontOption[] {
   if (allowedFontIds === null) {
-    return FONT_REGISTRY
+    return FONT_REGISTRY.map(withTranslatedLabel)
   }
 
   return allowedFontIds
     .map((id) => FONT_REGISTRY.find((font) => font.id === id))
     .filter((font): font is FontOption => font !== undefined)
+    .map(withTranslatedLabel)
 }
 
 export function defaultFontId(): string {
@@ -54,5 +64,6 @@ export function sanitizeFontId(id: string | undefined): string {
 }
 
 export function getFontById(id: string): FontOption {
-  return FONT_REGISTRY.find((font) => font.id === id) ?? fontOptions()[0] ?? FONT_REGISTRY[0]
+  const font = FONT_REGISTRY.find((item) => item.id === id) ?? fontOptions()[0] ?? FONT_REGISTRY[0]
+  return withTranslatedLabel(font)
 }

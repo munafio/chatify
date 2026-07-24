@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { preferencesForServer } from '../composables/useBootConfig'
+import { chatifyT } from '../i18n/nonComponent'
 import { extractErrorMessage } from '../utils/errors'
 import { useConfigStore } from './config'
 import { useToastStore } from './toast'
@@ -38,7 +39,7 @@ export const useSettingsStore = defineStore('settings', () => {
       return true
     } catch (err) {
       toastStore.show({
-        message: extractErrorMessage(err, 'Failed to save settings'),
+        message: extractErrorMessage(err, chatifyT('ui.errors.failed_save_settings')),
         icon: 'error',
         placement: 'bottom',
       })

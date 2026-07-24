@@ -73,9 +73,11 @@
 
 #chatify-app input,
 #chatify-app textarea,
+#chatify-app select,
 #chatify-app [contenteditable='true'] {
   user-select: text;
   -webkit-user-select: text;
+  text-align: start;
 }
 
 #chatify-app .chatify-message-body,
@@ -320,7 +322,7 @@ body.chatify-dark {
   content: '';
   position: absolute;
   top: 0.125rem;
-  left: 0.125rem;
+  inset-inline-start: 0.125rem;
   width: 1.25rem;
   height: 1.25rem;
   border-radius: 999px;
@@ -335,6 +337,10 @@ body.chatify-dark {
 
 .chatify-settings-toggle-on::after {
   transform: translateX(1.25rem);
+}
+
+#chatify-app[dir='rtl'] .chatify-settings-toggle-on::after {
+  transform: translateX(-1.25rem);
 }
 
 .chatify-settings-range {
@@ -384,7 +390,7 @@ body.chatify-dark {
   display: block;
   width: 100%;
   padding: 0.625rem 0.875rem;
-  text-align: left;
+  text-align: start;
   font-size: 0.875rem;
   color: var(--chatify-color-chatify-text);
   transition: background-color 120ms ease;
@@ -410,7 +416,7 @@ body.chatify-dark {
   box-shadow:
     0 4px 6px -1px rgb(0 0 0 / 12%),
     0 10px 24px -4px rgb(0 0 0 / 18%);
-  transform-origin: var(--chatify-context-menu-origin-x, top) var(--chatify-context-menu-origin-y, left);
+  transform-origin: top inline-start;
 }
 
 .chatify-context-menu-item {
@@ -419,7 +425,7 @@ body.chatify-dark {
   align-items: center;
   border-radius: 0.375rem;
   padding: 0.375rem 0.5rem;
-  text-align: left;
+  text-align: start;
   font-size: 0.875rem;
   line-height: 1.25rem;
   color: var(--chatify-color-chatify-text);
@@ -472,7 +478,7 @@ body.chatify-dark {
 
 .chatify-presence-dot {
   position: absolute;
-  right: 0;
+  inset-inline-end: 0;
   bottom: 0;
   height: 0.75rem;
   width: 0.75rem;
@@ -504,7 +510,7 @@ body.chatify-dark {
 
 .chatify-settings-toggle-thumb {
   position: absolute;
-  left: 0.125rem;
+  inset-inline-start: 0.125rem;
   height: 1.25rem;
   width: 1.25rem;
   border-radius: 999px;
@@ -514,6 +520,10 @@ body.chatify-dark {
 
 .chatify-settings-toggle-on .chatify-settings-toggle-thumb {
   transform: translateX(1.25rem);
+}
+
+#chatify-app[dir='rtl'] .chatify-settings-toggle-on .chatify-settings-toggle-thumb {
+  transform: translateX(-1.25rem);
 }
 
 .chatify-composer-blocked-banner {
@@ -621,6 +631,19 @@ body.chatify-dark {
 
 .chatify-list-item-active {
   background-color: color-mix(in srgb, var(--chatify-color-chatify-bubble-in) 88%, var(--chatify-color-chatify-sidebar));
+}
+
+.chatify-conversation-type-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  color: var(--chatify-color-chatify-muted);
+}
+
+.chatify-conversation-type-icon-svg {
+  width: 0.875rem;
+  height: 0.875rem;
 }
 
 .chatify-sidebar-input {
@@ -817,7 +840,7 @@ body.chatify-dark {
 
 .chatify-composer-preview-remove {
   position: absolute;
-  right: 0.125rem;
+  inset-inline-end: 0.125rem;
   top: 0.125rem;
   border-radius: 9999px;
   background: rgb(0 0 0 / 60%);
@@ -848,7 +871,7 @@ body.chatify-dark {
   gap: 0.75rem;
   border-radius: 0.625rem;
   padding: 0.625rem 0.75rem;
-  text-align: left;
+  text-align: start;
   font-size: 0.875rem;
   color: var(--chatify-color-chatify-text);
   transition: background-color 120ms ease;
@@ -884,7 +907,7 @@ body.chatify-dark {
 .chatify-composer-popover {
   position: absolute;
   bottom: calc(100% + 0.5rem);
-  left: 0;
+  inset-inline-start: 0;
   z-index: 40;
 }
 
@@ -910,7 +933,6 @@ body.chatify-dark {
   border-radius: 9999px;
   border: 1px solid color-mix(in srgb, var(--chatify-color-chatify-text) 8%, var(--chatify-color-chatify-sidebar));
   background: color-mix(in srgb, var(--chatify-color-chatify-bubble-in) 72%, var(--chatify-color-chatify-sidebar));
-  padding: 0.5rem 0.875rem;
   font-size: 0.875rem;
   color: var(--chatify-color-chatify-text);
   outline: none;
@@ -1111,6 +1133,67 @@ body.chatify-dark {
   opacity: 0;
 }
 
+#chatify-app[dir='rtl'] {
+  font-family: var(
+    --chatify-font-family,
+    'Segoe UI',
+    'Segoe UI Arabic',
+    Tahoma,
+    'Noto Sans Arabic',
+    'Cairo',
+    'Tajawal',
+    sans-serif
+  );
+}
+
+#chatify-app[dir='rtl'] .chatify-slide-left-enter-from {
+  transform: translateX(-10px);
+}
+
+#chatify-app[dir='rtl'] .chatify-slide-left-leave-to {
+  transform: translateX(10px);
+}
+
+#chatify-app[dir='rtl'] .chatify-slide-right-enter-from {
+  transform: translateX(10px);
+}
+
+#chatify-app[dir='rtl'] .chatify-slide-right-leave-to {
+  transform: translateX(-10px);
+}
+
+#chatify-app[dir='rtl'] .chatify-icon-back {
+  transform: scaleX(-1);
+}
+
+#chatify-app[dir='rtl'] .chatify-thread-panel {
+  direction: ltr;
+}
+
+#chatify-app[dir='rtl'] .chatify-thread-panel .chatify-icon-back {
+  transform: none;
+}
+
+.chatify-thread-panel .chatify-message-row {
+  width: fit-content;
+  max-width: 80%;
+}
+
+@media (min-width: 768px) {
+  .chatify-thread-panel .chatify-message-row {
+    max-width: 40%;
+  }
+}
+
+.chatify-thread-panel .chatify-message-row-outgoing {
+  margin-inline-start: auto;
+  margin-inline-end: 0;
+}
+
+#chatify-app[dir='rtl'] .chatify-modal-nav-chevron {
+  transform: none;
+}
+
 .chatify-toast-host {
   position: fixed;
   left: 50%;
@@ -1176,7 +1259,12 @@ body.chatify-dark {
 .chatify-message-ticks {
   display: inline-flex;
   align-items: center;
-  margin-left: 0.125rem;
+  margin-inline-start: 0.125rem;
+}
+
+.chatify-message-bubble {
+  min-width: 0;
+  overflow: hidden;
 }
 
 .chatify-message-meta {
@@ -1189,6 +1277,45 @@ body.chatify-dark {
 
 .chatify-message-bubble-in .chatify-message-meta {
   color: var(--chatify-color-chatify-muted);
+}
+
+.chatify-voice-duration {
+  color: var(--chatify-color-chatify-muted);
+}
+
+.chatify-message-bubble-out .chatify-voice-duration {
+  color: color-mix(in srgb, var(--chatify-color-chatify-text) 72%, transparent);
+}
+
+.chatify-message-bubble-in .chatify-voice-duration {
+  color: var(--chatify-color-chatify-muted);
+}
+
+.chatify-link-preview-card {
+  margin-top: 0.5rem;
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  border-radius: 0.375rem;
+  border: 1px solid color-mix(in srgb, black 10%, transparent);
+  background: color-mix(in srgb, black 5%, transparent);
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+}
+
+.chatify-link-preview-card:hover {
+  background: color-mix(in srgb, black 10%, transparent);
+}
+
+.chatify-link-preview-card-image {
+  max-height: 7rem;
+  width: 100%;
+  object-fit: cover;
+}
+
+.chatify-link-preview-skeleton-image {
+  height: 7rem;
+  width: 100%;
 }
 
 .chatify-message-ticks-sent {
@@ -1208,7 +1335,7 @@ body.chatify-dark {
 }
 
 .chatify-message-ticks-second {
-  margin-left: -0.35rem;
+  margin-inline-start: -0.35rem;
 }
 
 .chatify-message-pending {
@@ -1221,7 +1348,7 @@ body.chatify-dark {
 
 .chatify-scroll-bottom-btn {
   position: absolute;
-  right: 1.25rem;
+  inset-inline-end: 1.25rem;
   bottom: 5.75rem;
   z-index: 40;
   display: flex;
@@ -1251,7 +1378,7 @@ body.chatify-dark {
 .chatify-scroll-bottom-count {
   position: absolute;
   top: -0.55rem;
-  left: 50%;
+  inset-inline-start: 50%;
   display: flex;
   min-width: 1.25rem;
   height: 1.25rem;
@@ -1451,11 +1578,11 @@ body.chatify-dark {
 }
 
 .chatify-lightbox-nav-prev {
-  left: 1rem;
+  inset-inline-start: 1rem;
 }
 
 .chatify-lightbox-nav-next {
-  right: 1rem;
+  inset-inline-end: 1rem;
 }
 
 @keyframes chatify-shimmer {
@@ -1497,7 +1624,7 @@ body.chatify-dark {
 
 .chatify-attachment-progress-cancel {
   position: absolute;
-  right: 0.25rem;
+  inset-inline-end: 0.25rem;
   top: 0.25rem;
   display: inline-flex;
   height: 1.25rem;
@@ -1650,7 +1777,7 @@ body.chatify-dark {
 .chatify-voice-bar-timer {
   min-width: 2.75rem;
   flex-shrink: 0;
-  text-align: right;
+  text-align: end;
   font-size: 0.875rem;
   font-variant-numeric: tabular-nums;
   color: var(--chatify-color-chatify-text);
@@ -1732,6 +1859,9 @@ body.chatify-dark {
   display: flex;
   height: 1.75rem;
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
   align-items: center;
   gap: 0.125rem;
   touch-action: none;

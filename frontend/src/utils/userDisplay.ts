@@ -1,14 +1,20 @@
+import { chatifyT } from '../i18n/nonComponent'
 import type { ChatifyConversation, ChatifyUser } from '../types'
 
+export function hiddenUserName(): string {
+  return chatifyT('ui.user.unknown_user')
+}
+
+/** @deprecated Use hiddenUserName() for translated labels */
 export const HIDDEN_USER_NAME = 'Unknown User'
 
 export function displayUserName(user: Pick<ChatifyUser, 'attributes'> | null | undefined): string {
   if (!user) {
-    return HIDDEN_USER_NAME
+    return hiddenUserName()
   }
 
   if (user.attributes.is_identity_hidden) {
-    return HIDDEN_USER_NAME
+    return hiddenUserName()
   }
 
   return user.attributes.name
@@ -34,7 +40,7 @@ export function maskUserIdentity(user: ChatifyUser, defaultAvatarUrl: string): C
     ...user,
     attributes: {
       ...user.attributes,
-      name: HIDDEN_USER_NAME,
+      name: hiddenUserName(),
       avatar: defaultAvatarUrl,
       is_identity_hidden: true,
       email: undefined,

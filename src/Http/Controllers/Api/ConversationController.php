@@ -58,7 +58,7 @@ class ConversationController extends Controller
         $recipient = ChatifyModels::userClass()::query()->findOrFail($request->integer('user_id'));
 
         if ($blockService->eitherBlocked($request->user(), $recipient)) {
-            abort(403, 'You cannot message this user.');
+            abort(403, __('chatify::chatify.errors.cannot_message_user'));
         }
 
         $conversation = $action->handle($request->user(), $recipient);
@@ -153,7 +153,7 @@ class ConversationController extends Controller
         $conversationService = app(ConversationService::class);
 
         if ((int) $request->user()->getKey() === $user && $conversationService->isOwner($conversation, $user)) {
-            abort(422, 'Group owner cannot leave via remove. Transfer ownership or delete the group.');
+            abort(422, __('chatify::chatify.errors.group_owner_cannot_leave_via_remove'));
         }
 
         $conversation = $action->handle($conversation, $request->user(), $user);

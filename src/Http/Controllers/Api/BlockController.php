@@ -31,7 +31,7 @@ class BlockController extends Controller
         $target = ChatifyModels::userClass()::query()->findOrFail($user);
 
         if ((int) $request->user()->getKey() === (int) $target->getKey()) {
-            abort(422, 'You cannot block yourself.');
+            abort(422, __('chatify::chatify.errors.cannot_block_self'));
         }
 
         $blockService->block($request->user(), $target);

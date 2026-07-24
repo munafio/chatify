@@ -4,12 +4,14 @@ import { storeToRefs } from 'pinia'
 import { accentSwatchesForTheme } from '../../themes/presets'
 import type { ThemeId } from '../../themes/types'
 import { useConfigStore } from '../../stores/config'
+import { useChatifyI18n } from '../../composables/useChatifyI18n'
 
 const props = defineProps<{
   themeId: ThemeId
 }>()
 
 const configStore = useConfigStore()
+const { t } = useChatifyI18n()
 const { preferences, colors } = storeToRefs(configStore)
 
 const swatches = computed(() => accentSwatchesForTheme(props.themeId, colors.value))
@@ -62,7 +64,7 @@ const mixDots = [
       <button
         type="button"
         class="chatify-accent-swatch chatify:relative chatify:flex chatify:h-8 chatify:w-8 chatify:shrink-0 chatify:items-center chatify:justify-center"
-        :aria-label="`Select accent color ${color}`"
+        :aria-label="t('ui.settings.select_accent_color', { hex: color })"
         :aria-pressed="isSwatchActive(color)"
         @click="select(color)"
       >
@@ -82,7 +84,7 @@ const mixDots = [
     <div class="chatify:flex chatify:flex-1 chatify:justify-center">
       <label
         class="chatify-accent-swatch chatify:relative chatify:flex chatify:h-8 chatify:w-8 chatify:cursor-pointer chatify:items-center chatify:justify-center"
-        :aria-label="isCustomColor ? `Custom color ${preferences.accentColor}` : 'Pick custom color'"
+        :aria-label="isCustomColor ? t('ui.settings.custom_color', { hex: preferences.accentColor }) : t('ui.settings.pick_custom_color')"
       >
         <span
           v-if="isCustomColor"

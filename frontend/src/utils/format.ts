@@ -1,3 +1,5 @@
+import { getBootLocale } from '../i18n/bootLocale'
+import { chatifyT } from '../i18n/nonComponent'
 import type { ChatifyConversation, ChatifyUser } from '../types'
 import { isParticipantRecord, participantUser } from './group'
 import { displayUserAvatar, displayUserName } from './userDisplay'
@@ -11,20 +13,21 @@ export function formatRelativeTime(iso: string | null | undefined): string {
   const now = new Date()
   const diffMs = now.getTime() - date.getTime()
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+  const locale = getBootLocale()
 
   if (diffDays === 0) {
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    return date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })
   }
 
   if (diffDays === 1) {
-    return 'Yesterday'
+    return chatifyT('dates.yesterday')
   }
 
   if (diffDays < 7) {
-    return date.toLocaleDateString([], { weekday: 'short' })
+    return date.toLocaleDateString(locale, { weekday: 'short' })
   }
 
-  return date.toLocaleDateString([], { month: 'short', day: 'numeric' })
+  return date.toLocaleDateString(locale, { month: 'short', day: 'numeric' })
 }
 
 export function formatDurationMs(ms: number): string {
@@ -39,7 +42,7 @@ export function formatMessageTime(iso: string | null | undefined): string {
     return ''
   }
 
-  return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  return new Date(iso).toLocaleTimeString(getBootLocale(), { hour: '2-digit', minute: '2-digit' })
 }
 
 export function formatMessageDate(iso: string | null | undefined): string {
@@ -52,16 +55,17 @@ export function formatMessageDate(iso: string | null | undefined): string {
   const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate())
   const startOfDate = new Date(date.getFullYear(), date.getMonth(), date.getDate())
   const diffDays = Math.round((startOfToday.getTime() - startOfDate.getTime()) / (1000 * 60 * 60 * 24))
+  const locale = getBootLocale()
 
   if (diffDays === 0) {
-    return 'Today'
+    return chatifyT('dates.today')
   }
 
   if (diffDays === 1) {
-    return 'Yesterday'
+    return chatifyT('dates.yesterday')
   }
 
-  return date.toLocaleDateString([], { month: 'numeric', day: 'numeric', year: 'numeric' })
+  return date.toLocaleDateString(locale, { month: 'numeric', day: 'numeric', year: 'numeric' })
 }
 
 export function truncate(text: string, max = 48): string {
@@ -82,14 +86,14 @@ export function conversationDisplayName(
     }
     relationships: { other_user: ChatifyUser | null }
   },
-  fallbackSavedTitle = 'Saved Messages',
+  fallbackSavedTitle = chatifyT('ui.saved_messages'),
 ): string {
   if (conversation.attributes.conversation_type === 'saved' || conversation.attributes.is_saved) {
     return conversation.attributes.saved_title ?? conversation.attributes.name ?? fallbackSavedTitle
   }
 
   if (conversation.attributes.conversation_type === 'group') {
-    return conversation.attributes.name ?? 'Group'
+    return conversation.attributes.name ?? chatifyT('ui.format.group_label')
   }
 
   return displayUserName(conversation.relationships.other_user)

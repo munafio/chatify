@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { chatifyT } from '../i18n/nonComponent'
 import type { ChatifyUser, UserBlockChangedPayload } from '../types'
 import { useConfigStore } from './config'
 import { useConversationsStore } from './conversations'
@@ -41,7 +42,7 @@ export const useContactsStore = defineStore('contacts', () => {
       const { data } = await configStore.api.searchContacts(q.trim())
       searchResults.value = data.data.filter((user) => !isMessagingBlocked(user.id))
     } catch (err) {
-      searchError.value = err instanceof Error ? err.message : 'Search failed'
+      searchError.value = err instanceof Error ? err.message : chatifyT('ui.errors.search_failed')
       searchResults.value = []
     } finally {
       searching.value = false

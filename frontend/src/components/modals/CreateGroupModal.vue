@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useDebouncedWatch } from '../../composables/useDebouncedFn'
+import { useChatifyI18n } from '../../composables/useChatifyI18n'
 import { useContactsStore } from '../../stores/contacts'
 import { useConversationsStore } from '../../stores/conversations'
 import { useUiStore } from '../../stores/ui'
@@ -10,6 +11,7 @@ import BaseModal from './BaseModal.vue'
 const uiStore = useUiStore()
 const contactsStore = useContactsStore()
 const conversationsStore = useConversationsStore()
+const { t } = useChatifyI18n()
 const { activeModal } = storeToRefs(uiStore)
 
 const name = ref('')
@@ -66,7 +68,7 @@ async function create() {
 <template>
   <BaseModal
     :open="open"
-    title="Create group"
+    :title="t('ui.modals.create_group.title')"
     size="lg"
     @close="uiStore.closeModal()"
   >
@@ -74,23 +76,23 @@ async function create() {
       <input
         v-model="name"
         type="text"
-        placeholder="Group name"
+        :placeholder="t('ui.modals.create_group.name_placeholder')"
         class="chatify:w-full chatify:rounded-lg chatify:border chatify:border-chatify-border chatify:px-3 chatify:py-2 chatify:text-sm chatify:focus:outline-none chatify:focus:ring-2 chatify:focus:ring-chatify-primary"
       />
 
       <input
         v-model="search"
         type="search"
-        placeholder="Search contacts by name or email"
+        :placeholder="t('ui.modals.create_group.search_placeholder')"
         class="chatify:w-full chatify:rounded-lg chatify:border chatify:border-chatify-border chatify:px-3 chatify:py-2 chatify:text-sm chatify:focus:outline-none chatify:focus:ring-2 chatify:focus:ring-chatify-primary"
       />
 
-      <p v-if="contactsStore.searching" class="chatify:text-sm chatify:text-chatify-muted">Searching...</p>
+      <p v-if="contactsStore.searching" class="chatify:text-sm chatify:text-chatify-muted">{{ $t('ui.modals.create_group.searching') }}</p>
       <p v-else-if="contactsStore.searchError" class="chatify:text-sm chatify:text-chatify-danger">
         {{ contactsStore.searchError }}
       </p>
       <p v-else-if="search.trim() && contactsStore.searchResults.length === 0" class="chatify:text-sm chatify:text-chatify-muted">
-        No contacts found.
+        {{ $t('ui.modals.create_group.no_contacts') }}
       </p>
 
       <ul
@@ -123,7 +125,7 @@ async function create() {
         :disabled="creating || !name.trim() || selectedIds.length < 1"
         @click="create"
       >
-        Create group
+        {{ $t('ui.modals.create_group.submit') }}
       </button>
     </div>
   </BaseModal>

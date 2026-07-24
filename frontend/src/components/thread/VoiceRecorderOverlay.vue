@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { formatDurationMs } from '../../utils/format'
+import { useChatifyI18n } from '../../composables/useChatifyI18n'
 
 const props = defineProps<{
   durationMs: number
@@ -12,6 +13,8 @@ const emit = defineEmits<{
   send: []
 }>()
 
+const { t } = useChatifyI18n()
+
 const timerLabel = computed(() => formatDurationMs(props.durationMs))
 </script>
 
@@ -20,7 +23,7 @@ const timerLabel = computed(() => formatDurationMs(props.durationMs))
     <button
       type="button"
       class="chatify-voice-bar-trash"
-      aria-label="Cancel recording"
+      :aria-label="t('ui.thread.voice.cancel_recording')"
       @click="emit('cancel')"
     >
       <svg class="chatify:h-5 chatify:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -44,7 +47,7 @@ const timerLabel = computed(() => formatDurationMs(props.durationMs))
     <button
       type="button"
       class="chatify-voice-bar-send"
-      aria-label="Send voice message"
+      :aria-label="t('ui.thread.voice.send_voice')"
       @click="emit('send')"
     >
       <svg class="chatify:h-5 chatify:w-5" fill="currentColor" viewBox="0 0 24 24">

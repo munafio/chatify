@@ -2,8 +2,10 @@
 import { computed, onBeforeUnmount, onMounted, watch } from 'vue'
 import { useImageLightbox } from '../../composables/useImageLightbox'
 import { CHATIFY_TELEPORT_TARGET } from '../../constants/dom'
+import { useChatifyI18n } from '../../composables/useChatifyI18n'
 
 const { open, images, activeIndex, close, next, prev } = useImageLightbox()
+const { t } = useChatifyI18n()
 
 const current = computed(() => images.value[activeIndex.value] ?? null)
 
@@ -41,7 +43,7 @@ onBeforeUnmount(() => {
       class="chatify-lightbox"
       role="dialog"
       aria-modal="true"
-      aria-label="Image viewer"
+      :aria-label="t('ui.lightbox.viewer')"
       @click.self="close"
     >
       <div class="chatify-lightbox-toolbar">
@@ -55,9 +57,9 @@ onBeforeUnmount(() => {
             class="chatify-lightbox-btn"
             @click.stop
           >
-            Download
+            {{ $t('ui.lightbox.download') }}
           </a>
-          <button type="button" class="chatify-lightbox-btn" @click="close">Close</button>
+          <button type="button" class="chatify-lightbox-btn" @click="close">{{ $t('ui.common.close') }}</button>
         </div>
       </div>
 
@@ -65,7 +67,7 @@ onBeforeUnmount(() => {
         v-if="images.length > 1"
         type="button"
         class="chatify-lightbox-nav chatify-lightbox-nav-prev"
-        aria-label="Previous image"
+        :aria-label="t('ui.lightbox.previous')"
         @click="prev"
       >
         <svg class="chatify-lightbox-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -75,7 +77,7 @@ onBeforeUnmount(() => {
 
       <img
         :src="current.url"
-        :alt="current.original_name ?? 'Image'"
+        :alt="current.original_name ?? t('ui.thread.bubble.image')"
         class="chatify-lightbox-image"
         @click.stop
       />
@@ -84,7 +86,7 @@ onBeforeUnmount(() => {
         v-if="images.length > 1"
         type="button"
         class="chatify-lightbox-nav chatify-lightbox-nav-next"
-        aria-label="Next image"
+        :aria-label="t('ui.lightbox.next')"
         @click="next"
       >
         <svg class="chatify-lightbox-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">

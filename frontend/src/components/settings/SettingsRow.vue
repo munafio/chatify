@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useChatifyDirection } from '../../composables/useChatifyDirection'
+
 defineProps<{
   label: string
   value?: string
@@ -12,12 +14,14 @@ defineEmits<{
   click: []
   toggle: []
 }>()
+
+const { isRtl } = useChatifyDirection()
 </script>
 
 <template>
   <button
     type="button"
-    class="chatify-settings-row chatify-list-item chatify:flex chatify:w-full chatify:items-center chatify:justify-between chatify:px-4 chatify:py-3 chatify:text-left chatify:transition disabled:chatify:opacity-50"
+    class="chatify-settings-row chatify-list-item chatify:flex chatify:w-full chatify:items-center chatify:justify-between chatify:px-4 chatify:py-3 chatify:text-start chatify:transition disabled:chatify:opacity-50"
     :disabled="disabled"
     @click="toggle ? $emit('toggle') : $emit('click')"
   >
@@ -36,12 +40,18 @@ defineEmits<{
       <slot />
       <svg
         v-if="chevron"
-        class="chatify:h-4 chatify:w-4 chatify:text-chatify-muted"
+        class="chatify-modal-nav-chevron chatify:h-4 chatify:w-4 chatify:shrink-0 chatify:text-chatify-muted"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
+        aria-hidden="true"
       >
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          :d="isRtl ? 'M15 19l-7-7 7-7' : 'M9 5l7 7-7 7'"
+        />
       </svg>
     </span>
   </button>

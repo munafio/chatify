@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useConfigStore } from '../../stores/config'
+import { useChatifyI18n } from '../../composables/useChatifyI18n'
 
 const props = withDefaults(
   defineProps<{
@@ -15,6 +16,7 @@ const props = withDefaults(
 )
 
 const configStore = useConfigStore()
+const { t } = useChatifyI18n()
 const { user, avatarUploadProgress, avatarUploading, avatarRemoving } = storeToRefs(configStore)
 
 const sizeClass = computed(() => {
@@ -50,7 +52,7 @@ const progressLabelClass = computed(() => {
   }
 })
 
-const displayName = computed(() => props.alt || user.value?.attributes.name || 'User')
+const displayName = computed(() => props.alt || user.value?.attributes.name || t('ui.user.default'))
 const avatarSrc = computed(() => user.value?.attributes.avatar ?? '')
 const hasAvatar = computed(() => Boolean(avatarSrc.value))
 const showProgress = computed(() => avatarUploading.value && avatarUploadProgress.value !== null)

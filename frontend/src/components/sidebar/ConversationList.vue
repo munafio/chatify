@@ -9,6 +9,7 @@ import { useConversationsStore } from '../../stores/conversations'
 import { useUiStore } from '../../stores/ui'
 import { useConfigStore } from '../../stores/config'
 import { useBreakpoints } from '../../composables/useBreakpoints'
+import { useChatifyI18n } from '../../composables/useChatifyI18n'
 import { conversationListKey } from '../../utils/sortConversations'
 import {
   buildConversationActionItems,
@@ -26,6 +27,7 @@ const confirmStore = useConfirmStore()
 const uiStore = useUiStore()
 const configStore = useConfigStore()
 const { isMobile } = useBreakpoints()
+const { t } = useChatifyI18n()
 
 const {
   filteredItems,
@@ -129,9 +131,9 @@ async function onMenuSelect(actionId: string) {
     case 'block':
       if (otherUser) {
         const confirmed = await confirmStore.confirm({
-          title: `Block ${otherUser.attributes.name}?`,
-          message: 'They will not be able to message you, and you will not see them in search.',
-          confirmLabel: 'Block',
+          title: t('ui.confirm.block.title', { name: otherUser.attributes.name }),
+          message: t('ui.confirm.block.message'),
+          confirmLabel: t('ui.confirm.block.confirm'),
           variant: 'danger',
         })
         if (confirmed) {
@@ -146,9 +148,9 @@ async function onMenuSelect(actionId: string) {
       break
     case 'hideConversation': {
       const confirmed = await confirmStore.confirm({
-        title: 'Delete conversation?',
-        message: "Remove this chat from your inbox. The other person won't be affected.",
-        confirmLabel: 'Delete conversation',
+        title: t('ui.confirm.delete_conversation.title'),
+        message: t('ui.confirm.delete_conversation.message'),
+        confirmLabel: t('ui.confirm.delete_conversation.confirm'),
         variant: 'danger',
       })
       if (confirmed && configStore.api) {
@@ -160,9 +162,9 @@ async function onMenuSelect(actionId: string) {
     }
     case 'clearSavedMessages': {
       const confirmed = await confirmStore.confirm({
-        title: 'Clear Saved Messages?',
-        message: 'All messages in Saved Messages will be permanently deleted.',
-        confirmLabel: 'Clear chat',
+        title: t('ui.confirm.clear_saved.title'),
+        message: t('ui.confirm.clear_saved.message'),
+        confirmLabel: t('ui.confirm.clear_saved.confirm'),
         variant: 'danger',
       })
       if (confirmed) {
@@ -172,9 +174,9 @@ async function onMenuSelect(actionId: string) {
     }
     case 'leaveGroup': {
       const confirmed = await confirmStore.confirm({
-        title: 'Leave this group?',
-        message: "You won't receive new messages from this group.",
-        confirmLabel: 'Leave group',
+        title: t('ui.confirm.leave_group.title'),
+        message: t('ui.confirm.leave_group.message'),
+        confirmLabel: t('ui.confirm.leave_group.confirm'),
         variant: 'danger',
       })
       if (confirmed && configStore.api) {
@@ -186,9 +188,9 @@ async function onMenuSelect(actionId: string) {
     }
     case 'deleteGroup': {
       const confirmed = await confirmStore.confirm({
-        title: 'Delete group?',
-        message: 'This permanently deletes the group for everyone.',
-        confirmLabel: 'Delete group',
+        title: t('ui.confirm.delete_group.title'),
+        message: t('ui.confirm.delete_group.message'),
+        confirmLabel: t('ui.confirm.delete_group.confirm'),
         variant: 'danger',
       })
       if (confirmed && configStore.api) {
@@ -211,22 +213,22 @@ async function onMenuSelect(actionId: string) {
 
     <EmptyState
       v-else-if="loadFailed"
-      title="Unable to load conversations"
-      description="We couldn't load your conversations right now. Please check your connection and try again."
+      :title="$t('ui.sidebar.errors.load_conversations_title')"
+      :description="$t('ui.sidebar.errors.load_conversations_description')"
     >
       <button
         type="button"
         class="chatify:mt-2 chatify:rounded-lg chatify:bg-chatify-primary chatify:px-4 chatify:py-2 chatify:text-sm chatify:text-white"
         @click="conversationsStore.fetchAll()"
       >
-        Try again
+        {{ $t('ui.sidebar.try_again') }}
       </button>
     </EmptyState>
 
     <EmptyState
       v-else-if="filteredItems.length === 0"
-      title="No conversations yet"
-      description="Start a new chat from contacts search or create a group."
+      :title="$t('ui.sidebar.empty.no_conversations_title')"
+      :description="$t('ui.sidebar.empty.no_conversations_description')"
     />
 
     <template v-else>

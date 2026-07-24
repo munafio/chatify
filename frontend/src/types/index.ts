@@ -211,6 +211,12 @@ export interface BootConfig {
   broadcastAuthUrl: string
   csrfToken: string
   conversationId: string | null
+  webBase: string
+  locale: string
+  fallbackLocale: string
+  dir: 'ltr' | 'rtl'
+  translations: Record<string, unknown>
+  fallbackTranslations?: Record<string, unknown> | null
   appName?: string
   debug: boolean
   groupsEnabled: boolean

@@ -36,7 +36,7 @@ final class ChatBackgroundPatterns
 
             $patterns[] = [
                 'id' => $id,
-                'name' => $name,
+                'name' => self::translatePatternName($id, $name),
                 'url' => $baseUrl.'/'.$filename,
             ];
         }
@@ -67,5 +67,13 @@ final class ChatBackgroundPatterns
     private static function isSafeFilename(string $filename): bool
     {
         return preg_match('/^[a-zA-Z0-9._-]+\.(svg|png|webp)$/i', $filename) === 1;
+    }
+
+    private static function translatePatternName(string $id, string $fallback): string
+    {
+        $key = "chatify.wallpaper.{$id}";
+        $translated = trans($key);
+
+        return $translated !== $key ? $translated : $fallback;
     }
 }

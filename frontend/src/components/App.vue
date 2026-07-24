@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, watch } from 'vue'
+import { onMounted, onUnmounted, provide, watch } from 'vue'
 import type Echo from 'laravel-echo'
 import type {
   BootConfig,
@@ -14,7 +14,9 @@ import type {
   UserTypingPayload,
 } from '../types'
 import { bindEchoConnectionState, bindEchoDisconnect, bindEchoReconnect, subscribeToConversation, subscribeToUserInbox, useEcho } from '../composables/useEcho'
+import { useConversationRouting } from '../composables/useConversationRouting'
 import { createTypingSoundPlayer, useChatSounds } from '../composables/useChatSounds'
+import { CONVERSATION_ROUTING_KEY } from '../constants/dom'
 import { usePresence } from '../composables/usePresence'
 import { tryPlayIncomingMessageSound, resolveMessageSenderId } from '../utils/chatSounds'
 import { useConfigStore } from '../stores/config'
@@ -52,6 +54,9 @@ const { sendOffline: sendPresenceOffline } = usePresence()
 
 const { play: playChatSound } = useChatSounds()
 const playTypingSound = createTypingSoundPlayer(playChatSound)
+const conversationRouting = useConversationRouting()
+
+provide(CONVERSATION_ROUTING_KEY, conversationRouting)
 
 const echo = useEcho(props.config)
 let unsubscribeConversation: (() => void) | null = null

@@ -1,6 +1,10 @@
 import axios from 'axios'
+import { chatifyT } from '../i18n/nonComponent'
 
-export function extractErrorMessage(error: unknown, fallback = 'Something went wrong'): string {
+export function extractErrorMessage(
+  error: unknown,
+  fallback = chatifyT('ui.errors.something_went_wrong'),
+): string {
   if (axios.isAxiosError(error)) {
     const data = error.response?.data as {
       message?: string

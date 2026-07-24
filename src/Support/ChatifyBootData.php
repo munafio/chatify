@@ -8,7 +8,6 @@ use Chatify\Http\Resources\UserResource;
 use Chatify\Services\AttachmentService;
 use Chatify\Services\BlockService;
 use Chatify\Services\UserSettingsService;
-use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
 
 final class ChatifyBootData
@@ -16,6 +15,8 @@ final class ChatifyBootData
     public static function fromRequest(Request $request, ?string $conversationId = null): array
     {
         $user = $request->user();
+        $locale = ChatifyLocale::current();
+        $fallback = ChatifyLocale::fallback();
 
         $broadcast = config('chatify.frontend.broadcast', []);
         $settings = app(UserSettingsService::class)->forUser($user);
@@ -30,7 +31,15 @@ final class ChatifyBootData
             'broadcastAuthUrl' => url('/'.trim(config('chatify.api.prefix', 'api/chatify/v1'), '/').'/broadcasting/auth'),
             'csrfToken' => csrf_token(),
             'conversationId' => $conversationId,
-            'appName' => config('chatify.name', 'Chatify Messenger'),
+            'webBase' => url('/'.trim(config('chatify.web.prefix', 'chatify'), '/')),
+            'locale' => $locale,
+            'fallbackLocale' => $fallback,
+            'dir' => ChatifyLocale::direction($locale),
+            'translations' => ChatifyLocale::translationPayload($locale),
+            'fallbackTranslations' => $locale !== $fallback
+                ? ChatifyLocale::translationPayload($fallback)
+                : null,
+            'appName' => __('chatify::chatify.ui.app_name', ['name' => config('chatify.name', 'Chatify Messenger')]),
             'debug' => (bool) config('app.debug', false),
             'groupsEnabled' => (bool) config('chatify.groups.enabled', true),
             'features' => ChatifyAppearanceConfig::features(),
@@ -80,7 +89,7 @@ final class ChatifyBootData
             ],
             'savedMessages' => [
                 'enabled' => (bool) config('chatify.saved_messages.enabled', true),
-                'title' => config('chatify.saved_messages.title', 'Saved Messages'),
+                'title' => __('chatify::chatify.ui.saved_messages'),
             ],
         ];
     }

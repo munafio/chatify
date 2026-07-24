@@ -22,11 +22,11 @@ trait ValidatesUploadedFiles
             }
 
             $message = match ($file->getError()) {
-                UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE => 'The file exceeds the server upload size limit. Increase upload_max_filesize and post_max_size in php.ini.',
-                UPLOAD_ERR_PARTIAL => 'The file was only partially uploaded. Please try again.',
-                UPLOAD_ERR_NO_FILE => 'No file was uploaded.',
-                UPLOAD_ERR_NO_TMP_DIR, UPLOAD_ERR_CANT_WRITE => 'Server cannot write upload temp files. Set upload_tmp_dir in php.ini to a writable directory (e.g. storage/framework/temp).',
-                default => 'The file failed to upload.',
+                UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE => __('chatify::chatify.errors.upload_exceeds_server_limit'),
+                UPLOAD_ERR_PARTIAL => __('chatify::chatify.errors.upload_partial'),
+                UPLOAD_ERR_NO_FILE => __('chatify::chatify.errors.upload_no_file'),
+                UPLOAD_ERR_NO_TMP_DIR, UPLOAD_ERR_CANT_WRITE => __('chatify::chatify.errors.upload_temp_dir_error'),
+                default => __('chatify::chatify.errors.upload_failed'),
             };
 
             $validator->errors()->add($field, $message);

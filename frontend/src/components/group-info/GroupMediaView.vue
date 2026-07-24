@@ -8,6 +8,7 @@ import { useUiStore } from '../../stores/ui'
 import { jumpToMessage } from '../../utils/jumpToMessage'
 import EmptyState from '../states/EmptyState.vue'
 import GroupMediaSkeleton from '../skeletons/GroupMediaSkeleton.vue'
+import { useChatifyI18n } from '../../composables/useChatifyI18n'
 
 const props = defineProps<{
   conversation: ChatifyConversation
@@ -16,6 +17,7 @@ const props = defineProps<{
 const configStore = useConfigStore()
 const uiStore = useUiStore()
 const { show } = useImageLightbox()
+const { t } = useChatifyI18n()
 
 function isImageItem(item: SharedAttachment): boolean {
   const mime = item.attributes.mime ?? ''
@@ -72,13 +74,19 @@ const initialLoaded = ref(false)
 const emptyCopy = computed(() => {
   switch (tab.value) {
     case 'docs':
-      return { title: 'No documents yet', description: 'Shared documents will appear here.' }
+      return { title: t('ui.group.media.empty.docs_title'), description: t('ui.group.media.empty.docs_description') }
     case 'links':
-      return { title: 'No links yet', description: 'Shared links will appear here.' }
+      return { title: t('ui.group.media.empty.links_title'), description: t('ui.group.media.empty.links_description') }
     default:
-      return { title: 'No media yet', description: 'Photos and videos shared in this group will appear here.' }
+      return { title: t('ui.group.media.empty.media_title'), description: t('ui.group.media.empty.media_description') }
   }
 })
+
+const tabOptions = computed(() => [
+  ['media', t('ui.group.media.tabs.media')] as const,
+  ['docs', t('ui.group.media.tabs.docs')] as const,
+  ['links', t('ui.group.media.tabs.links')] as const,
+])
 
 async function load(reset = false) {
   if (!configStore.api || loading.value) {
@@ -144,7 +152,7 @@ watch(
   <div class="chatify:flex chatify:min-h-0 chatify:flex-1 chatify:flex-col">
     <div class="chatify:mb-3 chatify:flex chatify:gap-4 chatify:border-b chatify:border-chatify-border">
       <button
-        v-for="option in ([['media', 'Media'], ['docs', 'Docs'], ['links', 'Links']] as const)"
+        v-for="option in tabOptions"
         :key="option[0]"
         type="button"
         class="chatify:border-b-2 chatify:px-1 chatify:pb-2 chatify:text-sm"
@@ -198,7 +206,7 @@ watch(
             <li v-for="item in items" :key="`${item.attributes.message_id}-${item.attributes.url}`">
               <button
                 type="button"
-                class="chatify:flex chatify:w-full chatify:items-center chatify:gap-3 chatify:rounded-lg chatify:px-2 chatify:py-3 chatify:text-left chatify:transition chatify:hover:bg-chatify-sidebar"
+                class="chatify:flex chatify:w-full chatify:items-center chatify:gap-3 chatify:rounded-lg chatify:px-2 chatify:py-3 chatify:text-start chatify:transition chatify:hover:bg-chatify-sidebar"
                 @click="goToMessage(item)"
               >
                 <span class="chatify:flex chatify:h-9 chatify:w-9 chatify:shrink-0 chatify:items-center chatify:justify-center chatify:rounded-md chatify:bg-chatify-sidebar chatify:text-chatify-muted">
@@ -207,7 +215,7 @@ watch(
                   </svg>
                 </span>
                 <span class="chatify:min-w-0 chatify:flex-1 chatify:truncate chatify:text-sm chatify:text-chatify-text">
-                  {{ item.attributes.original_name || item.attributes.filename || 'Document' }}
+                  {{ item.attributes.original_name || item.attributes.filename || t('ui.group.media.document') }}
                 </span>
               </button>
             </li>

@@ -86,7 +86,7 @@ final class ParticipantPermissionService
     {
         if ($permissions === null) {
             if (! $allowFullAdmin || ! $this->canPromoteToFullAdmin($conversation, $actorId)) {
-                abort(422, 'Only the group owner can assign full admin permissions.');
+                abort(422, __('chatify::chatify.errors.only_owner_can_assign_full_admin'));
             }
 
             return;
@@ -94,7 +94,7 @@ final class ParticipantPermissionService
 
         foreach (array_keys($permissions) as $key) {
             if (! in_array($key, self::ALL_PERMISSIONS, true)) {
-                abort(422, "Invalid permission key: {$key}");
+                abort(422, __('chatify::chatify.errors.invalid_permission_key', ['key' => $key]));
             }
         }
     }

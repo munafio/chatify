@@ -1,30 +1,51 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, inject, nextTick, onMounted, ref, watch } from 'vue'
+import { MESSAGE_SCROLL_PIN_KEY } from '../../constants/dom'
 import { useConfigStore } from '../../stores/config'
 import type { LinkPreview } from '../../types'
 import { firstLinkUrl, linkify } from '../../utils/linkify'
+import {
+  getLinkPreview,
+  hasLinkPreviewData,
+  setLinkPreview,
+} from '../../utils/linkPreviewCache'
 import LinkPreviewCard from './LinkPreviewCard.vue'
+import LinkPreviewSkeleton from './LinkPreviewSkeleton.vue'
 
 const props = defineProps<{
   body: string
 }>()
 
 const configStore = useConfigStore()
+const scrollPin = inject(MESSAGE_SCROLL_PIN_KEY, null)
 const segments = ref(linkify(props.body))
 const linkPreview = ref<LinkPreview | null>(null)
 const previewLoading = ref(false)
+const previewDismissed = ref(false)
 let previewRequestId = 0
 
-const hasPreviewData = computed(() => {
-  const preview = linkPreview.value
-  if (!preview) {
+const previewUrl = computed(() => firstLinkUrl(props.body))
+
+const showPreviewSlot = computed(() => {
+  if (!previewUrl.value || previewDismissed.value) {
     return false
   }
-  return Boolean(preview.title || preview.description || preview.image)
+  if (previewLoading.value) {
+    return true
+  }
+  return hasLinkPreviewData(linkPreview.value)
 })
+
+function pinScrollIfNearBottom() {
+  if (!scrollPin?.isNearBottom.value) {
+    return
+  }
+  void nextTick(() => scrollPin.scrollToBottom('auto'))
+}
 
 async function loadPreview(url: string) {
   if (!configStore.api) {
+    previewDismissed.value = true
     return
   }
 
@@ -33,12 +54,22 @@ async function loadPreview(url: string) {
 
   try {
     const { data } = await configStore.api.fetchLinkPreview(url)
-    if (requestId === previewRequestId) {
-      linkPreview.value = data.data
+    if (requestId !== previewRequestId) {
+      return
     }
+
+    setLinkPreview(url, data.data)
+
+    if (hasLinkPreviewData(data.data)) {
+      linkPreview.value = data.data
+      pinScrollIfNearBottom()
+      return
+    }
+
+    previewDismissed.value = true
   } catch {
     if (requestId === previewRequestId) {
-      linkPreview.value = null
+      previewDismissed.value = true
     }
   } finally {
     if (requestId === previewRequestId) {
@@ -50,11 +81,26 @@ async function loadPreview(url: string) {
 function syncBody() {
   segments.value = linkify(props.body)
   linkPreview.value = null
+  previewLoading.value = false
+  previewDismissed.value = false
+  previewRequestId += 1
 
   const url = firstLinkUrl(props.body)
-  if (url) {
-    void loadPreview(url)
+  if (!url) {
+    return
   }
+
+  const cached = getLinkPreview(url)
+  if (cached !== undefined) {
+    if (hasLinkPreviewData(cached)) {
+      linkPreview.value = cached
+    } else {
+      previewDismissed.value = true
+    }
+    return
+  }
+
+  void loadPreview(url)
 }
 
 onMounted(syncBody)
@@ -82,6 +128,12 @@ watch(
       </template>
     </p>
 
-    <LinkPreviewCard v-if="linkPreview && hasPreviewData" :preview="linkPreview" />
+    <template v-if="showPreviewSlot">
+      <LinkPreviewSkeleton v-if="previewLoading" />
+      <LinkPreviewCard
+        v-else-if="linkPreview && hasLinkPreviewData(linkPreview)"
+        :preview="linkPreview"
+      />
+    </template>
   </div>
 </template>

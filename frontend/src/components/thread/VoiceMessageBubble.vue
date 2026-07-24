@@ -2,6 +2,7 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import type { MessageAttachment } from '../../types'
 import { clearActiveVoice, setActiveVoice } from '../../utils/voicePlayback'
+import { useChatifyI18n } from '../../composables/useChatifyI18n'
 
 const props = defineProps<{
   attachment: MessageAttachment
@@ -12,6 +13,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   cancel: []
 }>()
+
+const { t } = useChatifyI18n()
 
 const playing = ref(false)
 const ready = ref(false)
@@ -399,12 +402,12 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="chatify:mb-1 chatify:flex chatify:min-w-40 chatify:items-center chatify:gap-2">
+  <div class="chatify:mb-1 chatify:flex chatify:w-full chatify:min-w-0 chatify:max-w-full chatify:items-center chatify:gap-2">
     <button
       v-if="uploading"
       type="button"
       class="chatify-voice-control chatify-voice-control-uploading"
-      aria-label="Cancel sending"
+      :aria-label="t('ui.thread.voice.cancel_sending')"
       @click="emit('cancel')"
     >
       <svg class="chatify-voice-control-spinner chatify:h-8 chatify:w-8" viewBox="0 0 36 36">
@@ -438,7 +441,7 @@ onBeforeUnmount(() => {
       v-else-if="!ready"
       type="button"
       class="chatify-voice-control"
-      aria-label="Loading voice message"
+      :aria-label="t('ui.thread.voice.loading')"
       disabled
     >
       <svg class="chatify-voice-loading chatify:h-5 chatify:w-5" viewBox="0 0 24 24" fill="none">
@@ -451,7 +454,7 @@ onBeforeUnmount(() => {
       v-else
       type="button"
       class="chatify-voice-control"
-      :aria-label="playing ? 'Pause voice message' : 'Play voice message'"
+      :aria-label="playing ? t('ui.thread.voice.pause') : t('ui.thread.voice.play')"
       @click="togglePlayback"
     >
       <svg v-if="!playing" class="chatify:h-4 chatify:w-4" fill="currentColor" viewBox="0 0 24 24">
@@ -467,7 +470,7 @@ onBeforeUnmount(() => {
         class="chatify-voice-wave"
         :class="hasDuration ? 'chatify-voice-wave-seekable' : ''"
         role="slider"
-        aria-label="Seek voice message"
+        :aria-label="t('ui.thread.voice.seek')"
         :aria-valuenow="Math.round(progress)"
         aria-valuemin="0"
         aria-valuemax="100"
@@ -484,7 +487,7 @@ onBeforeUnmount(() => {
           :style="{ height: `${height}%` }"
         />
       </div>
-      <p class="chatify:mt-1 chatify:text-[10px] chatify:text-chatify-muted">
+      <p class="chatify-voice-duration chatify:mt-1 chatify:text-[10px]">
         {{ durationLabel }}
       </p>
     </div>

@@ -5,6 +5,7 @@ import { useContactsStore } from '../../stores/contacts'
 import { useConversationsStore } from '../../stores/conversations'
 import { useUiStore } from '../../stores/ui'
 import { useConfigStore } from '../../stores/config'
+import { useChatifyI18n } from '../../composables/useChatifyI18n'
 import { displayUserAvatar, displayUserName } from '../../utils/userDisplay'
 import EmptyState from '../states/EmptyState.vue'
 
@@ -12,6 +13,7 @@ const contactsStore = useContactsStore()
 const conversationsStore = useConversationsStore()
 const uiStore = useUiStore()
 const configStore = useConfigStore()
+const { t } = useChatifyI18n()
 const { favorites, favoritesLoadFailed } = storeToRefs(contactsStore)
 
 const search = ref('')
@@ -46,7 +48,7 @@ async function openFavorite(userId: number | string) {
       <input
         v-model="search"
         type="search"
-        placeholder="Search favorites"
+        :placeholder="t('ui.sidebar.search_favorites')"
         class="chatify-sidebar-input chatify:w-full chatify:rounded-lg chatify:px-3 chatify:py-2 chatify:text-sm chatify:text-chatify-text"
       />
     </div>
@@ -54,15 +56,15 @@ async function openFavorite(userId: number | string) {
     <EmptyState
       v-if="favoritesLoadFailed"
       class="chatify:flex-1"
-      title="Unable to load favorites"
-      description="We couldn't load your favorite contacts right now. Please check your connection and try again."
+      :title="t('ui.sidebar.errors.load_favorites_title')"
+      :description="t('ui.sidebar.errors.load_favorites_description')"
     >
       <button
         type="button"
         class="chatify:mt-2 chatify:rounded-lg chatify:bg-chatify-primary chatify:px-4 chatify:py-2 chatify:text-sm chatify:text-white"
         @click="contactsStore.fetchFavorites()"
       >
-        Try again
+        {{ $t('ui.sidebar.try_again') }}
       </button>
     </EmptyState>
 
@@ -75,9 +77,9 @@ async function openFavorite(userId: number | string) {
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
         </svg>
       </div>
-      <h3 class="chatify:text-base chatify:font-semibold">No favorites yet</h3>
+      <h3 class="chatify:text-base chatify:font-semibold">{{ $t('ui.sidebar.empty.no_favorites_title') }}</h3>
       <p class="chatify:max-w-xs chatify:text-sm chatify:text-chatify-muted">
-        Open a contact's profile and tap the star to add them here for quick access.
+        {{ $t('ui.sidebar.empty.no_favorites_description') }}
       </p>
     </div>
 
@@ -85,7 +87,7 @@ async function openFavorite(userId: number | string) {
       v-else-if="filteredFavorites.length === 0"
       class="chatify:p-6 chatify:text-center chatify:text-sm chatify:text-chatify-muted"
     >
-      No favorites match your search.
+      {{ $t('ui.sidebar.empty.no_favorites_match') }}
     </p>
 
     <div v-else class="chatify:flex-1 chatify:overflow-y-auto">
@@ -93,7 +95,7 @@ async function openFavorite(userId: number | string) {
         v-for="user in filteredFavorites"
         :key="user.id"
         type="button"
-        class="chatify-list-item chatify:flex chatify:w-full chatify:items-center chatify:gap-3 chatify:px-4 chatify:py-3 chatify:text-left"
+        class="chatify-list-item chatify:flex chatify:w-full chatify:items-center chatify:gap-3 chatify:px-4 chatify:py-3 chatify:text-start"
         @click="openFavorite(user.id)"
       >
         <div class="chatify:h-10 chatify:w-10 chatify:shrink-0">

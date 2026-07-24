@@ -9,6 +9,7 @@ import { getFontById } from '../../themes/fonts'
 import { getPatternById } from '../../themes/patterns'
 import { useConfigStore } from '../../stores/config'
 import { useContactsStore } from '../../stores/contacts'
+import { useChatifyI18n } from '../../composables/useChatifyI18n'
 
 defineEmits<{
   navigate: [screen: 'themes' | 'font' | 'wallpaper' | 'blocked']
@@ -16,6 +17,7 @@ defineEmits<{
 
 const configStore = useConfigStore()
 const contactsStore = useContactsStore()
+const { t } = useChatifyI18n()
 const { preferences, themesEnabled, fontsEnabled, wallpaperEnabled, showOnlineStatus } = storeToRefs(configStore)
 const { blockedUsers } = storeToRefs(contactsStore)
 
@@ -25,23 +27,23 @@ const fontLabel = computed(() => getFontById(preferences.value.fontFamily).label
 const wallpaperLabel = computed(() => {
   const wallpaper = preferences.value.wallpaper
   if (wallpaper.kind === 'none') {
-    return 'None'
+    return t('ui.settings.none')
   }
 
   if (wallpaper.kind === 'image') {
-    return 'Custom photo'
+    return t('ui.settings.custom_photo')
   }
 
-  return getPatternById(wallpaper.patternId)?.name ?? 'Pattern'
+  return getPatternById(wallpaper.patternId)?.name ?? t('ui.settings.pattern')
 })
 
 const blockedContactsLabel = computed(() => {
   const count = blockedUsers.value.length
   if (count === 0) {
-    return 'None'
+    return t('ui.settings.none')
   }
 
-  return count === 1 ? '1 contact' : `${count} contacts`
+  return count === 1 ? t('ui.settings.contact_count') : t('ui.settings.contacts_count', { n: count })
 })
 
 async function toggleOnlineStatus() {
@@ -55,35 +57,35 @@ async function toggleOnlineStatus() {
 
     <SettingsGroup>
       <SettingsRow
-        label="Show online status"
-        :value="showOnlineStatus ? 'On' : 'Off'"
+        :label="t('ui.settings.show_online_status')"
+        :value="showOnlineStatus ? t('ui.settings.on') : t('ui.settings.off')"
         toggle
         :toggle-on="showOnlineStatus"
         @toggle="toggleOnlineStatus"
       />
       <SettingsRow
         v-if="themesEnabled"
-        label="Themes"
+        :label="t('ui.settings.themes')"
         :value="themeLabel"
         chevron
         @click="$emit('navigate', 'themes')"
       />
       <SettingsRow
         v-if="fontsEnabled"
-        label="Font"
+        :label="t('ui.settings.font')"
         :value="fontLabel"
         chevron
         @click="$emit('navigate', 'font')"
       />
       <SettingsRow
         v-if="wallpaperEnabled"
-        label="Wallpaper"
+        :label="t('ui.settings.wallpaper')"
         :value="wallpaperLabel"
         chevron
         @click="$emit('navigate', 'wallpaper')"
       />
       <SettingsRow
-        label="Blocked contacts"
+        :label="t('ui.settings.blocked_contacts')"
         :value="blockedContactsLabel"
         chevron
         @click="$emit('navigate', 'blocked')"

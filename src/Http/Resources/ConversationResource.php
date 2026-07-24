@@ -71,7 +71,7 @@ class ConversationResource extends JsonResource
                     $blockService = app(BlockService::class);
                     $creatorName = $blockService->shouldRevealIdentity($user, $this->creator)
                         ? $this->creator->name
-                        : BlockService::HIDDEN_USER_NAME;
+                        : BlockService::hiddenUserName();
                 }
 
                 $attributes['created_by'] = [
@@ -92,7 +92,7 @@ class ConversationResource extends JsonResource
 
         if ($this->isSaved()) {
             $attributes['is_saved'] = true;
-            $attributes['saved_title'] = config('chatify.saved_messages.title', 'Saved Messages');
+            $attributes['saved_title'] = config('chatify.saved_messages.title', __('chatify::chatify.ui.saved_messages'));
             $attributes['name'] = $attributes['saved_title'];
         }
 

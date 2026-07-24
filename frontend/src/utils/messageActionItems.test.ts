@@ -14,4 +14,14 @@ describe('buildMessageActionItems', () => {
     expect(items.some((item) => item.id === 'edit')).toBe(true)
     expect(items.some((item) => item.id === 'removeForAll')).toBe(true)
   })
+
+  it('omits remove for everyone in saved messages', () => {
+    const items = buildMessageActionItems({
+      isOwn: true,
+      hasCopyableText: false,
+      isSavedConversation: true,
+    })
+    expect(items.some((item) => item.id === 'edit')).toBe(true)
+    expect(items.some((item) => item.id === 'removeForAll')).toBe(false)
+  })
 })

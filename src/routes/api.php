@@ -12,14 +12,27 @@ use Chatify\Http\Controllers\Api\ConversationController;
 use Chatify\Http\Controllers\Api\FavoriteController;
 use Chatify\Http\Controllers\Api\MessageController;
 use Chatify\Http\Controllers\Api\PresenceController;
+use Chatify\Http\Controllers\Api\TranslationsController;
 use Chatify\Http\Controllers\Api\TypingController;
 use Chatify\Http\Controllers\Api\UserController;
 use Chatify\Http\Controllers\Api\UserSettingsController;
+use Chatify\Http\Middleware\SetLocaleFromRequest;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(config('chatify.api.middleware', ['api', 'auth:sanctum']))
+$apiMiddleware = config('chatify.api.middleware', ['api', 'auth:sanctum']);
+
+if (config('chatify.locale.middleware', true)) {
+    $apiMiddleware = array_values(array_unique([
+        SetLocaleFromRequest::class,
+        ...$apiMiddleware,
+    ]));
+}
+
+Route::middleware($apiMiddleware)
     ->prefix(config('chatify.api.prefix', 'api/chatify/v1'))
     ->group(function () {
+        Route::get('translations', TranslationsController::class);
+
         Route::get('conversations', [ConversationController::class, 'index']);
         Route::put('conversations/pin-order', [ConversationController::class, 'reorderPinned']);
         Route::post('conversations/direct', [ConversationController::class, 'storeDirect']);

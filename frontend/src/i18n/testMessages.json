@@ -1,0 +1,435 @@
+{
+    "ui": {
+        "app_name": ":name",
+        "saved_messages": "Saved Messages",
+        "actions": {
+            "conversation": {
+                "pin": "Pin",
+                "unpin": "Unpin",
+                "mark_read": "Mark as read",
+                "contact_info": "Contact info",
+                "favorite": "Favorite",
+                "unfavorite": "Unfavorite",
+                "block": "Block",
+                "unblock": "Unblock",
+                "leave_group": "Leave group",
+                "delete_group": "Delete group",
+                "delete_conversation": "Delete conversation",
+                "group_info": "Group info",
+                "clear_saved": "Clear chat"
+            },
+            "message": {
+                "copy_text": "Copy text",
+                "reply": "Reply",
+                "forward": "Forward",
+                "edit": "Edit",
+                "remove_for_me": "Remove for me",
+                "remove_for_everyone": "Remove for everyone"
+            }
+        },
+        "connection": {
+            "connecting": "Connecting…",
+            "updating": "Updating…",
+            "messenger": "Messenger"
+        },
+        "sidebar": {
+            "chats": "Chats",
+            "favorites": "Favorites",
+            "search_conversations": "Search conversations",
+            "search_favorites": "Search favorites",
+            "settings": "Settings",
+            "new_chat": "New chat",
+            "create_group": "Create group",
+            "navigation": "Sidebar navigation",
+            "empty": {
+                "no_conversations_title": "No conversations yet",
+                "no_conversations_description": "Start a new chat from contacts search or create a group.",
+                "no_favorites_title": "No favorites yet",
+                "no_favorites_description": "Open a contact's profile and tap the star to add them here for quick access.",
+                "no_favorites_match": "No favorites match your search."
+            },
+            "errors": {
+                "load_conversations_title": "Unable to load conversations",
+                "load_conversations_description": "We couldn't load your conversations right now. Please check your connection and try again.",
+                "load_favorites_title": "Unable to load favorites",
+                "load_favorites_description": "We couldn't load your favorite contacts right now. Please check your connection and try again."
+            },
+            "try_again": "Try again",
+            "no_messages_yet": "No messages yet",
+            "online": "Online",
+            "blocked": "Blocked",
+            "pinned": "Pinned",
+            "drag_to_reorder": "Drag to reorder"
+        },
+        "conversation_type": {
+            "group": "Group",
+            "saved": "Saved messages"
+        },
+        "thread": {
+            "select_conversation": {
+                "title": "Select a conversation",
+                "description": "Choose a chat from the sidebar or start a new one."
+            },
+            "drop": {
+                "document": "Drop document to send",
+                "files": "Drop files to send",
+                "media": "Drop photos or videos to send"
+            },
+            "header": {
+                "back": "Back",
+                "group_default": "Group",
+                "search": "Search conversation",
+                "online": "Online"
+            },
+            "search": {
+                "title": "Search messages",
+                "placeholder": "Search",
+                "close": "Close search",
+                "clear": "Clear search",
+                "prompt_title": "Search for messages in this chat",
+                "prompt_description": "Enter at least 2 characters to search.",
+                "no_results_title": "No messages found",
+                "no_results_description": "Try a different search term.",
+                "preview_attachment": "Attachment"
+            },
+            "composer": {
+                "type_message": "Type a message",
+                "send": "Send message",
+                "record_voice": "Record voice message",
+                "attach": "Attach",
+                "photos_videos": "Photos & videos",
+                "document": "Document",
+                "stickers": "Stickers",
+                "search_stickers": "Search stickers",
+                "sticker_load_failed": "Could not load stickers",
+                "sticker_send_failed": "Could not send sticker",
+                "sticker_no_results": "No stickers found",
+                "unblock": "Unblock",
+                "editing_message": "Editing message",
+                "replying_to": "Replying to :preview",
+                "reply_attachment": "attachment",
+                "blocked_by_me": "You blocked this contact.",
+                "blocked_by_them": "You can't message this contact.",
+                "attach_menu_open": "Attach"
+            },
+            "voice": {
+                "cancel_recording": "Cancel recording",
+                "send_voice": "Send voice message",
+                "cancel_sending": "Cancel sending",
+                "loading": "Loading voice message",
+                "pause": "Pause voice message",
+                "play": "Play voice message",
+                "seek": "Seek voice message"
+            },
+            "bubble": {
+                "forwarded": "Forwarded",
+                "edited": "edited",
+                "attachment": "Attachment",
+                "document": "Document",
+                "image": "Image",
+                "link_preview": "Link preview",
+                "message_actions": "Message actions",
+                "cancel_upload": "Cancel upload",
+                "resend": "Resend",
+                "cancel": "Cancel"
+            },
+            "delivery": {
+                "sending": "Sending…",
+                "sending_aria": "Sending"
+            },
+            "scroll": {
+                "to_latest": "Scroll to latest messages"
+            },
+            "empty": {
+                "no_messages_title": "No messages yet",
+                "no_messages_description": "Send a message to start the conversation."
+            },
+            "load_error": {
+                "title": "Couldn't load messages",
+                "description": "Check your connection and try again."
+            }
+        },
+        "modals": {
+            "new_chat": {
+                "title": "New chat",
+                "placeholder": "Search by name or email",
+                "searching": "Searching...",
+                "no_contacts": "No contacts found.",
+                "hint": "Type to find people to message.",
+                "chat": "Chat"
+            },
+            "create_group": {
+                "title": "Create group",
+                "name_placeholder": "Group name",
+                "search_placeholder": "Search contacts by name or email",
+                "searching": "Searching...",
+                "no_contacts": "No contacts found.",
+                "submit": "Create group"
+            },
+            "forward_message": {
+                "title": "Forward message",
+                "search_placeholder": "Search conversations",
+                "no_targets": "No conversations available to forward to.",
+                "forward": "Forward"
+            },
+            "contact_info": {
+                "title": "Contact info",
+                "message": "Message"
+            },
+            "group_info": {
+                "title": "Group info",
+                "add_members": "Add members",
+                "media_links_docs": "Media, links and docs"
+            },
+            "close": "Close",
+            "more_actions": "More actions"
+        },
+        "confirm": {
+            "default_title": "Confirm",
+            "block": {
+                "title": "Block :name?",
+                "message": "They will not be able to message you, and you will not see them in search.",
+                "confirm": "Block"
+            },
+            "unblock": {
+                "title": "Unblock :name?",
+                "message": "They will be able to message you again and appear in search results.",
+                "confirm": "Unblock"
+            },
+            "delete_conversation": {
+                "title": "Delete conversation?",
+                "message": "Remove this chat from your inbox. The other person won't be affected.",
+                "confirm": "Delete conversation"
+            },
+            "clear_saved": {
+                "title": "Clear Saved Messages?",
+                "message": "All messages in Saved Messages will be permanently deleted.",
+                "confirm": "Clear chat"
+            },
+            "leave_group": {
+                "title": "Leave this group?",
+                "message": "You won't receive new messages from this group.",
+                "confirm": "Leave group"
+            },
+            "delete_group": {
+                "title": "Delete group?",
+                "message": "This permanently deletes the group for everyone.",
+                "confirm": "Delete group"
+            },
+            "remove_member": {
+                "title": "Remove :name?",
+                "message": "They won't be able to see new messages in this group.",
+                "confirm": "Remove"
+            },
+            "remove_for_everyone": {
+                "title": "Remove for everyone?",
+                "message": "This message will be deleted for all participants.",
+                "confirm": "Remove"
+            },
+            "transfer_ownership": {
+                "title": "Transfer ownership?",
+                "message": "Make :name the group owner. You will become a full admin and lose delete and ownership transfer powers.",
+                "confirm": "Transfer"
+            }
+        },
+        "toast": {
+            "copied": "Copied to clipboard",
+            "copy_failed": "Unable to copy text",
+            "avatar_upload_failed": "Failed to upload avatar",
+            "avatar_remove_failed": "Failed to remove avatar",
+            "settings_save_failed": "Failed to save settings"
+        },
+        "settings": {
+            "title": "Settings",
+            "themes": "Themes",
+            "font": "Font",
+            "font_title": "Choose font family",
+            "wallpaper": "Wallpaper",
+            "blocked_contacts": "Blocked contacts",
+            "show_online_status": "Show online status",
+            "on": "On",
+            "off": "Off",
+            "none": "None",
+            "custom_photo": "Custom photo",
+            "pattern": "Pattern",
+            "contact_count": "1 contact",
+            "contacts_count": ":n contacts",
+            "change_photo": "Change photo",
+            "remove_photo": "Remove photo",
+            "avatar_options": "Avatar options",
+            "close_settings": "Close settings",
+            "blur_wallpaper": "Blur wallpaper",
+            "blur_intensity": "Intensity",
+            "upload": "Upload",
+            "custom_wallpaper": "Custom wallpaper",
+            "remove_wallpaper": "Remove wallpaper",
+            "search": "Search",
+            "select_accent_color": "Select accent color :hex",
+            "pick_custom_color": "Pick custom color",
+            "custom_color": "Custom color :hex",
+            "blocked": {
+                "intro": "Blocked contacts cannot message you and are hidden from search. You can unblock them here at any time.",
+                "search_placeholder": "Search blocked contacts",
+                "load_failed_title": "Unable to load blocked contacts",
+                "load_failed_description": "We couldn't load your blocked contacts right now. Please check your connection and try again.",
+                "loading": "Loading blocked contacts…",
+                "empty_title": "No blocked contacts",
+                "empty_description": "People you block from a chat or contact profile will appear here.",
+                "no_match": "No blocked contacts match your search.",
+                "unblock": "Unblock"
+            }
+        },
+        "group": {
+            "info": {
+                "add_members": "Add members",
+                "search": "Search",
+                "media_links_docs": "Media, links and docs",
+                "view_all": "View all",
+                "leave_group": "Leave group",
+                "delete_group": "Delete group",
+                "search_members": "Search members",
+                "edit_name": "Edit group name",
+                "name_placeholder": "Add group description",
+                "description_placeholder": "Add group description"
+            },
+            "members": {
+                "search_contacts": "Search contacts",
+                "search_members": "Search members",
+                "add_member": "Add member",
+                "already_member": "Already a member",
+                "adding": "Adding…",
+                "add": "Add",
+                "no_members_title": "No members found",
+                "no_members_description": "Try a different search term.",
+                "search_to_add_title": "Search contacts to add",
+                "search_to_add_description": "Type a name to find people to add to this group.",
+                "no_contacts_title": "No contacts found",
+                "no_contacts_description": "Try a different search term.",
+                "added": "Added",
+                "change_role": "Change role",
+                "transfer_ownership": "Transfer ownership",
+                "remove_member": "Remove member"
+            },
+            "media": {
+                "tabs": {
+                    "media": "Media",
+                    "docs": "Docs",
+                    "links": "Links"
+                },
+                "empty": {
+                    "media_title": "No media yet",
+                    "media_description": "Photos and videos shared in this group will appear here.",
+                    "docs_title": "No documents yet",
+                    "docs_description": "Shared documents will appear here.",
+                    "links_title": "No links yet",
+                    "links_description": "Shared links will appear here."
+                },
+                "document": "Document"
+            },
+            "roles": {
+                "sheet_title": "Member role",
+                "full_admin": "Full group admin",
+                "limited_admin": "Limited admin",
+                "moderator": "Moderator",
+                "member": "Member",
+                "permissions": {
+                    "edit_info": "Edit group info",
+                    "add_members": "Add members",
+                    "remove_members": "Remove members",
+                    "manage_admins": "Manage admins"
+                }
+            }
+        },
+        "format": {
+            "group_label": "Group",
+            "member_count": ":n member",
+            "member_count_plural": ":n members",
+            "group_created_by": "Group created by :creator",
+            "group_created_by_on": "Group created by :creator, on :date at :time"
+        },
+        "user": {
+            "you": "You",
+            "unknown_user": "Unknown User",
+            "sender": "Sender",
+            "default": "User"
+        },
+        "fonts": {
+            "system": "System font",
+            "segoe": "Segoe UI",
+            "arial": "Arial",
+            "helvetica": "Helvetica",
+            "georgia": "Georgia",
+            "times": "Times New Roman",
+            "courier": "Courier New",
+            "verdana": "Verdana",
+            "tahoma": "Tahoma",
+            "trebuchet": "Trebuchet MS",
+            "palatino": "Palatino",
+            "garamond": "Garamond",
+            "consolas": "Consolas",
+            "calibri": "Calibri",
+            "cambria": "Cambria",
+            "lucida": "Lucida Sans",
+            "impact": "Impact",
+            "comic": "Comic Sans MS"
+        },
+        "common": {
+            "confirm": "Confirm",
+            "cancel": "Cancel",
+            "save": "Save",
+            "saving": "Saving…",
+            "try_again": "Try again",
+            "searching": "Searching...",
+            "loading": "Loading…",
+            "close": "Close",
+            "back": "Back"
+        },
+        "errors": {
+            "something_went_wrong": "Something went wrong",
+            "failed_load_messages": "Failed to load messages",
+            "search_failed": "Search failed",
+            "failed_upload_avatar": "Failed to upload avatar",
+            "failed_remove_avatar": "Failed to remove avatar",
+            "failed_save_settings": "Failed to save settings"
+        },
+        "attachment": {
+            "attachment": "Attachment",
+            "forwarded": "Forwarded",
+            "uploading": "Uploading :progress%"
+        }
+    },
+    "system_messages": {
+        "participant_added": ":actor added :targets",
+        "participant_removed": ":actor removed :target",
+        "participant_left": ":user left",
+        "you": "You",
+        "member": "Member",
+        "members": "members",
+        "list_and": ":names and :last",
+        "list_comma": ":names, :last"
+    },
+    "dates": {
+        "today": "Today",
+        "yesterday": "Yesterday"
+    },
+    "themes": {
+        "classic": "Classic",
+        "day": "Day",
+        "tinted": "Tinted",
+        "night": "Night"
+    },
+    "wallpaper": {
+        "bubbles": "Bubbles",
+        "circuit": "Circuit",
+        "glamorous": "Glamorous",
+        "hideout": "Hideout"
+    },
+    "roles": {
+        "owner": "Owner",
+        "admin": "Admin",
+        "limited_admin": "Limited admin",
+        "moderator": "Moderator",
+        "member": "Member",
+        "unknown": "Unknown"
+    }
+}

@@ -3,6 +3,8 @@ import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useTyping } from '../../composables/useTyping'
 import { useVoiceRecorder } from '../../composables/useVoiceRecorder'
+import { useChatifyI18n } from '../../composables/useChatifyI18n'
+import { useChatifyDirection } from '../../composables/useChatifyDirection'
 import { stopAllVoicePlayback } from '../../utils/voicePlayback'
 import { useConfigStore } from '../../stores/config'
 import { useConfirmStore } from '../../stores/confirm'
@@ -22,10 +24,13 @@ const configStore = useConfigStore()
 const conversationsStore = useConversationsStore()
 const contactsStore = useContactsStore()
 const confirmStore = useConfirmStore()
+const { t } = useChatifyI18n()
+const { dir } = useChatifyDirection()
 const giphyEnabled = computed(() => configStore.giphyEnabled)
 const { replyToMessage, editingMessage } = storeToRefs(messagesStore)
 
 const body = ref('')
+const composerDir = computed(() => (body.value.trim() ? 'auto' : dir.value))
 const attachments = ref<File[]>([])
 const previewUrls = ref<string[]>([])
 const mediaInput = ref<HTMLInputElement | null>(null)
@@ -65,10 +70,11 @@ const mediaAccept = [
 
 const modeLabel = computed(() => {
   if (editingMessage.value) {
-    return 'Editing message'
+    return t('ui.thread.composer.editing_message')
   }
   if (replyToMessage.value) {
-    return `Replying to ${replyToMessage.value.attributes.body?.slice(0, 80) ?? 'attachment'}`
+    const preview = replyToMessage.value.attributes.body?.slice(0, 80) ?? t('ui.thread.composer.reply_attachment')
+    return t('ui.thread.composer.replying_to', { preview })
   }
   return ''
 })
@@ -104,9 +110,9 @@ async function unblockContact() {
   }
 
   const confirmed = await confirmStore.confirm({
-    title: `Unblock ${otherUser.value.attributes.name}?`,
-    message: 'They will be able to message you again and appear in search results.',
-    confirmLabel: 'Unblock',
+    title: t('ui.confirm.unblock.title', { name: otherUser.value.attributes.name }),
+    message: t('ui.confirm.unblock.message'),
+    confirmLabel: t('ui.confirm.unblock.confirm'),
   })
 
   if (confirmed) {
@@ -210,7 +216,7 @@ function buildReplyPreview() {
   return {
     id: reply.id,
     body: reply.attributes.body,
-    sender_name: isOwnReplyTarget ? 'You' : 'Reply',
+    sender_name: isOwnReplyTarget ? t('ui.user.you') : t('ui.actions.message.reply'),
   }
 }
 
@@ -389,10 +395,10 @@ defineExpose({
       class="chatify-composer-blocked-banner"
     >
       <p v-if="blockedByMe">
-        You blocked this contact.
+        {{ $t('ui.thread.composer.blocked_by_me') }}
       </p>
       <p v-else>
-        You can't message this contact.
+        {{ $t('ui.thread.composer.blocked_by_them') }}
       </p>
       <button
         v-if="blockedByMe"
@@ -400,7 +406,7 @@ defineExpose({
         class="chatify-composer-blocked-action"
         @click="unblockContact"
       >
-        Unblock
+        {{ $t('ui.thread.composer.unblock') }}
       </button>
     </div>
 
@@ -491,8 +497,9 @@ defineExpose({
         ref="textareaRef"
         v-model="body"
         rows="1"
-        placeholder="Type a message"
-        class="chatify-composer-input chatify-composer-floating-input"
+        :dir="composerDir"
+        :placeholder="$t('ui.thread.composer.type_message')"
+        class="chatify-composer-input chatify-composer-floating-input chatify:text-start"
         @keydown="onKeydown"
         @input="onInput"
         @focus="closePopups"
@@ -503,7 +510,7 @@ defineExpose({
         type="button"
         class="chatify-composer-send-btn"
         :disabled="!hasContent && !editingMessage"
-        aria-label="Send message"
+        :aria-label="$t('ui.thread.composer.send')"
         @click="send"
       >
         <svg class="chatify:h-5 chatify:w-5" fill="currentColor" viewBox="0 0 24 24">
@@ -515,7 +522,7 @@ defineExpose({
         v-else
         type="button"
         class="chatify-composer-mic-btn"
-        aria-label="Record voice message"
+        :aria-label="$t('ui.thread.composer.record_voice')"
         @click="beginVoiceRecording"
       >
         <svg class="chatify:h-5 chatify:w-5" fill="currentColor" viewBox="0 0 24 24">

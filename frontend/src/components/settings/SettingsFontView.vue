@@ -2,8 +2,10 @@
 import { computed, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useConfigStore } from '../../stores/config'
+import { useChatifyI18n } from '../../composables/useChatifyI18n'
 
 const configStore = useConfigStore()
+const { t } = useChatifyI18n()
 const { preferences, fontOptions } = storeToRefs(configStore)
 
 const query = ref('')
@@ -27,7 +29,7 @@ function selectFont(fontId: string) {
     <input
       v-model="query"
       type="search"
-      placeholder="Search"
+      :placeholder="t('ui.settings.search')"
       class="chatify-settings-input chatify:w-full chatify:rounded-lg chatify:px-3 chatify:py-2 chatify:text-sm chatify:text-chatify-text"
     />
 
@@ -36,7 +38,7 @@ function selectFont(fontId: string) {
         v-for="font in filteredFonts"
         :key="font.id"
         type="button"
-        class="chatify-list-item chatify:flex chatify:w-full chatify:items-center chatify:gap-3 chatify:border-b chatify-border-soft chatify:px-4 chatify:py-3 chatify:text-left chatify:last:border-b-0"
+        class="chatify-list-item chatify:flex chatify:w-full chatify:items-center chatify:gap-3 chatify:border-b chatify-border-soft chatify:px-4 chatify:py-3 chatify:text-start chatify:last:border-b-0"
         @click="selectFont(font.id)"
       >
         <span

@@ -12,7 +12,10 @@ use Illuminate\Support\Str;
 
 final class BlockService
 {
-    public const HIDDEN_USER_NAME = 'Unknown User';
+    public static function hiddenUserName(): string
+    {
+        return __('chatify::chatify.errors.unknown_user');
+    }
 
     public function __construct(
         private readonly FavoriteService $favoriteService,

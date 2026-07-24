@@ -16,7 +16,7 @@ final class ConversationPinService
     {
         if ($conversation->isSaved()) {
             throw ValidationException::withMessages([
-                'conversation' => ['Saved Messages cannot be pinned.'],
+                'conversation' => [__('chatify::chatify.errors.saved_messages_cannot_be_pinned')],
             ]);
         }
 
@@ -54,14 +54,14 @@ final class ConversationPinService
 
         if (count($conversationIds) !== count($pinnedIds)) {
             throw ValidationException::withMessages([
-                'conversation_ids' => ['Pinned conversation order must include all pinned conversations.'],
+                'conversation_ids' => [__('chatify::chatify.errors.pin_order_must_include_all')],
             ]);
         }
 
         foreach ($conversationIds as $conversationId) {
             if (! in_array((string) $conversationId, $pinnedIds, true)) {
                 throw ValidationException::withMessages([
-                    'conversation_ids' => ['Only pinned conversations can be reordered.'],
+                    'conversation_ids' => [__('chatify::chatify.errors.only_pinned_can_be_reordered')],
                 ]);
             }
         }
@@ -84,7 +84,7 @@ final class ConversationPinService
 
         if ($participant === null) {
             throw ValidationException::withMessages([
-                'conversation' => ['You are not a participant in this conversation.'],
+                'conversation' => [__('chatify::chatify.errors.not_participant')],
             ]);
         }
 

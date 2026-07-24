@@ -28,7 +28,7 @@ class FavoriteController extends Controller
         $target = ChatifyModels::userClass()::query()->findOrFail($user);
 
         if ((int) $request->user()->getKey() === (int) $target->getKey()) {
-            abort(422, 'You cannot favorite yourself.');
+            abort(422, __('chatify::chatify.errors.cannot_favorite_self'));
         }
 
         $favorited = $action->handle($request->user(), $target);

@@ -2,6 +2,8 @@
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useDebouncedWatch } from '../../composables/useDebouncedFn'
 import { useGiphy, type GiphySticker } from '../../composables/useGiphy'
+import { useChatifyI18n } from '../../composables/useChatifyI18n'
+import SearchField from '../ui/SearchField.vue'
 
 const emit = defineEmits<{
   select: [file: File]
@@ -9,6 +11,7 @@ const emit = defineEmits<{
 }>()
 
 const { isEnabled, searchStickers, trendingStickers, fetchStickerAsFile } = useGiphy()
+const { t } = useChatifyI18n()
 
 const open = ref(false)
 const query = ref('')
@@ -35,7 +38,7 @@ async function loadStickers(search = '') {
       ? await searchStickers(search)
       : await trendingStickers()
   } catch {
-    error.value = 'Could not load stickers'
+    error.value = t('ui.thread.composer.sticker_load_failed')
     stickers.value = []
   } finally {
     loading.value = false
@@ -68,7 +71,7 @@ async function selectSticker(sticker: GiphySticker) {
     close()
     emit('select', file)
   } catch {
-    error.value = 'Could not send sticker'
+    error.value = t('ui.thread.composer.sticker_send_failed')
   } finally {
     selectingId.value = null
   }
@@ -114,7 +117,7 @@ defineExpose({ close, toggle })
       type="button"
       class="chatify-composer-icon-btn"
       :class="open ? 'chatify-composer-icon-btn-active' : ''"
-      aria-label="Stickers"
+      :aria-label="t('ui.thread.composer.stickers')"
       :disabled="!isEnabled"
       :aria-expanded="open"
       @click.stop="toggle"
@@ -129,11 +132,11 @@ defineExpose({ close, toggle })
       class="chatify-sticker-picker chatify-composer-popover"
     >
       <div class="chatify-sticker-picker-search">
-        <input
+        <SearchField
           v-model="query"
-          type="search"
-          placeholder="Search stickers"
-          class="chatify-sticker-picker-input"
+          :placeholder="t('ui.thread.composer.search_stickers')"
+          :clear-label="t('ui.thread.search.clear')"
+          input-class="chatify-sticker-picker-input chatify:py-2 chatify:text-sm chatify:text-chatify-text"
         />
       </div>
 
@@ -146,7 +149,7 @@ defineExpose({ close, toggle })
           />
         </div>
         <div v-else-if="error" class="chatify-sticker-picker-state">{{ error }}</div>
-        <div v-else-if="stickers.length === 0" class="chatify-sticker-picker-state">No stickers found</div>
+        <div v-else-if="stickers.length === 0" class="chatify-sticker-picker-state">{{ $t('ui.thread.composer.sticker_no_results') }}</div>
         <div v-else class="chatify-sticker-picker-grid">
           <button
             v-for="sticker in stickers"

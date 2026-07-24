@@ -128,6 +128,6 @@ class MessageResource extends JsonResource
 
         return $blockService->shouldRevealIdentity($viewer, $sender)
             ? $sender->name
-            : BlockService::HIDDEN_USER_NAME;
+            : BlockService::hiddenUserName();
     }
 }

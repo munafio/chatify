@@ -41,6 +41,6 @@ export function firstLinkUrl(text: string | null | undefined): string | null {
     return null
   }
 
-  const match = text.match(URL_PATTERN)
+  const match = text.match(/https?:\/\/[^\s<>"\])]+/i)
   return match?.[0] ?? null
 }

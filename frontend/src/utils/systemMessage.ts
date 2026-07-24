@@ -1,3 +1,4 @@
+import { chatifyT } from '../i18n/nonComponent'
 import type { ChatifyMessage } from '../types'
 
 export type SystemMessageEvent = 'participant_added' | 'participant_removed' | 'participant_left'
@@ -18,15 +19,15 @@ function displayName(
   currentUserId?: number | string,
 ): string {
   if (currentUserId !== undefined && String(userId) === String(currentUserId)) {
-    return 'You'
+    return chatifyT('system_messages.you')
   }
 
-  return nameFor(String(userId)) ?? 'Member'
+  return nameFor(String(userId)) ?? chatifyT('system_messages.member')
 }
 
 function joinNames(names: string[]): string {
   if (names.length === 0) {
-    return 'members'
+    return chatifyT('system_messages.members')
   }
 
   if (names.length === 1) {
@@ -34,10 +35,13 @@ function joinNames(names: string[]): string {
   }
 
   if (names.length === 2) {
-    return `${names[0]} and ${names[1]}`
+    return chatifyT('system_messages.list_and', { names: names[0], last: names[1] })
   }
 
-  return `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`
+  return chatifyT('system_messages.list_comma', {
+    names: names.slice(0, -1).join(', '),
+    last: names[names.length - 1],
+  })
 }
 
 export function formatSystemMessage(
@@ -54,14 +58,17 @@ export function formatSystemMessage(
   const actorName = displayName(event.actor_user_id, nameFor, currentUserId)
   const targetNames = event.target_user_ids.map((id) => displayName(id, nameFor, currentUserId))
   const targets = joinNames(targetNames)
+  const youLabel = chatifyT('system_messages.you')
 
   switch (event.event) {
     case 'participant_added':
-      return `${actorName} added ${targets}`
+      return chatifyT('system_messages.participant_added', { actor: actorName, targets })
     case 'participant_removed':
-      return `${actorName} removed ${targets}`
+      return chatifyT('system_messages.participant_removed', { actor: actorName, target: targets })
     case 'participant_left':
-      return targetNames[0] === 'You' ? 'You left' : `${targets} left`
+      return chatifyT('system_messages.participant_left', {
+        user: targetNames[0] === youLabel ? youLabel : targets,
+      })
     default:
       return message.attributes.body ?? ''
   }

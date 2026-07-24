@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onBeforeUnmount, watch } from 'vue'
 import { CHATIFY_TELEPORT_TARGET } from '../../constants/dom'
+import { useChatifyI18n } from '../../composables/useChatifyI18n'
 
 const props = defineProps<{
   title: string
@@ -13,6 +14,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   close: []
 }>()
+
+const { t } = useChatifyI18n()
 
 function onKeydown(event: KeyboardEvent) {
   if (event.key !== 'Escape' || !props.open) {
@@ -71,7 +74,7 @@ onBeforeUnmount(() => {
             <button
               type="button"
               class="chatify:rounded-full chatify:p-1 chatify:hover:bg-chatify-border"
-              aria-label="Close"
+              :aria-label="t('ui.modals.close')"
               @click="$emit('close')"
             >
               <svg class="chatify:h-5 chatify:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

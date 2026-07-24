@@ -30,7 +30,7 @@ final class ForwardMessage
 
         if ($participant === null) {
             throw ValidationException::withMessages([
-                'message' => ['You cannot forward this message.'],
+                'message' => [__('chatify::chatify.errors.cannot_forward_message')],
             ]);
         }
 
@@ -39,7 +39,7 @@ final class ForwardMessage
 
         if ($sourceMessage->kind === 'system') {
             throw ValidationException::withMessages([
-                'message' => ['System messages cannot be forwarded.'],
+                'message' => [__('chatify::chatify.errors.system_messages_cannot_be_forwarded')],
             ]);
         }
 

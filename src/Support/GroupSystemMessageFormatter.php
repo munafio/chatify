@@ -11,19 +11,25 @@ final class GroupSystemMessageFormatter
 {
     public static function participantAdded(Model $actor, iterable $targets): string
     {
-        $names = self::joinNames(self::names($targets));
-
-        return "{$actor->name} added {$names}";
+        return trans('chatify::chatify.system_messages.participant_added', [
+            'actor' => $actor->name,
+            'targets' => self::joinNames(self::names($targets)),
+        ]);
     }
 
     public static function participantRemoved(Model $actor, Model $target): string
     {
-        return "{$actor->name} removed {$target->name}";
+        return trans('chatify::chatify.system_messages.participant_removed', [
+            'actor' => $actor->name,
+            'target' => $target->name,
+        ]);
     }
 
     public static function participantLeft(Model $user): string
     {
-        return "{$user->name} left";
+        return trans('chatify::chatify.system_messages.participant_left', [
+            'user' => $user->name,
+        ]);
     }
 
     private static function names(iterable $users): array
@@ -37,7 +43,7 @@ final class GroupSystemMessageFormatter
     private static function joinNames(array $names): string
     {
         if ($names === []) {
-            return 'members';
+            return trans('chatify::chatify.system_messages.members');
         }
 
         if (count($names) === 1) {
@@ -46,6 +52,16 @@ final class GroupSystemMessageFormatter
 
         $last = array_pop($names);
 
-        return implode(', ', $names).' and '.$last;
+        if (count($names) === 1) {
+            return trans('chatify::chatify.system_messages.list_and', [
+                'names' => $names[0],
+                'last' => $last,
+            ]);
+        }
+
+        return trans('chatify::chatify.system_messages.list_comma', [
+            'names' => implode(', ', $names),
+            'last' => $last,
+        ]);
     }
 }

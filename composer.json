@@ -1,5 +1,6 @@
 {
   "name": "munafio/chatify",
+  "version": "2.0.0-beta.1",
   "description": "A Laravel package for real-time chat with conversation-based architecture.",
   "type": "library",
   "license": "MIT",

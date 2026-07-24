@@ -17,4 +17,10 @@ describe('linkify', () => {
   it('extracts the first URL from a message body', () => {
     expect(firstLinkUrl('Check https://a.test and https://b.test')).toBe('https://a.test')
   })
+
+  it('extracts the first URL after linkify has run', () => {
+    const body = 'See https://example.com now'
+    linkify(body)
+    expect(firstLinkUrl(body)).toBe('https://example.com')
+  })
 })

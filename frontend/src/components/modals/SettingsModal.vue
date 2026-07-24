@@ -13,12 +13,14 @@ import type { ChatifyThemePreferences } from '../../themes/types'
 import { useConfigStore } from '../../stores/config'
 import { useSettingsStore } from '../../stores/settings'
 import { useUiStore } from '../../stores/ui'
+import { useChatifyI18n } from '../../composables/useChatifyI18n'
 
 type SettingsScreen = 'root' | 'themes' | 'font' | 'wallpaper' | 'blocked'
 
 const uiStore = useUiStore()
 const configStore = useConfigStore()
 const settingsStore = useSettingsStore()
+const { t } = useChatifyI18n()
 const { activeModal } = storeToRefs(uiStore)
 const { saving } = storeToRefs(settingsStore)
 const { isDirty } = storeToRefs(configStore)
@@ -30,13 +32,13 @@ const draftSnapshots = ref<ChatifyThemePreferences[]>([])
 
 const open = computed(() => activeModal.value === 'settings')
 
-const titles: Record<SettingsScreen, string> = {
-  root: 'Settings',
-  themes: 'Themes',
-  font: 'Choose font family',
-  wallpaper: 'Wallpaper',
-  blocked: 'Blocked contacts',
-}
+const titles = computed<Record<SettingsScreen, string>>(() => ({
+  root: t('ui.settings.title'),
+  themes: t('ui.settings.themes'),
+  font: t('ui.settings.font_title'),
+  wallpaper: t('ui.settings.wallpaper'),
+  blocked: t('ui.settings.blocked_contacts'),
+}))
 
 const screensWithFooter = new Set<SettingsScreen>(['themes', 'font', 'wallpaper'])
 
@@ -103,7 +105,7 @@ async function saveChanges() {
 <template>
   <BaseModal
     :open="open"
-    title="Settings"
+    :title="t('ui.settings.title')"
     size="md"
     bare
     panel-class="chatify-settings-modal"
@@ -135,7 +137,7 @@ async function saveChanges() {
           :disabled="saving"
           @click="cancelChanges"
         >
-          Cancel
+          {{ $t('ui.common.cancel') }}
         </button>
         <button
           type="button"
@@ -143,7 +145,7 @@ async function saveChanges() {
           :disabled="saving || !isDirty"
           @click="saveChanges"
         >
-          {{ saving ? 'Saving…' : 'Save' }}
+          {{ saving ? $t('ui.common.saving') : $t('ui.common.save') }}
         </button>
       </template>
     </SettingsNavShell>

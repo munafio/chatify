@@ -2,8 +2,10 @@ import { describe, expect, it, vi } from 'vitest'
 import axios from 'axios'
 import { createApiClient, createChatifyApi } from '../api/client'
 import type { BootConfig } from '../types'
+import { TEST_BOOT_I18N } from '../i18n/bootLocale'
 
 const bootConfig: BootConfig = {
+  ...TEST_BOOT_I18N,
   user: {
     type: 'user',
     id: 1,
@@ -13,6 +15,7 @@ const bootConfig: BootConfig = {
   broadcastAuthUrl: 'https://example.test/api/chatify/v1/broadcasting/auth',
   csrfToken: 'test-csrf-token',
   conversationId: null,
+  webBase: '/chatify',
   debug: false,
   groupsEnabled: true,
   features: {

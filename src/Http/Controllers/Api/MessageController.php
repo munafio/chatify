@@ -45,7 +45,7 @@ class MessageController extends Controller
         $query = trim($request->string('q')->toString());
 
         if (mb_strlen($query) < 2) {
-            abort(422, 'Search query must be at least 2 characters.');
+            abort(422, __('chatify::chatify.errors.search_query_min_length'));
         }
 
         $messages = $messageService->search(
@@ -100,7 +100,7 @@ class MessageController extends Controller
     {
         $scope = $request->string('scope', 'all')->toString();
         if (! in_array($scope, ['me', 'all'], true)) {
-            abort(422, 'Invalid delete scope.');
+            abort(422, __('chatify::chatify.errors.invalid_delete_scope'));
         }
 
         $this->authorize($scope === 'me' ? 'hide' : 'delete', $message);

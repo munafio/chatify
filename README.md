@@ -1,10 +1,14 @@
 <p style="text-align:center;width:100%;"><img src="/art/preview.png" alt="Chatify Laravel Package"></p>
 
 <p align="center">
-<a href="https://github.com/laravel/telescope/actions"><img src="https://poser.pugx.org/munafio/chatify/v/stable?style=flat-square" alt="Build Status"></a>
+<a href="https://github.com/munafio/chatify/actions/workflows/tests.yml"><img src="https://github.com/munafio/chatify/actions/workflows/tests.yml/badge.svg" alt="Tests"></a>
+<a href="https://packagist.org/packages/munafio/chatify"><img src="https://poser.pugx.org/munafio/chatify/v/stable?style=flat-square" alt="Latest Stable Version"></a>
 <a href="https://packagist.org/packages/munafio/chatify"><img src="https://poser.pugx.org/munafio/chatify/downloads?style=flat-square" alt="Total Downloads"></a>
 <a href="https://packagist.org/packages/munafio/chatify"><img src="https://poser.pugx.org/munafio/chatify/license?style=flat-square" alt="License"></a>
 </p>
+
+> **v2 beta:** Install with `composer require munafio/chatify:2.0.0-beta.1`.
+> v1 remains stable on `^1.6`. See [Releases](https://github.com/munafio/chatify/releases) for upgrade notes.
 
 ## Chatify Laravel Package
 
@@ -46,9 +50,9 @@ So, [join now](https://discord.gg/RaxyKVykYJ) and keep updated.
 
 The official documentation can be found [here](https://chatify.munafio.com)
 
-## Change log
+## Releases
 
-[CHANGELOG.md](https://github.com/munafio/chatify/blob/master/CHANGELOG.md)
+See [GitHub Releases](https://github.com/munafio/chatify/releases) for version history and upgrade notes.
 
 ## Author
 

@@ -11,6 +11,7 @@ import { useConfigStore } from '../../stores/config'
 import { useConnectionStore } from '../../stores/connection'
 import { storeToRefs } from 'pinia'
 import { connectionStatusLabel } from '../../utils/connectionLabel'
+import { useChatifyI18n } from '../../composables/useChatifyI18n'
 
 const props = defineProps<{
   conversation: ChatifyConversation
@@ -29,6 +30,7 @@ const connectionStore = useConnectionStore()
 const { defaultAvatarUrl, savedMessagesTitle } = storeToRefs(configStore)
 const { messagingBlockedUserIds } = storeToRefs(contactsStore)
 const { uiState } = storeToRefs(connectionStore)
+const { t } = useChatifyI18n()
 
 const isSaved = computed(() => isSavedConversation(props.conversation))
 
@@ -42,7 +44,7 @@ const displayName = computed(() => {
   }
 
   if (props.conversation.attributes.conversation_type === 'group') {
-    return props.conversation.attributes.name ?? 'Group'
+    return props.conversation.attributes.name ?? t('ui.thread.header.group_default')
   }
 
   const user = otherUser.value
@@ -90,10 +92,10 @@ const directOnlineLabel = computed(() => {
   }
 
   if (!presenceStore.canShowPresence()) {
-    return 'tap for contact info'
+    return t('ui.presence.tap_for_contact_info')
   }
 
-  return presenceStore.visibleOnline(otherUser.value.id) ? 'Online' : 'Offline'
+  return presenceStore.visibleOnline(otherUser.value.id) ? t('ui.presence.online') : t('ui.presence.offline')
 })
 
 const connectionLabel = computed(() => connectionStatusLabel(uiState.value))
@@ -104,7 +106,7 @@ const threadSubtitle = computed(() => {
   }
 
   if (isSaved.value) {
-    return 'Message yourself'
+    return t('ui.presence.message_yourself')
   }
 
   if (props.conversation.attributes.conversation_type === 'group') {
@@ -146,7 +148,7 @@ function openInfo(conversation: ChatifyConversation) {
       v-if="showBack"
       type="button"
       class="chatify:rounded-full chatify:p-2 chatify:hover:bg-chatify-border"
-      aria-label="Back"
+      :aria-label="$t('ui.thread.header.back')"
       @click="$emit('back')"
     >
       <svg class="chatify:h-5 chatify:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -157,7 +159,7 @@ function openInfo(conversation: ChatifyConversation) {
     <button
       v-if="conversation.attributes.conversation_type === 'group' || canOpenDirectInfo"
       type="button"
-      class="chatify:flex chatify:min-w-0 chatify:flex-1 chatify:cursor-pointer chatify:items-center chatify:gap-3 chatify:text-left"
+      class="chatify:flex chatify:min-w-0 chatify:flex-1 chatify:cursor-pointer chatify:items-center chatify:gap-3 chatify:text-start"
       @click="openInfo(conversation)"
     >
       <div class="chatify:relative chatify:shrink-0">
@@ -178,7 +180,7 @@ function openInfo(conversation: ChatifyConversation) {
         <span
           v-if="conversation.attributes.conversation_type === 'direct' && otherUser && !contactsStore.isMessagingBlocked(otherUser.id) && presenceStore.visibleOnline(otherUser.id)"
           class="chatify-presence-dot"
-          aria-label="Online"
+          :aria-label="$t('ui.thread.header.online')"
         />
       </div>
       <div
@@ -240,10 +242,9 @@ function openInfo(conversation: ChatifyConversation) {
     </div>
 
     <button
-      v-if="conversation.attributes.conversation_type === 'group'"
       type="button"
       class="chatify:rounded-full chatify:p-2 chatify:hover:bg-chatify-border"
-      aria-label="Search conversation"
+      :aria-label="$t('ui.thread.header.search')"
       @click="uiStore.openMessageSearch()"
     >
       <svg class="chatify:h-5 chatify:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

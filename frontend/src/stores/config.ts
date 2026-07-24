@@ -14,6 +14,7 @@ import { fontOptions } from '../themes/fonts'
 import { getThemeById, themePresets } from '../themes/presets'
 import type { ChatifyThemePreferences, WallpaperPreferences } from '../themes/types'
 import type { BootConfig } from '../types'
+import { chatifyT } from '../i18n/nonComponent'
 import { extractErrorMessage } from '../utils/errors'
 import { useToastStore } from './toast'
 import { wallpaperPatterns } from '../themes/patterns'
@@ -72,8 +73,9 @@ export const useConfigStore = defineStore('config', () => {
   const defaultAvatarUrl = computed(() => boot.value?.default_avatar_url ?? boot.value?.user.attributes.avatar ?? '')
 
   const soundsEnabled = computed(() => boot.value?.sounds?.enabled ?? false)
-  const savedMessagesTitle = computed(() => boot.value?.savedMessages?.title ?? 'Saved Messages')
+  const savedMessagesTitle = computed(() => boot.value?.savedMessages?.title ?? chatifyT('ui.saved_messages'))
   const savedMessagesEnabled = computed(() => boot.value?.savedMessages?.enabled ?? false)
+  const dir = computed(() => boot.value?.dir ?? 'ltr')
 
   const showOnlineStatus = ref(true)
 
@@ -220,7 +222,7 @@ export const useConfigStore = defineStore('config', () => {
       setUserAvatar(previousAvatar)
       revokeActiveAvatarPreview()
       toastStore.show({
-        message: extractErrorMessage(err, 'Failed to upload avatar'),
+        message: extractErrorMessage(err, chatifyT('ui.errors.failed_upload_avatar')),
         icon: 'error',
         placement: 'bottom',
       })
@@ -253,7 +255,7 @@ export const useConfigStore = defineStore('config', () => {
     } catch (err) {
       setUserAvatar(previousAvatar)
       toastStore.show({
-        message: extractErrorMessage(err, 'Failed to remove avatar'),
+        message: extractErrorMessage(err, chatifyT('ui.errors.failed_remove_avatar')),
         icon: 'error',
         placement: 'bottom',
       })
@@ -351,6 +353,7 @@ export const useConfigStore = defineStore('config', () => {
     soundsEnabled,
     savedMessagesTitle,
     savedMessagesEnabled,
+    dir,
     init,
     updateDraft,
     setTheme,

@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { chatifyT } from '../i18n/nonComponent'
 
 export type ConfirmVariant = 'default' | 'danger'
 
@@ -21,8 +22,8 @@ export const useConfirmStore = defineStore('confirm', () => {
     }
 
     options.value = {
-      confirmLabel: 'Confirm',
-      cancelLabel: 'Cancel',
+      confirmLabel: chatifyT('ui.common.confirm'),
+      cancelLabel: chatifyT('ui.common.cancel'),
       variant: 'default',
       ...payload,
     }

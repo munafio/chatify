@@ -176,11 +176,11 @@ final class AttachmentService
         $allowed = config('chatify.attachments.allowed_images', ['png', 'jpg', 'jpeg', 'gif']);
 
         if (! in_array(strtolower($file->getClientOriginalExtension()), $allowed, true)) {
-            throw new \InvalidArgumentException('Image file type not allowed.');
+            throw new \InvalidArgumentException(__('chatify::chatify.errors.image_type_not_allowed'));
         }
 
         if ($file->getSize() > $this->maxBytes()) {
-            throw new \InvalidArgumentException('Image file is too large.');
+            throw new \InvalidArgumentException(__('chatify::chatify.errors.image_too_large'));
         }
 
         $extension = strtolower($file->getClientOriginalExtension());
@@ -431,11 +431,11 @@ final class AttachmentService
         );
 
         if (! in_array(strtolower($file->getClientOriginalExtension()), $allowed, true)) {
-            throw new \InvalidArgumentException('File extension not allowed.');
+            throw new \InvalidArgumentException(__('chatify::chatify.errors.file_extension_not_allowed'));
         }
 
         if ($file->getSize() > $this->maxBytes()) {
-            throw new \InvalidArgumentException('File is too large.');
+            throw new \InvalidArgumentException(__('chatify::chatify.errors.file_too_large'));
         }
     }
 

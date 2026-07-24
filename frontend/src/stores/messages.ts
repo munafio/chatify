@@ -8,6 +8,7 @@ import {
   revokeBlobUrls,
   type OutboundMessageDraft,
 } from '../utils/outboundMessage'
+import { chatifyT } from '../i18n/nonComponent'
 import { filterMessagesFromBlockedSenders, isBlockedSender } from '../utils/blockMessaging'
 import { playChatSound } from '../composables/useChatSounds'
 import { useConfigStore } from './config'
@@ -327,7 +328,7 @@ export const useMessagesStore = defineStore('messages', () => {
         pendingScrollToBottom.value = true
       }
     } catch {
-      bucket.error = 'Failed to load messages'
+      bucket.error = chatifyT('ui.errors.failed_load_messages')
     } finally {
       bucket.loading = false
       bucket.loadingOlder = false

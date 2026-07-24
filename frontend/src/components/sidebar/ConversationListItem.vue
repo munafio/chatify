@@ -7,6 +7,7 @@ import { displayUserAvatar, displayUserName, HIDDEN_USER_NAME } from '../../util
 import { useContactsStore } from '../../stores/contacts'
 import { usePresenceStore } from '../../stores/presence'
 import { useConfigStore } from '../../stores/config'
+import { useChatifyI18n } from '../../composables/useChatifyI18n'
 
 const props = defineProps<{
   conversation: ChatifyConversation
@@ -24,6 +25,7 @@ const contactsStore = useContactsStore()
 const configStore = useConfigStore()
 const { defaultAvatarUrl, savedMessagesTitle } = storeToRefs(configStore)
 const { messagingBlockedUserIds } = storeToRefs(contactsStore)
+const { t } = useChatifyI18n()
 
 const isSaved = computed(() => isSavedConversation(props.conversation))
 
@@ -37,7 +39,7 @@ const displayName = computed(() => {
   }
 
   if (props.conversation.attributes.conversation_type === 'group') {
-    return props.conversation.attributes.name ?? 'Group'
+    return props.conversation.attributes.name ?? t('ui.format.group_label')
   }
 
   const otherUser = props.conversation.relationships.other_user
@@ -92,7 +94,7 @@ const showBlockedIcon = computed(() =>
 <template>
   <button
     type="button"
-    class="chatify-list-item chatify:flex chatify:w-full chatify:items-center chatify:gap-3 chatify:px-4 chatify:py-3 chatify:text-left"
+    class="chatify-list-item chatify:flex chatify:w-full chatify:items-center chatify:gap-3 chatify:px-4 chatify:py-3 chatify:text-start"
     :class="{ 'chatify-list-item-active': active }"
     @click="$emit('select')"
   >
@@ -120,7 +122,7 @@ const showBlockedIcon = computed(() =>
       <span
         v-if="showPresenceDot"
         class="chatify-presence-dot"
-        aria-label="Online"
+        :aria-label="$t('ui.sidebar.online')"
       />
     </div>
 
@@ -136,7 +138,7 @@ const showBlockedIcon = computed(() =>
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
-            aria-label="Blocked"
+            :aria-label="$t('ui.sidebar.blocked')"
           >
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
           </svg>
@@ -145,7 +147,7 @@ const showBlockedIcon = computed(() =>
             class="chatify:h-3.5 chatify:w-3.5 chatify:shrink-0 chatify:text-chatify-muted"
             fill="currentColor"
             viewBox="0 0 24 24"
-            aria-label="Pinned"
+            :aria-label="$t('ui.sidebar.pinned')"
           >
             <path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z" />
           </svg>
@@ -154,7 +156,7 @@ const showBlockedIcon = computed(() =>
           <div
             v-if="draggable"
             class="chatify-conversation-drag-handle chatify:flex chatify:h-6 chatify:w-5 chatify:cursor-grab chatify:items-center chatify:justify-center chatify:rounded chatify:text-chatify-muted chatify:opacity-60 hover:chatify:opacity-100"
-            aria-label="Drag to reorder"
+            :aria-label="$t('ui.sidebar.drag_to_reorder')"
             @click.stop
           >
             <svg class="chatify:h-4 chatify:w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -173,7 +175,7 @@ const showBlockedIcon = computed(() =>
       </div>
       <div class="chatify:flex chatify:items-center chatify:justify-between chatify:gap-2">
         <p class="chatify:truncate chatify:text-xs chatify:text-chatify-muted">
-          {{ truncate(conversation.relationships.last_message?.attributes.body ?? 'No messages yet') }}
+          {{ truncate(conversation.relationships.last_message?.attributes.body ?? t('ui.sidebar.no_messages_yet')) }}
         </p>
         <span
           v-if="conversation.attributes.unread_count > 0"

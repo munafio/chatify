@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { MessageAttachment } from '../../types'
+import { useChatifyI18n } from '../../composables/useChatifyI18n'
 
 const props = defineProps<{
   attachment: MessageAttachment
@@ -12,7 +13,9 @@ const emit = defineEmits<{
   cancel: []
 }>()
 
-const displayName = computed(() => props.attachment.original_name ?? props.attachment.filename ?? 'Document')
+const { t } = useChatifyI18n()
+
+const displayName = computed(() => props.attachment.original_name ?? props.attachment.filename ?? t('ui.thread.bubble.document'))
 
 const extension = computed(() => {
   const name = displayName.value
@@ -39,7 +42,7 @@ const extension = computed(() => {
     <span class="chatify-doc-card-body">
       <span class="chatify-doc-card-name">{{ displayName }}</span>
       <span class="chatify-doc-card-meta">
-        <template v-if="uploading">Uploading {{ progress ?? 0 }}%</template>
+        <template v-if="uploading">{{ t('ui.attachment.uploading', { progress: progress ?? 0 }) }}</template>
         <template v-else>{{ extension }}</template>
       </span>
       <span v-if="uploading" class="chatify-doc-card-progress">
@@ -51,7 +54,7 @@ const extension = computed(() => {
       v-if="uploading"
       type="button"
       class="chatify-doc-card-cancel"
-      aria-label="Cancel upload"
+      :aria-label="t('ui.thread.bubble.cancel_upload')"
       @click.prevent="emit('cancel')"
     >
       ✕

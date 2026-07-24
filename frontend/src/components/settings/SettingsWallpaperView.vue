@@ -3,8 +3,10 @@ import { computed, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { PATTERN_TILE_SIZE } from '../../themes/patterns'
 import { useConfigStore } from '../../stores/config'
+import { useChatifyI18n } from '../../composables/useChatifyI18n'
 
 const configStore = useConfigStore()
+const { t } = useChatifyI18n()
 const { preferences, pendingWallpaperPreview, wallpaperPatterns } = storeToRefs(configStore)
 
 const fileInput = ref<HTMLInputElement | null>(null)
@@ -70,7 +72,7 @@ const previewUrl = (url: string) => `url("${url}")`
           : 'chatify-border-soft chatify:text-chatify-muted'"
         @click="selectNone"
       >
-        None
+        {{ $t('ui.settings.none') }}
       </button>
 
       <button
@@ -109,21 +111,21 @@ const previewUrl = (url: string) => `url("${url}")`
         <img
           v-if="hasStoredImage"
           :src="storedImageUrl || undefined"
-          alt="Custom wallpaper"
+          :alt="t('ui.settings.custom_wallpaper')"
           class="chatify:h-full chatify:w-full chatify:object-cover"
         />
         <div
           v-else
           class="chatify:flex chatify:h-full chatify:w-full chatify:flex-col chatify:items-center chatify:justify-center chatify:bg-chatify-sidebar chatify:text-xs chatify:text-chatify-muted"
         >
-          Upload
+          {{ $t('ui.settings.upload') }}
         </div>
 
         <button
           v-if="hasStoredImage"
           type="button"
-          class="chatify:absolute chatify:right-1 chatify:top-1 chatify:flex chatify:h-5 chatify:w-5 chatify:items-center chatify:justify-center chatify:rounded-full chatify:bg-black/60 chatify:text-white chatify:hover:bg-black/80"
-          aria-label="Remove wallpaper"
+          class="chatify:absolute chatify:end-1 chatify:top-1 chatify:flex chatify:h-5 chatify:w-5 chatify:items-center chatify:justify-center chatify:rounded-full chatify:bg-black/60 chatify:text-white chatify:hover:bg-black/80"
+          :aria-label="t('ui.settings.remove_wallpaper')"
           @click="removeStoredImage"
         >
           <svg class="chatify:h-3 chatify:w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -143,7 +145,7 @@ const previewUrl = (url: string) => `url("${url}")`
 
     <div v-if="showBlurControls" class="chatify:space-y-3 chatify:rounded-xl chatify:border chatify-border-soft chatify:p-3">
       <div class="chatify:flex chatify:items-center chatify:justify-between chatify:gap-3">
-        <span class="chatify:text-sm chatify:text-chatify-text">Blur wallpaper</span>
+        <span class="chatify:text-sm chatify:text-chatify-text">{{ $t('ui.settings.blur_wallpaper') }}</span>
         <button
           type="button"
           class="chatify-settings-toggle chatify:shrink-0"
@@ -156,7 +158,7 @@ const previewUrl = (url: string) => `url("${url}")`
 
       <div v-if="preferences.wallpaper.blurEnabled" class="chatify:space-y-2">
         <div class="chatify:flex chatify:items-center chatify:justify-between chatify:text-xs chatify:text-chatify-muted">
-          <span>Intensity</span>
+          <span>{{ $t('ui.settings.blur_intensity') }}</span>
           <span>{{ preferences.wallpaper.blurAmount }}%</span>
         </div>
         <input

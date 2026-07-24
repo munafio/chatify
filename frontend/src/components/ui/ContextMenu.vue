@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { CHATIFY_TELEPORT_TARGET } from '../../constants/dom'
+import { floatingMenuPositionFromPoint } from '../../utils/floatingMenuPosition'
 
 export interface ContextMenuItem {
   id: string
@@ -24,7 +25,7 @@ const emit = defineEmits<{
 }>()
 
 const menu = ref<HTMLElement | null>(null)
-const menuStyle = ref<{ top: string; left: string }>({ top: '0px', left: '0px' })
+const menuStyle = ref({ x: 0, y: 0 })
 
 function close() {
   emit('close')
@@ -48,27 +49,7 @@ function updatePosition() {
   const menuHeight = menuEl.offsetHeight
   const margin = 8
 
-  let left = props.x
-  let top = props.y
-
-  if (left + menuWidth > window.innerWidth - margin) {
-    left = window.innerWidth - menuWidth - margin
-  }
-  if (left < margin) {
-    left = margin
-  }
-
-  if (top + menuHeight > window.innerHeight - margin) {
-    top = props.y - menuHeight
-  }
-  if (top < margin) {
-    top = margin
-  }
-
-  menuStyle.value = {
-    top: `${top}px`,
-    left: `${left}px`,
-  }
+  menuStyle.value = floatingMenuPositionFromPoint(props.x, props.y, menuWidth, menuHeight, margin)
 }
 
 function onDocumentPointerDown(event: MouseEvent) {
@@ -135,7 +116,7 @@ onBeforeUnmount(() => {
         ref="menu"
         class="chatify-context-menu"
         role="menu"
-        :style="menuStyle"
+        :style="{ top: `${menuStyle.y}px`, left: `${menuStyle.x}px` }"
         @contextmenu.prevent
       >
         <template v-for="item in items" :key="item.id">

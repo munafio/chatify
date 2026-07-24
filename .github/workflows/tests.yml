@@ -1,0 +1,104 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - master
+      - v2
+      - 'v2.*'
+  pull_request:
+    branches:
+      - master
+      - v2
+      - 'v2.*'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  php-tests:
+    name: php-tests (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.2', '8.3']
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: sqlite3
+          coverage: none
+
+      - name: Install Composer dependencies
+        run: composer install --prefer-stable --no-interaction --no-progress
+
+      - name: Run PHPUnit
+        run: composer test
+
+  frontend-tests:
+    name: frontend-tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install npm dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Run Vitest
+        working-directory: frontend
+        run: npm test
+
+      - name: Typecheck and build
+        working-directory: frontend
+        run: npm run build
+
+  verify-dist:
+    name: verify-dist
+    runs-on: ubuntu-latest
+    needs: frontend-tests
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install npm dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build frontend assets
+        working-directory: frontend
+        run: npm run build
+
+      - name: Verify committed dist/ matches build
+        run: |
+          if ! git diff --exit-code dist/; then
+            echo "::error::dist/ is out of date. Run 'npm run build' in frontend/ and commit dist/."
+            exit 1
+          fi

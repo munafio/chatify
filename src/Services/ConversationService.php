@@ -132,7 +132,7 @@ final class ConversationService
 
         if ($participant->role === ConversationParticipant::ROLE_OWNER) {
             throw ValidationException::withMessages([
-                'user_id' => ['Cannot remove the group owner. Transfer ownership first.'],
+                'user_id' => [__('chatify::chatify.errors.cannot_remove_group_owner')],
             ]);
         }
 
@@ -155,13 +155,13 @@ final class ConversationService
 
         if ($fromId === $toId) {
             throw ValidationException::withMessages([
-                'user_id' => ['Cannot transfer ownership to yourself.'],
+                'user_id' => [__('chatify::chatify.errors.cannot_transfer_ownership_to_self')],
             ]);
         }
 
         if (! $this->isOwner($conversation, $fromId)) {
             throw ValidationException::withMessages([
-                'conversation' => ['Only the group owner can transfer ownership.'],
+                'conversation' => [__('chatify::chatify.errors.only_owner_can_transfer_ownership')],
             ]);
         }
 
@@ -169,7 +169,7 @@ final class ConversationService
 
         if ($targetParticipant === null) {
             throw ValidationException::withMessages([
-                'user_id' => ['Target user must be a group member.'],
+                'user_id' => [__('chatify::chatify.errors.target_must_be_group_member')],
             ]);
         }
 
@@ -202,13 +202,13 @@ final class ConversationService
 
         if ($participant === null) {
             throw ValidationException::withMessages([
-                'user_id' => ['User is not a group member.'],
+                'user_id' => [__('chatify::chatify.errors.user_not_group_member')],
             ]);
         }
 
         if ($participant->role === ConversationParticipant::ROLE_OWNER) {
             throw ValidationException::withMessages([
-                'role' => ['Cannot change the owner role directly. Use transfer ownership.'],
+                'role' => [__('chatify::chatify.errors.cannot_change_owner_role')],
             ]);
         }
 
@@ -218,7 +218,7 @@ final class ConversationService
             ConversationParticipant::ROLE_MEMBER,
         ], true)) {
             throw ValidationException::withMessages([
-                'role' => ['Invalid role.'],
+                'role' => [__('chatify::chatify.errors.invalid_role')],
             ]);
         }
 
@@ -292,7 +292,7 @@ final class ConversationService
 
         if ($this->isOwner($conversation, $userId)) {
             throw ValidationException::withMessages([
-                'conversation' => ['Group owner cannot leave. Transfer ownership or delete the group instead.'],
+                'conversation' => [__('chatify::chatify.errors.group_owner_cannot_leave')],
             ]);
         }
 
@@ -334,7 +334,7 @@ final class ConversationService
             $conversation = ChatifyModels::conversationClass()::query()->create([
                 'id' => (string) Str::uuid(),
                 'type' => Conversation::TYPE_SAVED,
-                'name' => config('chatify.saved_messages.title', 'Saved Messages'),
+                'name' => config('chatify.saved_messages.title', __('chatify::chatify.ui.saved_messages')),
                 'created_by' => $user->getKey(),
             ]);
 
@@ -411,7 +411,7 @@ final class ConversationService
     {
         if (! $conversation->isGroup()) {
             throw ValidationException::withMessages([
-                'conversation' => ['This action is only available for group conversations.'],
+                'conversation' => [__('chatify::chatify.errors.group_only_action')],
             ]);
         }
     }
@@ -423,13 +423,13 @@ final class ConversationService
 
         if ($count < $min) {
             throw ValidationException::withMessages([
-                'user_ids' => ["A group must have at least {$min} participants."],
+                'user_ids' => [__('chatify::chatify.errors.group_min_participants', ['min' => $min])],
             ]);
         }
 
         if ($count > $max) {
             throw ValidationException::withMessages([
-                'user_ids' => ["A group cannot exceed {$max} participants."],
+                'user_ids' => [__('chatify::chatify.errors.group_max_participants', ['max' => $max])],
             ]);
         }
     }

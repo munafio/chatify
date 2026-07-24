@@ -1,3 +1,5 @@
+import { chatifyT } from '../i18n/nonComponent'
+
 export type MessageActionId =
   | 'copy'
   | 'edit'
@@ -13,35 +15,49 @@ export interface MessageActionItem {
   separatorBefore?: boolean
 }
 
+const ACTION_LABEL_KEYS: Record<MessageActionId, string> = {
+  copy: 'ui.actions.message.copy_text',
+  edit: 'ui.actions.message.edit',
+  reply: 'ui.actions.message.reply',
+  forward: 'ui.actions.message.forward',
+  removeForMe: 'ui.actions.message.remove_for_me',
+  removeForAll: 'ui.actions.message.remove_for_everyone',
+}
+
+function actionLabel(id: MessageActionId): string {
+  return chatifyT(ACTION_LABEL_KEYS[id])
+}
+
 export function buildMessageActionItems(options: {
   isOwn: boolean
   hasCopyableText: boolean
+  isSavedConversation?: boolean
 }): MessageActionItem[] {
   const items: MessageActionItem[] = []
 
   if (options.hasCopyableText) {
-    items.push({ id: 'copy', label: 'Copy text' })
+    items.push({ id: 'copy', label: actionLabel('copy') })
   }
 
   items.push(
-    { id: 'reply', label: 'Reply', separatorBefore: items.length > 0 },
-    { id: 'forward', label: 'Forward' },
+    { id: 'reply', label: actionLabel('reply'), separatorBefore: items.length > 0 },
+    { id: 'forward', label: actionLabel('forward') },
   )
 
   if (options.isOwn) {
-    items.push({ id: 'edit', label: 'Edit' })
+    items.push({ id: 'edit', label: actionLabel('edit') })
   }
 
   items.push({
     id: 'removeForMe',
-    label: 'Remove for me',
+    label: actionLabel('removeForMe'),
     separatorBefore: true,
   })
 
-  if (options.isOwn) {
+  if (options.isOwn && !options.isSavedConversation) {
     items.push({
       id: 'removeForAll',
-      label: 'Remove for everyone',
+      label: actionLabel('removeForAll'),
       danger: true,
     })
   }

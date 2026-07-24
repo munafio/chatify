@@ -1,0 +1,39 @@
+name: Feature Request
+description: Suggest a new feature or improvement
+title: '[Feature]: '
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting an improvement. For questions, see [Discord](https://discord.gg/RaxyKVykYJ) or the [docs](https://chatify.munafio.com).
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or use case
+      description: What problem does this solve? Who benefits?
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: How would you like this to work?
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Any alternative approaches you considered.
+
+  - type: dropdown
+    id: pr
+    attributes:
+      label: Are you willing to submit a PR?
+      options:
+        - 'Yes'
+        - 'No'
+        - 'Maybe, with guidance'

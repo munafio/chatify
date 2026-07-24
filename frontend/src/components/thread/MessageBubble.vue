@@ -7,6 +7,7 @@ import { copyPlainText } from '../../utils/copyText'
 import { bubbleTextClass } from '../../themes/utils'
 import { useImageLightbox } from '../../composables/useImageLightbox'
 import { useToastStore } from '../../stores/toast'
+import { useChatifyI18n } from '../../composables/useChatifyI18n'
 import MessageAlbumBubble from './MessageAlbumBubble.vue'
 import MessageActionsMenu from './MessageActionsMenu.vue'
 import MessageBody from './MessageBody.vue'
@@ -18,6 +19,7 @@ const props = defineProps<{
   message: ChatifyMessage
   isOwn: boolean
   isGroup?: boolean
+  isSavedConversation?: boolean
   senderName?: string
   showSenderName?: boolean
   clusterSpacing?: 'tight' | 'normal'
@@ -36,6 +38,7 @@ const emit = defineEmits<{
 
 const { show } = useImageLightbox()
 const toastStore = useToastStore()
+const { t } = useChatifyI18n()
 const actionsMenuRef = ref<InstanceType<typeof MessageActionsMenu> | null>(null)
 
 const localStatus = computed(() => props.message.attributes.local_status ?? null)
@@ -105,7 +108,7 @@ async function onCopyText() {
 
   const copied = await copyPlainText(body)
   toastStore.show({
-    message: copied ? 'Copied to clipboard' : 'Unable to copy text',
+    message: copied ? t('ui.toast.copied') : t('ui.toast.copy_failed'),
     icon: copied ? 'success' : 'error',
   })
 }
@@ -114,11 +117,14 @@ async function onCopyText() {
 <template>
   <div
     class="chatify:flex chatify:w-full chatify:flex-col chatify:gap-1"
-    :class="spacingClass"
+    :class="[
+      spacingClass,
+      isOwn ? 'chatify:items-end' : 'chatify:items-start',
+    ]"
   >
     <div
-      class="chatify:group chatify:flex chatify:w-full chatify:items-end chatify:gap-1"
-      :class="isOwn ? 'chatify:justify-end' : 'chatify:justify-start'"
+      class="chatify:group chatify-message-row chatify:flex chatify:min-w-0 chatify:items-end chatify:gap-1"
+      :class="isOwn ? 'chatify-message-row-outgoing' : ''"
       @contextmenu="onContextMenu"
     >
       <MessageActionsMenu
@@ -126,6 +132,7 @@ async function onCopyText() {
         ref="actionsMenuRef"
         :is-own="isOwn"
         :has-copyable-text="hasCopyableText"
+        :is-saved-conversation="isSavedConversation"
         @edit="emit('edit')"
         @remove-for-me="emit('removeForMe')"
         @remove-for-all="emit('removeForAll')"
@@ -135,7 +142,7 @@ async function onCopyText() {
       />
 
       <div
-        class="chatify-message-bubble chatify:max-w-[75%] chatify:rounded-lg chatify:px-3 chatify:py-2 chatify:shadow-sm"
+        class="chatify-message-bubble chatify:min-w-0 chatify:max-w-full chatify:overflow-hidden chatify:rounded-lg chatify:px-3 chatify:py-2 chatify:shadow-sm"
         :class="[
           isOwn ? `chatify-message-bubble-out chatify:bg-chatify-bubble-out ${bubbleTextClass(true)}` : `chatify-message-bubble-in chatify:bg-chatify-bubble-in ${bubbleTextClass(false)}`,
           localStatus === 'sending' ? 'chatify-message-pending' : '',
@@ -151,19 +158,19 @@ async function onCopyText() {
 
         <div
           v-if="message.attributes.forwarded_from"
-          class="chatify:mb-2 chatify:border-l-2 chatify:border-chatify-primary chatify:pl-2 chatify:text-xs chatify:italic chatify:opacity-80"
+          class="chatify:mb-2 chatify:border-s-2 chatify:border-chatify-primary chatify:ps-2 chatify:text-xs chatify:italic chatify:opacity-80"
         >
-          <p>Forwarded</p>
+          <p>{{ $t('ui.thread.bubble.forwarded') }}</p>
         </div>
 
         <button
           v-if="message.attributes.reply_to"
           type="button"
-          class="chatify:mb-2 chatify:block chatify:w-full chatify:cursor-pointer chatify:rounded chatify:border-l-2 chatify:border-chatify-primary chatify:bg-black/5 chatify:px-2 chatify:py-1 chatify:text-left chatify:text-xs chatify:opacity-80 chatify:transition chatify:hover:opacity-100"
+          class="chatify:mb-2 chatify:block chatify:w-full chatify:cursor-pointer chatify:rounded chatify:border-s-2 chatify:border-chatify-primary chatify:bg-black/5 chatify:px-2 chatify:py-1 chatify:text-start chatify:text-xs chatify:opacity-80 chatify:transition chatify:hover:opacity-100"
           @click="emit('jumpTo', message.attributes.reply_to.id)"
         >
           <span class="chatify:block chatify:font-semibold">{{ message.attributes.reply_to.sender_name }}</span>
-          <span class="chatify:block chatify:truncate">{{ message.attributes.reply_to.body || 'Attachment' }}</span>
+          <span class="chatify:block chatify:truncate">{{ message.attributes.reply_to.body || $t('ui.thread.bubble.attachment') }}</span>
         </button>
 
         <div v-if="isImageAlbum()" class="chatify:relative">
@@ -176,7 +183,7 @@ async function onCopyText() {
             <button
               type="button"
               class="chatify-attachment-progress-cancel"
-              aria-label="Cancel upload"
+              :aria-label="$t('ui.thread.bubble.cancel_upload')"
               @click="emit('cancel')"
             >
               ✕
@@ -195,7 +202,7 @@ async function onCopyText() {
 
           <div
             v-else-if="isVideoAttachment() && message.attributes.attachment"
-            class="chatify:relative chatify:mb-1 chatify:inline-block chatify:overflow-hidden chatify:rounded-md"
+            class="chatify:relative chatify:mb-1 chatify:block chatify:max-w-full chatify:overflow-hidden chatify:rounded-md"
           >
             <video
               :src="message.attributes.attachment.url"
@@ -211,7 +218,7 @@ async function onCopyText() {
               <button
                 type="button"
                 class="chatify-attachment-progress-cancel"
-                aria-label="Cancel upload"
+                :aria-label="$t('ui.thread.bubble.cancel_upload')"
                 @click="emit('cancel')"
               >
                 ✕
@@ -221,7 +228,7 @@ async function onCopyText() {
 
           <div
             v-else-if="message.attributes.attachment?.type === 'image'"
-            class="chatify:relative chatify:mb-1 chatify:inline-block chatify:overflow-hidden chatify:rounded-md"
+            class="chatify:relative chatify:mb-1 chatify:block chatify:max-w-full chatify:overflow-hidden chatify:rounded-md"
           >
             <div
               v-if="!imageLoaded"
@@ -235,7 +242,7 @@ async function onCopyText() {
             >
               <img
                 :src="message.attributes.attachment.url"
-                :alt="message.attributes.attachment.original_name ?? 'Attachment'"
+                :alt="message.attributes.attachment.original_name ?? t('ui.thread.bubble.attachment')"
                 class="chatify:max-h-40 chatify:max-w-[11rem] chatify:object-cover"
                 @load="imageLoaded = true"
                 @error="imageLoaded = true"
@@ -249,7 +256,7 @@ async function onCopyText() {
               <button
                 type="button"
                 class="chatify-attachment-progress-cancel"
-                aria-label="Cancel upload"
+                :aria-label="$t('ui.thread.bubble.cancel_upload')"
                 @click="emit('cancel')"
               >
                 ✕
@@ -272,7 +279,7 @@ async function onCopyText() {
         />
 
         <div class="chatify-message-meta chatify:mt-1 chatify:flex chatify:items-center chatify:justify-end chatify:gap-1">
-          <span v-if="message.attributes.edited_at" class="chatify:text-[10px] chatify:italic">edited</span>
+          <span v-if="message.attributes.edited_at" class="chatify:text-[10px] chatify:italic">{{ $t('ui.thread.bubble.edited') }}</span>
           <span class="chatify:text-[10px]">
             {{ formatMessageTime(message.attributes.created_at) }}
           </span>
@@ -290,6 +297,7 @@ async function onCopyText() {
         ref="actionsMenuRef"
         :is-own="isOwn"
         :has-copyable-text="hasCopyableText"
+        :is-saved-conversation="isSavedConversation"
         @edit="emit('edit')"
         @remove-for-me="emit('removeForMe')"
         @remove-for-all="emit('removeForAll')"
@@ -301,21 +309,21 @@ async function onCopyText() {
 
     <div
       v-if="isOwn && localStatus === 'failed'"
-      class="chatify:flex chatify:justify-end chatify:gap-2 chatify:px-1"
+      class="chatify-message-row chatify-message-row-outgoing chatify:flex chatify:gap-2 chatify:px-1"
     >
       <button
         type="button"
         class="chatify:text-xs chatify:font-medium chatify:text-chatify-primary"
         @click="emit('resend')"
       >
-        Resend
+        {{ $t('ui.thread.bubble.resend') }}
       </button>
       <button
         type="button"
         class="chatify:text-xs chatify:font-medium chatify:text-chatify-muted"
         @click="emit('cancel')"
       >
-        Cancel
+        {{ $t('ui.thread.bubble.cancel') }}
       </button>
     </div>
   </div>

@@ -1,0 +1,28 @@
+name: Security Report
+description: Report a security vulnerability (read SECURITY.md first)
+title: '[Security]: '
+labels:
+  - security
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Do not post exploit details, credentials, or step-by-step attack instructions in public issues.**
+
+        Please read [SECURITY.md](https://github.com/munafio/chatify/blob/master/SECURITY.md) and report vulnerabilities privately via email or [GitHub Security Advisories](https://github.com/munafio/chatify/security/advisories/new).
+
+  - type: checkboxes
+    id: acknowledgment
+    attributes:
+      label: Acknowledgment
+      options:
+        - label: I understand this form is for awareness only and I will not include sensitive exploit details here
+          required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: High-level summary (no exploit steps)
+      description: Brief description without sensitive details. For full reports, use private channels listed in SECURITY.md.
+    validations:
+      required: true

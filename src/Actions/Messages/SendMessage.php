@@ -47,7 +47,7 @@ final class SendMessage
 
             if ($recipient !== null && ! $this->recipientResolver->canMessage($sender, $recipient)) {
                 throw ValidationException::withMessages([
-                    'recipient' => ['You are not allowed to message this user.'],
+                    'recipient' => [__('chatify::chatify.errors.not_allowed_to_message')],
                 ]);
             }
         }
@@ -61,7 +61,7 @@ final class SendMessage
 
         if (($body === null || trim($body) === '') && $attachmentMeta === null) {
             throw ValidationException::withMessages([
-                'body' => ['A message body or attachment is required.'],
+                'body' => [__('chatify::chatify.errors.body_or_attachment_required')],
             ]);
         }
 
@@ -73,7 +73,7 @@ final class SendMessage
 
             if (! $replyExists) {
                 throw ValidationException::withMessages([
-                    'reply_to_message_id' => ['Reply target message was not found in this conversation.'],
+                    'reply_to_message_id' => [__('chatify::chatify.errors.reply_target_not_found')],
                 ]);
             }
         }
@@ -103,7 +103,7 @@ final class SendMessage
 
         if ($participant === null) {
             throw ValidationException::withMessages([
-                'conversation' => ['You are not a participant in this conversation.'],
+                'conversation' => [__('chatify::chatify.errors.not_participant')],
             ]);
         }
     }

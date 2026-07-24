@@ -26,7 +26,7 @@ class UserResource extends JsonResource
             'type' => 'user',
             'id' => $this->resource->getKey(),
             'attributes' => [
-                'name' => $hideIdentity ? BlockService::HIDDEN_USER_NAME : $this->resource->name,
+                'name' => $hideIdentity ? BlockService::hiddenUserName() : $this->resource->name,
                 'avatar' => $hideIdentity
                     ? $blockService->defaultAvatarUrl()
                     : $this->avatarUrl($settings),

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { useChatifyI18n } from '../../composables/useChatifyI18n'
 
 const emit = defineEmits<{
   'pick-media': []
@@ -7,6 +8,7 @@ const emit = defineEmits<{
   open: []
 }>()
 
+const { t } = useChatifyI18n()
 const open = ref(false)
 const root = ref<HTMLElement | null>(null)
 
@@ -59,7 +61,7 @@ defineExpose({ close, toggle })
       type="button"
       class="chatify-composer-icon-btn"
       :class="open ? 'chatify-composer-icon-btn-active' : ''"
-      aria-label="Attach"
+      :aria-label="t('ui.thread.composer.attach_menu_open')"
       aria-haspopup="menu"
       :aria-expanded="open"
       @click.stop="toggle"
@@ -80,7 +82,7 @@ defineExpose({ close, toggle })
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
         </span>
-        <span>Photos &amp; videos</span>
+        <span>{{ $t('ui.thread.composer.photos_videos') }}</span>
       </button>
       <button type="button" role="menuitem" class="chatify-composer-attach-item" @click="pickDocument">
         <span class="chatify-composer-attach-icon chatify-composer-attach-icon-doc">
@@ -88,7 +90,7 @@ defineExpose({ close, toggle })
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
         </span>
-        <span>Document</span>
+        <span>{{ $t('ui.thread.composer.document') }}</span>
       </button>
     </div>
   </div>

@@ -174,4 +174,15 @@ return [
         'enabled' => env('CHATIFY_SAVED_MESSAGES_ENABLED', true),
         'title' => env('CHATIFY_SAVED_MESSAGES_TITLE', 'Saved Messages'),
     ],
+
+    'rtl_locales' => ['ar', 'he', 'fa', 'ur'],
+
+    'locale' => [
+        'middleware' => env('CHATIFY_LOCALE_MIDDLEWARE', true),
+        'detect_via' => ['header', 'query', 'user', 'app'],
+        'header' => 'Accept-Language',
+        'fallback_header' => 'X-Chatify-Locale',
+        'query_parameter' => 'locale',
+        'user_attribute' => 'locale',
+    ],
 ];
