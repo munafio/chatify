@@ -7,7 +7,7 @@
 <a href="https://packagist.org/packages/munafio/chatify"><img src="https://poser.pugx.org/munafio/chatify/license?style=flat-square" alt="License"></a>
 </p>
 
-> **v2 beta:** Install with `composer require munafio/chatify:2.0.0-beta.1`.
+> **v2 beta:** Install with `composer require munafio/chatify:2.0.0-beta.2`.
 > v1 remains stable on `^1.6`. See [Releases](https://github.com/munafio/chatify/releases) for upgrade notes.
 
 ## Chatify Laravel Package

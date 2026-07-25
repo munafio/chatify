@@ -46,7 +46,7 @@ body:
     id: chatify-version
     attributes:
       label: Chatify version
-      placeholder: e.g. 2.0.0-beta.1, 1.6.3
+      placeholder: e.g. 2.0.0-beta.2, 1.6.3
 
   - type: input
     id: laravel-version

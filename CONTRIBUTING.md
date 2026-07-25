@@ -76,14 +76,14 @@ These settings cannot be committed as files; configure them in the GitHub UI.
 
 ## Release checklist
 
-### Beta release (e.g. `v2.0.0-beta.1`)
+### Beta release (e.g. `v2.0.0-beta.2`)
 
 - [ ] CI green on `v2`
 - [ ] `composer test`, `npm test`, and `npm run build` pass locally
 - [ ] `dist/` committed and matches build
 - [ ] Bump `version` in `composer.json` and `frontend/package.json`
-- [ ] Tag: `git tag -a v2.0.0-beta.1 -m "Chatify v2.0.0-beta.1"`
-- [ ] Push tag: `git push origin v2.0.0-beta.1`
+- [ ] Tag: `git tag -a v2.0.0-beta.2 -m "Chatify v2.0.0-beta.2"`
+- [ ] Push tag: `git push origin v2.0.0-beta.2`
 - [ ] Create GitHub Release (mark as **pre-release**)
 - [ ] Confirm Packagist picked up the tag
 - [ ] Announce on Discord
