@@ -1,60 +1,87 @@
-<p style="text-align:center;width:100%;"><img src="/art/preview.png" alt="Chatify Laravel Package"></p>
-
 <p align="center">
-<a href="https://github.com/munafio/chatify/actions/workflows/tests.yml"><img src="https://github.com/munafio/chatify/actions/workflows/tests.yml/badge.svg" alt="Tests"></a>
-<a href="https://packagist.org/packages/munafio/chatify"><img src="https://poser.pugx.org/munafio/chatify/v/stable?style=flat-square" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/munafio/chatify"><img src="https://poser.pugx.org/munafio/chatify/downloads?style=flat-square" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/munafio/chatify"><img src="https://poser.pugx.org/munafio/chatify/license?style=flat-square" alt="License"></a>
+  <img src="./.github/banner.png" alt="Chatify — Real-time chat for Laravel" width="100%">
 </p>
 
-> **v2 beta:** Install with `composer require munafio/chatify:2.0.0-beta.2`.
-> v1 remains stable on `^1.6`. See [Releases](https://github.com/munafio/chatify/releases) for upgrade notes.
+<p align="center">
+  <a href="https://github.com/munafio/chatify/actions/workflows/tests.yml"><img src="https://img.shields.io/github/actions/workflow/status/munafio/chatify/tests.yml?branch=v2&style=for-the-badge&label=tests" alt="Tests"></a>
+  <a href="https://packagist.org/packages/munafio/chatify"><img src="https://img.shields.io/packagist/v/munafio/chatify?style=for-the-badge&label=version" alt="Latest Version"></a>
+  <a href="https://packagist.org/packages/munafio/chatify"><img src="https://img.shields.io/packagist/dt/munafio/chatify?style=for-the-badge" alt="Total Downloads"></a>
+  <a href="https://packagist.org/packages/munafio/chatify"><img src="https://img.shields.io/packagist/l/munafio/chatify?style=for-the-badge" alt="License"></a>
 
-## Chatify Laravel Package
+</p>
 
-Laravel's #1 one-to-one chatting system package, helps you add a complete real-time chatting system to your new/existing Laravel application with only one command.
+<p align="center">
+  A real-time chat package for Laravel.<br>
+  Direct messages, group conversations, typing indicators, attachments, and more — installable with a single Artisan command.
+</p>
 
-## Need a Help? 📣
+<p align="center">
+  <a href="https://chatifyphp.com/docs"><strong>Documentation</strong></a> &nbsp;&bull;&nbsp;
+  <a href="https://github.com/munafio/chatify-v2-demo"><strong>Demo App</strong></a> &nbsp;&bull;&nbsp;
+  <a href="https://discord.gg/RaxyKVykYJ"><strong>Discord</strong></a> &nbsp;&bull;&nbsp;
+  <a href="https://github.com/munafio/chatify/releases"><strong>Releases</strong></a>
+</p>
 
-I have created a server for **Chatify** on `Discord` to let you **up-to-date** and help you as much as I can .. so now you can chat with me, get a help, showcases, and most importantly to get announcements and updates about **Chatify**.
+---
 
-So, [join now](https://discord.gg/RaxyKVykYJ) and keep updated.
+> **v2 is in beta.** Install with `composer require munafio/chatify:^2.0@beta`.
+> v1 remains stable on `^1.6`. See the [Upgrading Guide](https://chatifyphp.com/docs/upgrading) for details.
 
 ## Features
 
-- One-to-one users chat system.
-- Real-time contact list updates.
-- Favorite users system (Like stories style).
-- Saved Messages to save your messages online like Telegram messenger app.
-- Search functionality.
-- Contact item's last message indicator (e.g. You: ....).
-- Real-time user's active status.
-- Real-time typing indicator.
-- Real-time message seen indicator.
-- Real-time internet connection status.
-- Upload attachments (Photo/File).
-- Send Emoji's.
-- User details panel (Shared photos, delete conversation..).
-- Responsive design with all devices.
-- User settings and chat customization : user's profile photo, dark mode and chat color.
-  with simple and wonderful UI design.
+- **Direct messages** between any two authenticated users
+- **Group conversations** with roles, permissions, and participant management
+- **Saved messages** — Telegram-style self-chat for bookmarks and notes
+- **Real-time** typing indicators, read receipts, and presence (online/offline)
+- **Attachments** — images, documents, audio, video with configurable size limits
+- **Reply, edit, delete, and forward** messages
+- **Voice notes** recording and playback
+- **Favorites** and **blocking** system
+- **Message search** within conversations
+- **Giphy stickers** and **link previews**
+- **Themes, fonts, colors, and wallpaper** — all user-configurable
+- **Localization** with RTL support (English and Arabic included)
+- **Bundled messenger UI** (Vue 3 + Pinia + Tailwind CSS) served at `/chatify`
+- **Headless JSON API** for custom frontends (SPA, mobile, etc.)
+- **Gravatar** integration for default avatars
 
-...and much more you have to discover it yourself.
+...and much more!
+
+## Requirements
+
+| Dependency | Version |
+| --- | --- |
+| PHP | 8.2+ |
+| Laravel | 11+|
+| Broadcasting | Pusher, Laravel Reverb, or compatible WebSocket server |
+
+## Documentation
+
+Full documentation is available at **[chatifyphp.com/docs](https://chatifyphp.com/docs)** — covering installation, configuration, groups, API reference, broadcasting setup, customization, and more.
 
 ## Demo
 
-- Demo app - [Click Here](https://github.com/munafio/chatify-demo).
-<!-- - Demo video on YouTube - [Click Here](https://youtu.be/gjo74FUJJPI) -->
+| Resource | Link |
+| --- | --- |
+| Demo application | [munafio/chatify-v2-demo](https://github.com/munafio/chatify-v2-demo) |
+| Video walkthrough | [YouTube](https://www.youtube.com/watch?v=eOeYFa0zkj0) |
 
-## Official Documentation
+## Community
 
-The official documentation can be found [here](https://chatify.munafio.com)
+Join the [Discord server](https://discord.gg/RaxyKVykYJ) for help, announcements, showcases, and discussion.
 
-## Releases
+## Contributing
 
-See [GitHub Releases](https://github.com/munafio/chatify/releases) for version history and upgrade notes.
+Contributions are welcome. Please see the [contributing guide](CONTRIBUTING.md) for details.
+
+## Security
+
+If you discover a security vulnerability, please report it via the [GitHub Security Policy](https://github.com/munafio/chatify/security). Do not open a public issue.
+
+## License
+
+Chatify is open-source software licensed under the [MIT License](LICENSE).
 
 ## Author
 
-- [Munaf A. Mahdi](https://www.munafio.com)
-
+[Munaf A. Mahdi](https://www.munafio.com)
