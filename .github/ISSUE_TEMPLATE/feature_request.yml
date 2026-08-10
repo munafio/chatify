@@ -7,7 +7,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for suggesting an improvement. For questions, see [Discord](https://discord.gg/RaxyKVykYJ) or the [docs](https://chatify.munafio.com).
+        Thanks for suggesting an improvement. Please check the [documentation](https://www.chatifyphp.com/docs) and [existing issues](https://github.com/munafio/chatify/issues) first.
 
   - type: textarea
     id: problem

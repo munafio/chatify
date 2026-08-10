@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/munafio/chatify/actions/workflows/tests.yml"><img src="https://img.shields.io/github/actions/workflow/status/munafio/chatify/tests.yml?branch=v2&style=for-the-badge&label=tests" alt="Tests"></a>
+  <a href="https://github.com/munafio/chatify/actions/workflows/tests.yml"><img src="https://img.shields.io/github/actions/workflow/status/munafio/chatify/tests.yml?branch=main&style=for-the-badge&label=tests" alt="Tests"></a>
   <a href="https://packagist.org/packages/munafio/chatify"><img src="https://img.shields.io/packagist/v/munafio/chatify?style=for-the-badge&label=version" alt="Latest Version"></a>
   <a href="https://packagist.org/packages/munafio/chatify"><img src="https://img.shields.io/packagist/dt/munafio/chatify?style=for-the-badge" alt="Total Downloads"></a>
   <a href="https://packagist.org/packages/munafio/chatify"><img src="https://img.shields.io/packagist/l/munafio/chatify?style=for-the-badge" alt="License"></a>

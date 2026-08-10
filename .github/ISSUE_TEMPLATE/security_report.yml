@@ -9,7 +9,7 @@ body:
       value: |
         **Do not post exploit details, credentials, or step-by-step attack instructions in public issues.**
 
-        Please read [SECURITY.md](https://github.com/munafio/chatify/blob/master/SECURITY.md) and report vulnerabilities privately via email or [GitHub Security Advisories](https://github.com/munafio/chatify/security/advisories/new).
+        Please read [SECURITY.md](https://github.com/munafio/chatify/blob/main/SECURITY.md) and report vulnerabilities privately via email or [GitHub Security Advisories](https://github.com/munafio/chatify/security/advisories/new).
 
   - type: checkboxes
     id: acknowledgment

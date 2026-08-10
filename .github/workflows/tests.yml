@@ -3,14 +3,10 @@ name: Tests
 on:
   push:
     branches:
-      - master
-      - v2
-      - 'v2.*'
+      - main
   pull_request:
     branches:
-      - master
-      - v2
-      - 'v2.*'
+      - main
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
