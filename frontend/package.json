@@ -13,7 +13,7 @@
     "axios": "^1.7.9",
     "laravel-echo": "^1.17.1",
     "pinia": "^2.3.0",
-    "pusher-js": "^8.4.0",
+    "pusher-js": "^8.6.0",
     "vue": "^3.5.13",
     "vue-draggable-plus": "^0.6.1",
     "vue-i18n": "^9.14.5"
