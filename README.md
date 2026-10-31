@@ -24,9 +24,6 @@
 
 ---
 
-> **v2 is in beta.** Install with `composer require munafio/chatify:^2.0@beta`.
-> v1 remains stable on `^1.6`. See the [Upgrading Guide](https://chatifyphp.com/docs/upgrading) for details.
-
 ## Features
 
 - **Direct messages** between any two authenticated users

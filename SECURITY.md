@@ -4,7 +4,7 @@
 
 | Version | Supported |
 | ------- | --------- |
-| 2.x (beta) | Yes — security fixes during beta when feasible |
+| 2.x | Yes |
 | 1.6.x | Yes — maintenance line until v2 stable |
 | 1.5.x and older | No |
 

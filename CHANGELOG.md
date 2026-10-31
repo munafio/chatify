@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## v2.0.0 (2026-11-01)
+
+Stable release of Chatify v2.
+
+- Direct messages, groups, saved messages, bundled UI, headless API.
+- Not a drop-in upgrade from v1 — see https://www.chatifyphp.com/docs/upgrading
+
 ## v2.0.0-beta.2 (2026-8-8)
 
 ### Changed
