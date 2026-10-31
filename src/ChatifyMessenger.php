@@ -100,27 +100,32 @@ class ChatifyMessenger
      */
     public function pusherAuth($requestUser, $authUser, $channelName, $socket_id)
     {
-        // Auth data
+        if (! Auth::check()) {
+            return response()->json(['message' => 'Not authenticated'], 403);
+        }
+
+        if ($requestUser->id != $authUser->id) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
         $authData = json_encode([
             'user_id' => $authUser->id,
             'user_info' => [
-                'name' => $authUser->name
-            ]
+                'name' => $authUser->name,
+            ],
         ]);
-        // check if user authenticated
-        if (Auth::check()) {
-            if($requestUser->id == $authUser->id){
-                return $this->pusher->socket_auth(
-                    $channelName,
-                    $socket_id,
-                    $authData
-                );
-            }
-            // if not authorized
-            return response()->json(['message'=>'Unauthorized'], 401);
+
+        $ownPrivateChannel = 'private-chatify.'.$authUser->id;
+
+        if ($channelName === $ownPrivateChannel) {
+            return $this->pusher->socket_auth($channelName, $socket_id, $authData);
         }
-        // if not authenticated
-        return response()->json(['message'=>'Not authenticated'], 403);
+
+        if ($channelName === 'presence-activeStatus') {
+            return $this->pusher->socket_auth($channelName, $socket_id, $authData);
+        }
+
+        return response()->json(['message' => 'Unauthorized'], 403);
     }
 
     /**

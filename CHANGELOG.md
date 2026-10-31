@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.6.4 (2026-11-01)
+
+### Security
+
+- Fix Pusher private channel authorization bypass: only sign the authenticated user's `private-chatify.{id}` inbox channel and the `presence-activeStatus` channel; reject all other channel names.
+
 ## v1.6.3 (2024-03-17)
 
 ### Added
