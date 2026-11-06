@@ -16,7 +16,7 @@
     "pusher-js": "^8.4.0",
     "vue": "^3.5.13",
     "vue-draggable-plus": "^0.6.1",
-    "vue-i18n": "^9.14.5"
+    "vue-i18n": "^11.4.17"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.0.0",
